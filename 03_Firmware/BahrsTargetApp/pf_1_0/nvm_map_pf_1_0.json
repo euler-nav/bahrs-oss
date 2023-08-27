@@ -1,0 +1,198 @@
+{
+	"version": { "major": 1, "minor": 1 },
+	"memory_size": 8000,
+	"class_name": "CNvmDriver",
+	"full_nvm_struct_name": "SNvmData",
+	"struct_alignment": 4,
+	"inclusion_guard": "C_NVM_DRIVER_H",
+	"supported_types": ["char", "int32_t", "uint32_t", "int64_t", "uint64_t", "float", "double"],
+	"blocks": [
+		{
+			"name": "NmvFormatVersion",
+			"fields": [
+				{
+					"name": "Major",
+					"type": "uint32_t",
+					"length": 1
+				},
+				{
+					"name": "Minor",
+					"type": "uint32_t",
+					"length": 1
+				},
+				{
+					"name": "Crc",
+					"type": "uint32_t",
+					"length": 1
+				}
+			]
+		},
+		{
+			"name": "EulerAnglesDeviceToVehicle",
+			"fields": [
+				{
+					"name": "Roll",
+					"type": "float",
+					"length": 1,
+					"defaultValue": 0.0
+				},
+				{
+					"name": "Pitch",
+					"type": "float",
+					"length": 1,
+					"defaultValue": 0.0
+				},
+				{
+					"name": "Yaw",
+					"type": "float",
+					"length": 1,
+					"defaultValue": 0.0
+				},
+				{
+					"name": "Crc",
+					"type": "uint32_t",
+					"length": 1
+				}
+			]
+		},
+		{
+			"name": "MagnetometerCalibrationParameters",
+			"fields": [
+				{
+					"name": "HardIronOffset",
+					"type": "float",
+					"length": 3,
+					"defaultValue": [0.0, 0.0, 0.0] 
+				},
+				{
+					"name": "SoftIronDistortion",
+					"type": "float",
+					"length": 9,
+					"defaultValue": [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0] 
+				},
+				{
+					"name": "Crc",
+					"type": "uint32_t",
+					"length": 1
+				}
+			]
+		},
+		{
+			"name": "Assertions",
+			"fields": [
+				{
+					"name": "PositionInStream",
+					"type": "uint32_t",
+					"length": 1,
+					"defaultValue": 0
+				},
+				{
+					"name": "ByteStream",
+					"type": "char",
+					"length": 512,
+					"defaultValue": 0
+				}
+			]
+		},
+		{
+			"name": "CanConfigurationParameters",
+			"fields": [
+				{
+					"name": "NodeID",
+					"type": "uint32_t",
+					"length": 1,
+					"defaultValue": 45
+				},
+				{
+					"name": "RedundantChannelID",
+					"type": "uint32_t",
+					"length": 1,
+					"defaultValue": 0
+				},
+				{
+					"name": "ServiceChannelID",
+					"type": "uint32_t",
+					"length": 1,
+					"defaultValue": 8
+				},
+				{
+					"name": "UpdateRateFrame300",
+					"type": "uint32_t",
+					"length": 1,
+					"defaultValue": 80
+				},
+				{
+					"name": "UpdateRateFrame301",
+					"type": "uint32_t",
+					"length": 1,
+					"defaultValue": 80
+				},
+				{
+					"name": "UpdateRateFrame302",
+					"type": "uint32_t",
+					"length": 1,
+					"defaultValue": 80
+				},
+				{
+					"name": "UpdateRateFrame303",
+					"type": "uint32_t",
+					"length": 1,
+					"defaultValue": 80
+				},
+				{
+					"name": "UpdateRateFrame304",
+					"type": "uint32_t",
+					"length": 1,
+					"defaultValue": 80
+				},
+				{
+					"name": "UpdateRateFrame305",
+					"type": "uint32_t",
+					"length": 1,
+					"defaultValue": 80
+				},
+				{
+					"name": "UpdateRateFrame311",
+					"type": "uint32_t",
+					"length": 1,
+					"defaultValue": 80
+				},
+				{
+					"name": "UpdateRateFrame312",
+					"type": "uint32_t",
+					"length": 1,
+					"defaultValue": 80
+				},
+				{
+					"name": "UpdateRateFrame314",
+					"type": "uint32_t",
+					"length": 1,
+					"defaultValue": 80
+				},
+				{
+					"name": "UpdateRateFrame1069",
+					"type": "uint32_t",
+					"length": 1,
+					"defaultValue": 80
+				},
+				{
+					"name": "UpdateRateFrame322",
+					"type": "uint32_t",
+					"length": 1,
+					"defaultValue": 80
+				},
+				{
+					"name": "UpdateRateFrame326",
+					"type": "uint32_t",
+					"length": 1,
+					"defaultValue": 10
+				},
+				{
+					"name": "Crc",
+					"type": "uint32_t",
+					"length": 1
+				}
+			]
+		}
+	]
+}

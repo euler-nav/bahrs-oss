@@ -1,0 +1,6 @@
+[submodule "99_3rd_party/open-aided-navigation"]
+	path = 99_3rd_party/open-aided-navigation
+	url = https://bitbucket.org/oan/open-aided-navigation.git
+[submodule "99_3rd_party/TinyMAT"]
+	path = 99_3rd_party/TinyMAT
+	url = https://github.com/jkriege2/TinyMAT.git
