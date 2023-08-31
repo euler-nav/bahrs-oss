@@ -46,9 +46,9 @@ Reprogramming procedure:
 
 ## Debug connector schematics
 
-Debug interface: SWD.
+Debug interface: SWD, UART.
 
-Connector part number: BC075-08-A-L-A.
+Connector part number: [BC075-08-A-L-A](https://gct.co/connector/bc075).
 
 Pin assignment:
 
@@ -57,8 +57,8 @@ Pin assignment:
 3. SWCLK
 4. +3.3V
 5. SWO
-6. UART TX
-7. UART RX
+6. UART TX (output)
+7. UART RX (input)
 8. NRST
 
 ![](img/Debug_connector.png)
