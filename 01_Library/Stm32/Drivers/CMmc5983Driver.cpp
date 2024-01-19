@@ -34,9 +34,9 @@ void CMmc5983Driver::Init()
 
   if (true == IsInitialized())
   {
-    setBitSet();
     setFilterBandwidth(EBandwidth::e100Hz);
     setContinuousModeFrequency(EMeasurementMode::e10Hz);
+    setAutoSetReset();
   }
 }
 
