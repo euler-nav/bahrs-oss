@@ -13,7 +13,7 @@ This is a pre-built standard BAHRS software that samples are supplied with start
 
 1. Implemented safe IMU signal chain. The firmware outputs IMU measurements if and only if signals of all redundant IMUs agree, OR if a faulty sensor was successfully isolated.
 2. Improved configuration of the primary magnetometer chip. The change results into mitigation of turn-on drift of magnetic heading.
-3. Minor output protocol update: added the "Software version" message 0x07 that is sent once after turn-on.
+3. Minor output protocol update: added the "Software version" message 0x0F that is sent once after turn-on.
 
 ## Known issues
 
