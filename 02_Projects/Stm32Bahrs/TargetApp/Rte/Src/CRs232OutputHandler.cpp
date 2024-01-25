@@ -38,10 +38,10 @@ void CRs232OutputHandler::QueueTransmissionRequest(CSerialProtocol::EMessageIds 
 void CRs232OutputHandler::SendInertialDataMessage()
 {
   CRte& orRte = CRte::GetInstance();
-  SImuDataScha63T oImuData;
+  SOutputImuData oImuData;
   CSerialProtocol::SInertialDataMessage oMessage;
 
-  bool bPortReadStatus = orRte.oScha63TDriverPort_.Read(oImuData);
+  bool bPortReadStatus = orRte.oPortImuOutput_.Read(oImuData);
 
   if (true == bPortReadStatus)
   {
@@ -53,10 +53,10 @@ void CRs232OutputHandler::SendInertialDataMessage()
 void CRs232OutputHandler::SendTimeOfInertialDataMessage()
 {
   CRte& orRte = CRte::GetInstance();
-  SImuDataScha63T oImuData;
+  SOutputImuData oImuData;
   CSerialProtocol::STimeOfInertialDataMessage oMessage;
 
-  bool bPortReadStatus = orRte.oScha63TDriverPort_.Read(oImuData);
+  bool bPortReadStatus = orRte.oPortImuOutput_.Read(oImuData);
 
   if (true == bPortReadStatus)
   {
@@ -117,6 +117,12 @@ void CRs232OutputHandler::SendTimeOfLatestSyncPulseMessage()
     CSerialProtocol::STimeOfLatestSyncPulseMessage oMessage = oProtocol_.BuildTimeOfLatestSyncPulseMessage(uTimestampUs);
     transmitMessage(reinterpret_cast<uint8_t*>(&oMessage), sizeof(oMessage));
   }
+}
+
+void CRs232OutputHandler::SendSoftwareVersionMessage()
+{
+  CSerialProtocol::SSoftwareVersionMessage oMessage = oProtocol_.BuildSoftwareVersionMessage();
+  transmitMessage(reinterpret_cast<uint8_t*>(&oMessage), sizeof(oMessage));
 }
 
 void CRs232OutputHandler::transmitMessage(uint8_t* upData, uint16_t uSize)

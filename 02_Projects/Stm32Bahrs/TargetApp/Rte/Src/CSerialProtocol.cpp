@@ -10,26 +10,30 @@
 #include <cstring>
 #include "UintToBool.h"
 #include "NavigationUtilities.h"
+#include "CSoftwareVersion.h"
 
-CSerialProtocol::SInertialDataMessage CSerialProtocol::BuildInertialDataMessage(const SImuDataScha63T& korImuData)
+CSerialProtocol::SInertialDataMessage CSerialProtocol::BuildInertialDataMessage(const SOutputImuData& korImuData)
 {
   SInertialDataMessage oMessage;
 
   oMessage.oInertialData_.uSequenceCounter_ = uInertialDataSequenceCounter_;
 
-  if (true == UintToBool(korImuData.uValid_))
+  if (true == UintToBool(korImuData.uSpecificForceValid_))
   {
     float fTmp = 1.0F / skfSpecificForceScale_;
     oMessage.oInertialData_.iSpecificForceX_ = static_cast<int16_t>(korImuData.fSpecificForceX_ * fTmp);
     oMessage.oInertialData_.iSpecificForceY_ = static_cast<int16_t>(korImuData.fSpecificForceY_ * fTmp);
     oMessage.oInertialData_.iSpecificForceZ_ = static_cast<int16_t>(korImuData.fSpecificForceZ_ * fTmp);
+    oMessage.oInertialData_.uValidity_ |= 0x07; // 0000 0111
+  }
 
-    fTmp = 1.0F / skfAngularRateScale_;
+  if (true == UintToBool(korImuData.uAngularRateValid_))
+  {
+    float fTmp = 1.0F / skfAngularRateScale_;
     oMessage.oInertialData_.iAngularRateX_ = static_cast<int16_t>(korImuData.fAngularRateX_ * fTmp);
     oMessage.oInertialData_.iAngularRateY_ = static_cast<int16_t>(korImuData.fAngularRateY_ * fTmp);
     oMessage.oInertialData_.iAngularRateZ_ = static_cast<int16_t>(korImuData.fAngularRateZ_ * fTmp);
-
-    oMessage.oInertialData_.uValidity_ = 0x3F; // Set all the signals valid (0011 1111)
+    oMessage.oInertialData_.uValidity_ |= 0x38; // 0011 1000
   }
 
   memset(oMessage.auPadding_, 0, sizeof(oMessage.auPadding_));
@@ -41,13 +45,13 @@ CSerialProtocol::SInertialDataMessage CSerialProtocol::BuildInertialDataMessage(
   return oMessage;
 }
 
-CSerialProtocol::STimeOfInertialDataMessage CSerialProtocol::BuildTimeOfInertialDataMessage(const SImuDataScha63T& korImuData)
+CSerialProtocol::STimeOfInertialDataMessage CSerialProtocol::BuildTimeOfInertialDataMessage(const SOutputImuData& korImuData)
 {
   STimeOfInertialDataMessage oMessage;
 
   oMessage.oTimeOfInertialData_.uSequenceCounter_ = uTimeOfInertialDataSequenceCounter_;
 
-  if (true == UintToBool(korImuData.uValid_))
+  if ((true == UintToBool(korImuData.uSpecificForceValid_)) || (true == UintToBool(korImuData.uAngularRateValid_)))
   {
     oMessage.oTimeOfInertialData_.uTimestampUs_ = korImuData.uTimestampUs_;
     oMessage.oTimeOfInertialData_.uInertialDataSequenceCounter_ = uInertialDataSequenceCounter_;
@@ -173,6 +177,24 @@ CSerialProtocol::STimeOfLatestSyncPulseMessage CSerialProtocol::BuildTimeOfLates
   oMessage.uCrc_ = CalculateCrc(reinterpret_cast<uint32_t*>(&oMessage), (sizeof(oMessage) / PROTOCOL_WORD_LEN) - 1);
 
   ++uTimeOfLatestPulseSequenceCounter_;
+
+  return oMessage;
+}
+
+CSerialProtocol::SSoftwareVersionMessage CSerialProtocol::BuildSoftwareVersionMessage()
+{
+  SSoftwareVersionMessage oMessage;
+
+  static_assert(sizeof(CSoftwareVersion::skacProjectCode_) == sizeof(oMessage.oSoftwareVersion_.acProjectCode_));
+
+  oMessage.oSoftwareVersion_.uMajor_ = CSoftwareVersion::skuMajor_;
+  oMessage.oSoftwareVersion_.uMinor_ = CSoftwareVersion::skuMinor_;
+  oMessage.oSoftwareVersion_.acProjectCode_[0] = CSoftwareVersion::skacProjectCode_[0];
+  oMessage.oSoftwareVersion_.acProjectCode_[1] = CSoftwareVersion::skacProjectCode_[1];
+  oMessage.oSoftwareVersion_.acProjectCode_[2] = CSoftwareVersion::skacProjectCode_[2];
+
+  memset(oMessage.auPadding_, 0, sizeof(oMessage.auPadding_));
+  oMessage.uCrc_ = CalculateCrc(reinterpret_cast<uint32_t*>(&oMessage), (sizeof(oMessage) / PROTOCOL_WORD_LEN) - 1);
 
   return oMessage;
 }

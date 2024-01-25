@@ -105,6 +105,18 @@ public:
    * */
   void PollInertialSensor();
 
+  /**
+   * @brief Request IMU data in DMA mode.
+   * When reception is completed, received bytes can be processed in the interrupt handler.
+   * \return Status of the DMA request, true -- OK, false otherwise.
+   */
+  bool RequestInertialSensorDataDma();
+
+  /**
+   * @brief Parses IMU data received in DMA mode.
+   */
+  void ParseReceivedImuDataDma();
+
 private:
   CIcm20789Driver() = delete;
 
@@ -190,6 +202,7 @@ private:
                                                         ((3.141592F / 180.0F) * static_cast<float>(250 * (1 << static_cast<int>(skeGyroDynamicRange_))))};
 
   SCalibParam oCalibParam_;
+  uint8_t auImuDataBuffer_[14];
 
   bool bIsInitialized_ { false };  ///< Sensor status after initialization
   const EIcmIds keSensorId_; ///< ID of the sensor corresponding to the driver instance.

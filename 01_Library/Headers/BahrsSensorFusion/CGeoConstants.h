@@ -1,3 +1,10 @@
+/**
+* @file CGeoConstants.h
+* @brief Declaration of the geodetic constants.
+* @author Fedor Baklanov
+* @date 6 December 2023
+* @copyright Copyright 2023. AMS Advanced Air Mobility Sensors UG. All rights reserved.
+*/
 #ifndef C_GEO_CONSTANTS_H
 #define C_GEO_CONSTANTS_H
 

@@ -3,6 +3,7 @@
 * @brief Different functions related to navigational mathematics.
 * @author Fedor Baklanov
 * @date 11 Apr 2022
+* @copyright Copyright 2023. AMS Advanced Air Mobility Sensors UG. All rights reserved.
 */
 #ifndef NAVIGATION_UTILITIES_H
 #define NAVIGATION_UTILITIES_H

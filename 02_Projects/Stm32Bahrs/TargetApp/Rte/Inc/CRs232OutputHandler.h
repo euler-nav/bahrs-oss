@@ -58,6 +58,11 @@ public:
   */
   void SendTimeOfLatestSyncPulseMessage();
 
+  /**
+   * @brief Compose and send the software version message.
+  */
+  void SendSoftwareVersionMessage();
+
 protected:
 
 private:

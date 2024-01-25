@@ -1,3 +1,10 @@
+/**
+* @file BahrsFilterApi.h
+* @brief Declaration of the BAHRS filter API.
+* @author Fedor Baklanov
+* @date 6 December 2023
+* @copyright Copyright 2023. AMS Advanced Air Mobility Sensors UG. All rights reserved.
+*/
 #ifndef BAHRS_FILTER_API_H
 #define BAHRS_FILTER_API_H
 

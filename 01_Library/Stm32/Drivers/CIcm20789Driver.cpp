@@ -250,6 +250,103 @@ void CIcm20789Driver::PollInertialSensor()
   }
 }
 
+bool CIcm20789Driver::RequestInertialSensorDataDma()
+{
+  uint8_t uReg = ICM20789_IMU_REG_ACCEL_XOUT_H;
+
+  // Transmit the desired read address, NOT in DMA mode
+  bool bStatus = i2cWrite(ICM20789_ADDRESS_IMU, &uReg, 1);
+
+  // Receive bytes in DMA mode
+  if (true == bStatus)
+  {
+    HAL_StatusTypeDef eHalStatus = HAL_I2C_Master_Receive_DMA(opkI2CHandle_, ICM20789_ADDRESS_IMU << 1, auImuDataBuffer_, 14);
+    bStatus = (eHalStatus == HAL_OK);
+  }
+
+  return bStatus;
+}
+
+void CIcm20789Driver::ParseReceivedImuDataDma()
+{
+  SImuMeasurement oOutput;
+
+  if (true == IsInitialized())
+  {
+    int16_t iAccelX{0}, iAccelY{0}, iAccelZ{0};
+    int16_t iGyroX{0}, iGyroY{0}, iGyroZ{0};
+    int16_t iTemp{0};
+
+    oOutput.uTimestampUs_ = GetMicroseconds();
+
+    iAccelX = (auImuDataBuffer_[0] << 8) | auImuDataBuffer_[1];
+    iAccelY = (auImuDataBuffer_[2] << 8) | auImuDataBuffer_[3];
+    iAccelZ = (auImuDataBuffer_[4] << 8) | auImuDataBuffer_[5];
+
+    iTemp = (auImuDataBuffer_[6] << 8) | auImuDataBuffer_[7];
+
+    iGyroX = (auImuDataBuffer_[8] << 8) | auImuDataBuffer_[9];
+    iGyroY = (auImuDataBuffer_[10] << 8) | auImuDataBuffer_[11];
+    iGyroZ = (auImuDataBuffer_[12] << 8) | auImuDataBuffer_[13];
+
+    oOutput.fTemperature_ = (((static_cast<float>(iTemp)) - skfTempOffset_) / skfTempScale_) + skfTempOffset_;
+    oOutput.fSpecificForceX_ = -skfAccelRawToMetersPerSecondSquared_ * static_cast<float>(iAccelX);
+    oOutput.fSpecificForceY_ = skfAccelRawToMetersPerSecondSquared_ * static_cast<float>(iAccelY);
+    oOutput.fSpecificForceZ_ = -skfAccelRawToMetersPerSecondSquared_ * static_cast<float>(iAccelZ);
+
+    oOutput.fAngularRateX_ = -skfGyroRawToRadiansPerSecond_ * static_cast<float>(iGyroX);
+    oOutput.fAngularRateY_ = skfGyroRawToRadiansPerSecond_ * static_cast<float>(iGyroY);
+    oOutput.fAngularRateZ_ = -skfGyroRawToRadiansPerSecond_ * static_cast<float>(iGyroZ);
+
+    oOutput.uValid_ = BoolToUint(true);
+  }
+  else
+  {
+    oOutput.uValid_ = BoolToUint(false);
+  }
+
+  if (EIcmIds::eIcm1 == keSensorId_)
+  {
+    CRte::GetInstance().oPortIcm20789ImuInput1_.Write(oOutput);
+  }
+  else if (EIcmIds::eIcm2 == keSensorId_)
+  {
+    CRte::GetInstance().oPortIcm20789ImuInput2_.Write(oOutput);
+  }
+  else
+  {
+    // do nothing
+  }
+}
+
+extern "C" int Icm20789ImuDataDmaRequest(unsigned uInstanceIndex)
+{
+  bool bStatus = false;
+
+  if (uInstanceIndex > 1)
+  {
+    assert(false);
+  }
+  else
+  {
+    bStatus = CIcm20789Driver::GetInstance(uInstanceIndex).RequestInertialSensorDataDma();
+  }
+
+  return (bStatus ? 0 : 1);
+}
+
+extern "C" void Icm20789ParseImuDataDma(unsigned uInstanceIndex)
+{
+  if (uInstanceIndex > 1)
+  {
+    assert(false);
+  }
+  else
+  {
+    CIcm20789Driver::GetInstance(uInstanceIndex).ParseReceivedImuDataDma();
+  }
+}
+
 bool CIcm20789Driver::getChipIDBaro(uint8_t& urId)
 {
   bool bStatus;

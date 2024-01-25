@@ -3,6 +3,7 @@
 * @brief Definitions of different mathematical constants.
 * @author Fedor Baklanov
 * @date 29 Dec 2022
+* @copyright Copyright 2023. AMS Advanced Air Mobility Sensors UG. All rights reserved.
 */
 #ifndef C_MATH_CONSTANTS
 #define C_MATH_CONSTANTS

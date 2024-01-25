@@ -19,6 +19,12 @@ extern "C" void TaskRoutine5ms()
 {
   static uint32_t suCounter = 0U;
 
+  // Send the software version message one time.
+  if (0U == suCounter)
+  {
+    CRs232OutputHandler::GetInstance().QueueTransmissionRequest(CSerialProtocol::EMessageIds::eSoftwareVersion);
+  }
+
   // Poll the BMP384 data at 25 Hz
   if (0U == (suCounter % 8U))
   {
@@ -27,6 +33,7 @@ extern "C" void TaskRoutine5ms()
   }
 
   CScha63TDriver::GetInstance().ConvertRawDataset();
+  CImuMonitorSwc::GetInstance().Run();
   CBahrsFilterSwc::GetInstance().SetImuInput();
 
   // Do the following task at 10Hz
@@ -36,6 +43,8 @@ extern "C" void TaskRoutine5ms()
     CBmm150Driver::GetInstance(0).Bmm150ReadMagData();
     CBmm150Driver::GetInstance(1).Bmm150ReadMagData();
   }
+
+  COutputTransformer::GetInstance().TransformImuSignals();
 
   // Request to send inertial data message
   CRs232OutputHandler::GetInstance().QueueTransmissionRequest(CSerialProtocol::EMessageIds::eInertialData);
@@ -92,6 +101,9 @@ extern "C" void TaskRoutineRs232Sender(uint8_t uMessageId)
     case CSerialProtocol::EMessageIds::eTimeOfSyncPulse:
       CRs232OutputHandler::GetInstance().SendTimeOfLatestSyncPulseMessage();
       break;
+    case CSerialProtocol::EMessageIds::eSoftwareVersion:
+      CRs232OutputHandler::GetInstance().SendSoftwareVersionMessage();
+      break;
     default:
       break;
   }
@@ -138,6 +150,12 @@ extern "C" void InitializeSensors()
   {
     CIcm20789Driver::GetInstance(1).Init();
     bStatus = CIcm20789Driver::GetInstance(1).IsInitialized();
+  }
+
+  if (true == bStatus)
+  {
+    COutputTransformer::GetInstance().Init();
+    bStatus = COutputTransformer::GetInstance().IsInitialized();
   }
 
   if (false == bStatus)

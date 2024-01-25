@@ -28,6 +28,7 @@
 
 #include "RteWrapper.h"
 #include "TaskRoutines.h"
+#include "Icm20789DriverCApi.h"
 
 /* USER CODE END Includes */
 
@@ -106,6 +107,30 @@ const osThreadAttr_t TaskProcessSync_attributes = {
   .stack_size = sizeof(TaskProcessSyncBuffer),
   .priority = (osPriority_t) osPriorityHigh1,
 };
+/* Definitions for TaskPollIcm1 */
+osThreadId_t TaskPollIcm1Handle;
+uint32_t TaskPollIcmBuffer1[ 128 ];
+osStaticThreadDef_t TaskPollIcmControlBlock1;
+const osThreadAttr_t TaskPollIcm1_attributes = {
+  .name = "TaskPollIcm1",
+  .cb_mem = &TaskPollIcmControlBlock1,
+  .cb_size = sizeof(TaskPollIcmControlBlock1),
+  .stack_mem = &TaskPollIcmBuffer1[0],
+  .stack_size = sizeof(TaskPollIcmBuffer1),
+  .priority = (osPriority_t) osPriorityHigh,
+};
+/* Definitions for TaskPollIcm2 */
+osThreadId_t TaskPollIcm2Handle;
+uint32_t TaskPollIcmBuffer2[ 128 ];
+osStaticThreadDef_t TaskPollIcmControlBlock2;
+const osThreadAttr_t TaskPollIcm2_attributes = {
+  .name = "TaskPollIcm2",
+  .cb_mem = &TaskPollIcmControlBlock2,
+  .cb_size = sizeof(TaskPollIcmControlBlock2),
+  .stack_mem = &TaskPollIcmBuffer2[0],
+  .stack_size = sizeof(TaskPollIcmBuffer2),
+  .priority = (osPriority_t) osPriorityHigh,
+};
 /* Definitions for QueueTaskRs232Sender */
 osMessageQueueId_t QueueTaskRs232SenderHandle;
 uint8_t QueueTaskRs232SenderBuffer[ 8 * sizeof( uint8_t ) ];
@@ -152,6 +177,38 @@ const osSemaphoreAttr_t SemaphoreTask10ms_attributes = {
   .cb_mem = &SemaphoreTask10msControlBlock,
   .cb_size = sizeof(SemaphoreTask10msControlBlock),
 };
+/* Definitions for SemaphoreTdk1 */
+osSemaphoreId_t SemaphoreTdk1Handle;
+osStaticSemaphoreDef_t SemaphoreTdk1ControlBlock;
+const osSemaphoreAttr_t SemaphoreTdk1_attributes = {
+  .name = "SemaphoreTdk1",
+  .cb_mem = &SemaphoreTdk1ControlBlock,
+  .cb_size = sizeof(SemaphoreTdk1ControlBlock),
+};
+/* Definitions for SemaphoreTdk2 */
+osSemaphoreId_t SemaphoreTdk2Handle;
+osStaticSemaphoreDef_t SemaphoreTdk2ControlBlock;
+const osSemaphoreAttr_t SemaphoreTdk2_attributes = {
+  .name = "SemaphoreTdk2",
+  .cb_mem = &SemaphoreTdk2ControlBlock,
+  .cb_size = sizeof(SemaphoreTdk2ControlBlock),
+};
+/* Definitions for SemDataReceivedTdk1 */
+osSemaphoreId_t SemDataReceivedTdk1Handle;
+osStaticSemaphoreDef_t SemDataReceivedTdk1ControlBlock;
+const osSemaphoreAttr_t SemDataReceivedTdk1_attributes = {
+  .name = "SemDataReceivedTdk1",
+  .cb_mem = &SemDataReceivedTdk1ControlBlock,
+  .cb_size = sizeof(SemDataReceivedTdk1ControlBlock),
+};
+/* Definitions for SemDataReceivedTdk2 */
+osSemaphoreId_t SemDataReceivedTdk2Handle;
+osStaticSemaphoreDef_t SemDataReceivedTdk2ControlBlock;
+const osSemaphoreAttr_t SemDataReceivedTdk2_attributes = {
+  .name = "SemDataReceivedTdk2",
+  .cb_mem = &SemDataReceivedTdk2ControlBlock,
+  .cb_size = sizeof(SemDataReceivedTdk2ControlBlock),
+};
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -162,6 +219,8 @@ void StartTask5ms(void *argument);
 void StartTask10ms(void *argument);
 void StartTaskRs232Sender(void *argument);
 void StartTaskProcessSyncPulse(void *argument);
+void StartTaskPollIcm1(void *argument);
+void StartTaskPollIcm2(void *argument);
 void TimerCyclicTaskTriggerCallback(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
@@ -186,6 +245,18 @@ void MX_FREERTOS_Init(void) {
 
   /* creation of SemaphoreTask10ms */
   SemaphoreTask10msHandle = osSemaphoreNew(1, 0, &SemaphoreTask10ms_attributes);
+
+  /* creation of SemaphoreTdk1 */
+  SemaphoreTdk1Handle = osSemaphoreNew(1, 0, &SemaphoreTdk1_attributes);
+
+  /* creation of SemaphoreTdk2 */
+  SemaphoreTdk2Handle = osSemaphoreNew(1, 0, &SemaphoreTdk2_attributes);
+
+  /* creation of SemDataReceivedTdk1 */
+  SemDataReceivedTdk1Handle = osSemaphoreNew(1, 0, &SemDataReceivedTdk1_attributes);
+
+  /* creation of SemDataReceivedTdk2 */
+  SemDataReceivedTdk2Handle = osSemaphoreNew(1, 0, &SemDataReceivedTdk2_attributes);
 
   /* USER CODE BEGIN RTOS_SEMAPHORES */
   /* add semaphores, ... */
@@ -222,6 +293,12 @@ void MX_FREERTOS_Init(void) {
 
   /* creation of TaskProcessSync */
   TaskProcessSyncHandle = osThreadNew(StartTaskProcessSyncPulse, NULL, &TaskProcessSync_attributes);
+
+  /* creation of TaskPollIcm1 */
+  TaskPollIcm1Handle = osThreadNew(StartTaskPollIcm1, NULL, &TaskPollIcm1_attributes);
+
+  /* creation of TaskPollIcm2 */
+  TaskPollIcm2Handle = osThreadNew(StartTaskPollIcm2, NULL, &TaskPollIcm2_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -322,6 +399,62 @@ void StartTaskProcessSyncPulse(void *argument)
   /* USER CODE END StartTaskProcessSyncPulse */
 }
 
+/* USER CODE BEGIN Header_StartTaskPollIcm1 */
+/**
+* @brief Function implementing the TaskPollIcm1 thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartTaskPollIcm1 */
+void StartTaskPollIcm1(void *argument)
+{
+  /* USER CODE BEGIN StartTaskPollIcm1 */
+  /* Infinite loop */
+  for(;;)
+  {
+    osSemaphoreAcquire(SemaphoreTdk1Handle, osWaitForever);
+
+    if (0 == Icm20789ImuDataDmaRequest(0))
+    {
+      osStatus_t eStatus = osSemaphoreAcquire(SemDataReceivedTdk1Handle, skuPeriod5msInTicks);
+
+      if (osOK == eStatus)
+      {
+        Icm20789ParseImuDataDma(0);
+      }
+    }
+  }
+  /* USER CODE END StartTaskPollIcm1 */
+}
+
+/* USER CODE BEGIN Header_StartTaskPollIcm2 */
+/**
+* @brief Function implementing the TaskPollIcm2 thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartTaskPollIcm2 */
+void StartTaskPollIcm2(void *argument)
+{
+  /* USER CODE BEGIN StartTaskPollIcm2 */
+  /* Infinite loop */
+  for(;;)
+  {
+    osSemaphoreAcquire(SemaphoreTdk2Handle, osWaitForever);
+
+    if (0 == Icm20789ImuDataDmaRequest(1))
+    {
+      osStatus_t eStatus = osSemaphoreAcquire(SemDataReceivedTdk2Handle, skuPeriod5msInTicks);
+
+      if (osOK == eStatus)
+      {
+        Icm20789ParseImuDataDma(1);
+      }
+    }
+  }
+  /* USER CODE END StartTaskPollIcm2 */
+}
+
 /* TimerCyclicTaskTriggerCallback function */
 void TimerCyclicTaskTriggerCallback(void *argument)
 {
@@ -333,6 +466,8 @@ void TimerCyclicTaskTriggerCallback(void *argument)
   if ( 0U == (suCounter % skuPeriod5msInTicks) )
   {
     osSemaphoreRelease(SemaphoreTask5msHandle);
+    osSemaphoreRelease(SemaphoreTdk1Handle);
+    osSemaphoreRelease(SemaphoreTdk2Handle);
   }
 
   // Trigger 10ms tasks

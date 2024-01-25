@@ -56,6 +56,7 @@ public:
     eTimeOfNavigationData = 0x04, ///< "Time of navigation data" message
     eTimeOfInertialData = 0x05, ///< "Time of inertial data" message
     eTimeOfSyncPulse = 0x06, ///< "Time of the latest sync pulse" message
+    eSoftwareVersion = 0x0F, ///< "Software version" message
 
     eDebugEventWriteToPort = 0xC0, ///< Debug information: SWC port data
     eDebugEventRunnableCall = 0xC1, ///< Debug information: SWC API call
@@ -150,6 +151,16 @@ public:
   {
     uint8_t uSequenceCounter_ { 0U };
     uint64_t uTimestampUs_ { 0U };
+  };
+
+  /**
+   * @brief Payload of the "software version" message.
+  */
+  struct SSoftwareVersionData
+  {
+    char acProjectCode_[3] { '\0', '\0', '\0' };
+    uint16_t uMajor_ { 0U };
+    uint16_t uMinor_ { 0U };
   };
 
   /**
@@ -263,6 +274,21 @@ public:
   };
 
   /**
+   * @brief Software version message.
+  */
+  struct SSoftwareVersionMessage
+  {
+    SMessageHeader oHeader_ { CSerialProtocol::uMarker1_,
+                              CSerialProtocol::uMarker2_,
+                              CSerialProtocol::uVersion_,
+                              static_cast<uint8_t>(EMessageIds::eSoftwareVersion) };
+
+    SSoftwareVersionData oSoftwareVersion_;
+    uint8_t auPadding_[PADDING_SIZE(SSoftwareVersionData)];
+    CrcType_t uCrc_ { 0U };
+  };
+
+  /**
    * @brief A debug message with runnable call data.
   */
   struct SRunnableCallEventDebugMessage
@@ -312,18 +338,20 @@ public:
    * @param korImuData Reference to IMU data.
    * @return Inertial data message struct.
   */
-  SInertialDataMessage BuildInertialDataMessage(const SImuDataScha63T& korImuData);
+  SInertialDataMessage BuildInertialDataMessage(const SOutputImuData& korImuData);
 
   /**
    * @brief Build the "Time of inertial data message" from IMU measurements.
    * @param korImuData Reference to IMU measurement.
    * @return "Time of inertial data message" struct.
   */
-  STimeOfInertialDataMessage BuildTimeOfInertialDataMessage(const SImuDataScha63T& korImuData);
+  STimeOfInertialDataMessage BuildTimeOfInertialDataMessage(const SOutputImuData& korImuData);
 
   /**
    * @brief Build navigation data message from BAHRS filter output information.
    * @param korBahrsOutput Reference to BAHRS filter output.
+   * @param korOrientationData Reference to orientation data compensated for installation alignment.
+   * @param korMagneticHeading Reference to the estimated magnetic heading data compensated for installation alignment
    * @return Navigation data message struct.
   */
   SNavigationDataMessage BuildNavigationDataMessage(const NBahrsFilterApi::SOutputData& korBahrsOutput);
@@ -350,6 +378,12 @@ public:
   STimeOfLatestSyncPulseMessage BuildTimeOfLatestSyncPulseMessage(uint64_t uTimestamp);
 
   /**
+   * @brief Build the software version message.
+   * @return The software version message struct.
+   */
+  SSoftwareVersionMessage BuildSoftwareVersionMessage();
+
+  /**
    * @brief Calculate CRC.
    * @param pData Pointer to 32-bit data words aarray.
    * @param uNumberOfWords_ Number of words in the array.
@@ -360,6 +394,7 @@ public:
 protected:
 
 private:
+
   uint8_t uInertialDataSequenceCounter_ { 0U }; ///< Sent inertial data message count.
   uint8_t uNavigationDataSequenceCounter_ { 0U }; ///< Navigation inertial data message count.
   uint8_t uAccuracyDataSequenceCounter_ { 0U }; ///< Sent accuracy message count.

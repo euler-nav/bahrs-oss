@@ -18,9 +18,11 @@ function [objInertialData] = getFloatInertialData(objBahrsOutputRaw)
     objInertialData.angularRateXValid = logical(bitget(SInertialDataMessage.uValidity_, 4));
     objInertialData.angularRateYValid = logical(bitget(SInertialDataMessage.uValidity_, 5));
     objInertialData.angularRateZValid = logical(bitget(SInertialDataMessage.uValidity_, 6));
+    
+    timeDataValid = STimeOfInertialDataMessage.uTimestampUs_ ~= 0;
 
-    objInertialData.time = getTimeFromSequenceCounter(STimeOfInertialDataMessage.uInertialDataSequenceCounter_,...
-                                                      STimeOfInertialDataMessage.uTimestampUs_,...
+    objInertialData.time = getTimeFromSequenceCounter(STimeOfInertialDataMessage.uInertialDataSequenceCounter_(timeDataValid),...
+                                                      STimeOfInertialDataMessage.uTimestampUs_(timeDataValid),...
                                                       objInertialData.sequenceCounter);
 end
 

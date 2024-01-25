@@ -30,5 +30,7 @@ void CRte::Init()
   oPortIcm20789BaroInput2_.Init();
   oPortIcm20789ImuInput2_.Init();
   oPortSyncPulseTime_.Init();
+  oPortImuOutput_.Init();
+  oPortImuDataAfterMonitor_.Init();
 }
 

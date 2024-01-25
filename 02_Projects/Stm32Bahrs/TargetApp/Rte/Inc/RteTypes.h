@@ -12,6 +12,9 @@
   #error This header must not be included in .c files.
 #endif /* __cplusplus */
 
+#include "MeasurementStructs.h"
+#include "ImuMonitorApi.h"
+
 #pragma pack(push, 1)
 
 // ----IMPORTANT----
@@ -94,6 +97,21 @@ struct SImuMeasurement
   uint8_t uValid_ { 0U };
 };
 
+struct SOutputImuData
+{
+  float fSpecificForceX_ { 0.0F };
+  float fSpecificForceY_ { 0.0F };
+  float fSpecificForceZ_ { 0.0F };
+  float fAngularRateX_ { 0.0F };
+  float fAngularRateY_ { 0.0F };
+  float fAngularRateZ_ { 0.0F };
+  uint64_t uTimestampUs_ { 0U };
+  uint8_t uSpecificForceValid_ { 0U };
+  uint8_t uAngularRateValid_ { 0U };
+};
+
 #pragma pack(pop)
+
+using CImuDataAfterMonitor = NImuMonitorApi::CImuData;
 
 #endif /* RTE_TYPES_H */

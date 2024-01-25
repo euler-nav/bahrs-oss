@@ -1,3 +1,10 @@
+/**
+* @file CQuaternion.h
+* @brief Declaration of the quaternion class.
+* @author Fedor Baklanov
+* @date 6 December 2023
+* @copyright Copyright 2023. AMS Advanced Air Mobility Sensors UG. All rights reserved.
+*/
 #ifndef C_QUATERNION_H
 #define C_QUATERNION_H
 

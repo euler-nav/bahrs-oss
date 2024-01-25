@@ -22,6 +22,8 @@
 #include "CBmm150Driver.h"
 #include "CIcm20789Driver.h"
 #include "CSyncPulseHandler.h"
+#include "COutputTransformer.h"
+#include "CImuMonitorSwc.h"
 #endif /* _MSC_VER */
 
 /**
@@ -43,11 +45,9 @@ public:
   friend class CIcm20789Driver;
   friend class CMmc5983Driver;
   friend class CRs232OutputHandler;
-  friend class CCanOutputHandler;
   friend class CSyncPulseHandler;
   friend class COutputTransformer;
-  friend class CMagnetometerCompensator;
-  friend class CMagneticHeadingFilterSwc;
+  friend class CImuMonitorSwc;
 
   enum class EPortIds : uint8_t
   {
@@ -62,7 +62,9 @@ public:
     ePortIcm20789ImuInput1,
     ePortIcm20789BaroInput2,
     ePortIcm20789ImuInput2,
-    ePortSyncPulseTime
+    ePortSyncPulseTime,
+    ePortImuOutput,
+    ePortImuDataAfterMonitor
   };
 
   /**
@@ -99,6 +101,8 @@ private:
   CSoftwareComponentPort<SBarometerMeasurement, static_cast<uint8_t>(EPortIds::ePortIcm20789BaroInput2)> oPortIcm20789BaroInput2_;
   CSoftwareComponentPort<SImuMeasurement, static_cast<uint8_t>(EPortIds::ePortIcm20789ImuInput2)> oPortIcm20789ImuInput2_;
   CSoftwareComponentPort<uint64_t, static_cast<uint8_t>(EPortIds::ePortSyncPulseTime)> oPortSyncPulseTime_;
+  CSoftwareComponentPort<SOutputImuData, static_cast<uint8_t>(EPortIds::ePortImuOutput)> oPortImuOutput_;
+  CSoftwareComponentPort<CImuDataAfterMonitor, static_cast<uint8_t>(EPortIds::ePortImuDataAfterMonitor)> oPortImuDataAfterMonitor_;
 
 };
 

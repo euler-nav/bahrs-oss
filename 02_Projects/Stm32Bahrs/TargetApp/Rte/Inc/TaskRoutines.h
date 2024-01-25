@@ -21,10 +21,6 @@ void TaskRoutine10ms();
 
 void TaskRoutineRs232Sender(uint8_t uMessageId);
 
-void TaskRoutineCanSender();
-
-void TaskRoutineCanReceiver();
-
 void InitializeSensors();
 
 void TaskRoutineProcessSyncPulse(uint64_t uTimestampUs);
