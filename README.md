@@ -2,6 +2,8 @@
 
 This is the open-source software of the [EULER-NAV BAHRS](https://euler-nav.com/bahrs) Miniature Baro-Inertial Attitude and Heading Reference System.
 
+![](00_Documentation/img/BAHRS_main_image.jpg)
+
 # Licenses
 
 The software includes third-party open-source modules. For copyright notices please refer to NOTICES.txt.
