@@ -24,6 +24,7 @@
 #include "CSyncPulseHandler.h"
 #include "COutputTransformer.h"
 #include "CImuMonitorSwc.h"
+#include "CDroneCanHandler.h"
 #endif /* _MSC_VER */
 
 /**
@@ -48,6 +49,7 @@ public:
   friend class CSyncPulseHandler;
   friend class COutputTransformer;
   friend class CImuMonitorSwc;
+  friend class CDroneCanHandler;
 
   enum class EPortIds : uint8_t
   {
