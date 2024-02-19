@@ -12,23 +12,23 @@
 
 class CDroneCanHandler : public CSoftwareComponent<CDroneCanHandler, 1U>
 {
-	friend class CSoftwareComponent<CDroneCanHandler, 1U>;
-	FORBID_CLASS_COPY_AND_MOVE(CDroneCanHandler)
-	DECLARE_MANDATORY_APIS(CDroneCanHandler)
+  friend class CSoftwareComponent<CDroneCanHandler, 1U>;
+  FORBID_CLASS_COPY_AND_MOVE(CDroneCanHandler)
+  DECLARE_MANDATORY_APIS(CDroneCanHandler)
 
 public:
 
-	/**
-	 * @brief Compose a navigation data message according to DroneCAN standard and send it
-	 * to CAN bus.
-	 */
-	void SendNavigationDataMessage();
+  /**
+   * @brief Compose a navigation data message according to DroneCAN standard and send it
+   * to CAN bus.
+   */
+  void SendNavigationDataMessage();
 
 protected:
 
 private:
-	CDroneCanHandler () = default;
-	~CDroneCanHandler () = default;
+  CDroneCanHandler () = default;
+  ~CDroneCanHandler () = default;
 };
 
 #endif /* C_DRONECAN_HANDLER_H */

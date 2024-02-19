@@ -10,30 +10,30 @@
 
 CDroneCanHandler& CDroneCanHandler::getInstanceImpl(unsigned uInstanceIndex)
 {
-	static CDroneCanHandler soInstance;
-	assert(uInstanceIndex == 0U);
-	return soInstance;
+  static CDroneCanHandler soInstance;
+  assert(uInstanceIndex == 0U);
+  return soInstance;
 }
 
 void CDroneCanHandler::Init()
 {
-	// Do Nothing
+  // Do Nothing
 }
 
 bool CDroneCanHandler::IsInitialized()
 {
-	return true;
+  return true;
 }
 
 void CDroneCanHandler::SendNavigationDataMessage()
 {
-	CRte& orRte = CRte::GetInstance();
-	NBahrsFilterApi::SOutputData oBahrsData;
+  CRte& orRte = CRte::GetInstance();
+  NBahrsFilterApi::SOutputData oBahrsData;
 
-	bool bReadStatus = orRte.oPortBahrsFilterOutput_.Read(oBahrsData);
+  bool bReadStatus = orRte.oPortBahrsFilterOutput_.Read(oBahrsData);
 
-	if (true == bReadStatus)
-	{
-		/* TO DO. Compose the message according to the DroneCAN and then send it. */
-	}
+  if (true == bReadStatus)
+  {
+    /* TO DO. Compose the message according to the DroneCAN and then send it. */
+  }
 }
