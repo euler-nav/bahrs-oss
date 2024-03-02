@@ -14,6 +14,8 @@ BMM150 driver (deeply refactored version of the source code provided by Bosch Se
 
 Copyright (c) 2020 Bosch Sensortec GmbH. All rights reserved.
 
+DroneCAN, libcanard:  see 99_3rd_party\libcanard-master\LICENSE.txt
+
 BSD-3-Clause
 
 Redistribution and use in source and binary forms, with or without

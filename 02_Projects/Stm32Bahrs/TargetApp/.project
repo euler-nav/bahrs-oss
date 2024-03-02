@@ -32,6 +32,11 @@
 	</natures>
 	<linkedResources>
 		<link>
+			<name>libcanard-master</name>
+			<type>2</type>
+			<locationURI>PARENT-3-PROJECT_LOC/99_3rd_party/libcanard-master</locationURI>
+		</link>
+		<link>
 			<name>Rte/Inc/CBmm150Driver.h</name>
 			<type>1</type>
 			<locationURI>$%7BPARENT-3-PROJECT_LOC%7D/01_Library/Stm32/Drivers/CBmm150Driver.h</locationURI>
