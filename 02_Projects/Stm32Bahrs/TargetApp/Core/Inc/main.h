@@ -118,6 +118,10 @@ void Error_Handler(void);
 #define SYNC_INPUT_EXTI_IRQn EXTI2_IRQn
 #define SYNC_ENABLE_Pin GPIO_PIN_4
 #define SYNC_ENABLE_GPIO_Port GPIOB
+#define CAN_RX_Pin GPIO_PIN_5
+#define CAN_RX_GPIO_Port GPIOB
+#define CAN_TX_Pin GPIO_PIN_6
+#define CAN_TX_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
 
 
