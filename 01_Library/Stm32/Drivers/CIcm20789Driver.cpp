@@ -10,6 +10,7 @@
 #include <math.h>
 #include "GetMicroseconds.h"
 #include "UintToBool.h"
+#include <string.h>
 
 
 CIcm20789Driver::CIcm20789Driver(EIcmIds eIcmChipId) :
@@ -267,6 +268,17 @@ bool CIcm20789Driver::RequestInertialSensorDataDma()
   return bStatus;
 }
 
+bool CIcm20789Driver::RequestPressureSensorDataDma()
+{
+  HAL_StatusTypeDef eHalStatus = HAL_I2C_Master_Receive_DMA(opkI2CHandle_, ICM20789_ADDRESS_PRESS << 1, auPressureDataBuffer_, 9);
+  return (eHalStatus == HAL_OK);
+}
+
+bool CIcm20789Driver::TriggerPressureMeasurement()
+{
+  return setLowNoiseModeBaro();
+}
+
 void CIcm20789Driver::ParseReceivedImuDataDma()
 {
   SImuMeasurement oOutput;
@@ -319,6 +331,87 @@ void CIcm20789Driver::ParseReceivedImuDataDma()
   }
 }
 
+void CIcm20789Driver::ParseReceivedPressureDataDma()
+{
+  SBarometerMeasurement oOutput;
+
+  if((auPressureDataBuffer_[2] == crc8(&auPressureDataBuffer_[0], 2)) &&
+     (auPressureDataBuffer_[5] == crc8(&auPressureDataBuffer_[3], 2)) &&
+     (auPressureDataBuffer_[8] == crc8(&auPressureDataBuffer_[6], 2)))
+  {
+    uint32_t uTraw = (static_cast<uint32_t>(auPressureDataBuffer_[0]) << 8) | static_cast<uint32_t>(auPressureDataBuffer_[1]);
+    uint32_t uPraw = (static_cast<uint32_t>(auPressureDataBuffer_[3]) << 16) | \
+                                            (static_cast<uint32_t>(auPressureDataBuffer_[4]) << 8) | \
+                                            static_cast<uint32_t>(auPressureDataBuffer_[6]);
+    float fPressure, fTemperature;
+
+    processDataBaro(uPraw, uTraw, fPressure, fTemperature);
+
+    oOutput.fTemperature_ = fTemperature;
+    oOutput.fPressure_ = fPressure;
+    oOutput.uTimestampUs_ = GetMicroseconds();
+    oOutput.uValid_ = BoolToUint(true);
+  }
+  else
+  {
+    oOutput.uValid_ = BoolToUint(false);
+  }
+
+  if (EIcmIds::eIcm1 == keSensorId_)
+  {
+    CRte::GetInstance().oPortIcm20789BaroInput1_.Write(oOutput);
+  }
+  else if (EIcmIds::eIcm2 == keSensorId_)
+  {
+    CRte::GetInstance().oPortIcm20789BaroInput2_.Write(oOutput);
+  }
+  else
+  {
+    // do nothing
+  }
+
+  // Erase buffered data to prevent using it once again.
+  memset((void*)auPressureDataBuffer_, 0U, sizeof(auPressureDataBuffer_));
+}
+
+void CIcm20789Driver::InvalidateImuOutputPort()
+{
+  SImuMeasurement oOutput;
+  oOutput.uValid_ = BoolToUint(false);
+
+  if (EIcmIds::eIcm1 == keSensorId_)
+  {
+    CRte::GetInstance().oPortIcm20789ImuInput1_.Write(oOutput);
+  }
+  else if (EIcmIds::eIcm2 == keSensorId_)
+  {
+    CRte::GetInstance().oPortIcm20789ImuInput2_.Write(oOutput);
+  }
+  else
+  {
+    // do nothing
+  }
+}
+
+void CIcm20789Driver::InvalidatePressureOutputPort()
+{
+  SBarometerMeasurement oOutput;
+  oOutput.uValid_ = BoolToUint(false);
+
+  if (EIcmIds::eIcm1 == keSensorId_)
+  {
+    CRte::GetInstance().oPortIcm20789BaroInput1_.Write(oOutput);
+  }
+  else if (EIcmIds::eIcm2 == keSensorId_)
+  {
+    CRte::GetInstance().oPortIcm20789BaroInput2_.Write(oOutput);
+  }
+  else
+  {
+    // do nothing
+  }
+}
+
 extern "C" int Icm20789ImuDataDmaRequest(unsigned uInstanceIndex)
 {
   bool bStatus = false;
@@ -344,6 +437,78 @@ extern "C" void Icm20789ParseImuDataDma(unsigned uInstanceIndex)
   else
   {
     CIcm20789Driver::GetInstance(uInstanceIndex).ParseReceivedImuDataDma();
+  }
+}
+
+extern "C" int Icm20789PressureDataDmaRequest(unsigned uInstanceIndex)
+{
+  bool bStatus = false;
+
+  if (uInstanceIndex > 1)
+  {
+    assert(false);
+  }
+  else
+  {
+    bStatus = CIcm20789Driver::GetInstance(uInstanceIndex).RequestPressureSensorDataDma();
+  }
+
+  return (bStatus ? 0 : 1);
+}
+
+extern "C" int Icm20789TriggerPressureMeasurement(unsigned uInstanceIndex)
+{
+  bool bStatus = false;
+
+  if (uInstanceIndex > 1)
+  {
+    assert(false);
+  }
+  else
+  {
+    bStatus = CIcm20789Driver::GetInstance(uInstanceIndex).TriggerPressureMeasurement();
+  }
+
+  return (bStatus ? 0 : 1);
+}
+
+extern "C" void Icm20789ParsePressureDataDma(unsigned uInstanceIndex)
+{
+  if (uInstanceIndex > 1)
+  {
+    assert(false);
+  }
+  else
+  {
+    CIcm20789Driver::GetInstance(uInstanceIndex).ParseReceivedPressureDataDma();
+  }
+}
+
+extern "C" void Icm20789InvalidateImuOutputPort(unsigned uInstanceIndex)
+{
+  {
+    if (uInstanceIndex > 1)
+    {
+      assert(false);
+    }
+    else
+    {
+      CIcm20789Driver::GetInstance(uInstanceIndex).InvalidateImuOutputPort();
+    }
+  }
+}
+
+extern "C" void Icm20789InvalidatePressureOutputPort(unsigned uInstanceIndex)
+{
+  {
+    if (uInstanceIndex > 1)
+    {
+      assert(false);
+    }
+    else
+    {
+      CIcm20789Driver::GetInstance(uInstanceIndex).InvalidatePressureOutputPort();
+    }
   }
 }
 
@@ -501,15 +666,12 @@ void CIcm20789Driver::processDataBaro(uint32_t uPressData, uint32_t uTempData, f
 
 bool CIcm20789Driver::setLowNoiseModeBaro()
 {
-  uint8_t uSts = 0;
   uint8_t auCtrl[2];
 
   auCtrl[0] = 0x70;
   auCtrl[1] = 0xDF;
 
-  uSts = i2cWrite(ICM20789_ADDRESS_PRESS, auCtrl, 2);
-
-  return uSts;
+  return i2cWrite(ICM20789_ADDRESS_PRESS, auCtrl, 2);
 }
 
 bool CIcm20789Driver::getImuChipId(uint8_t& urId)

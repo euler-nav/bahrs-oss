@@ -23,33 +23,46 @@ CBmp384Driver& CBmp384Driver::getInstanceImpl(unsigned uInstanceIndex)
 
 void CBmp384Driver::Init()
 {
-  uint8_t uRes = 0;
-  uint8_t uStatus = BMP384_OK;
+  uint8_t uChipId = 0U;
+  bool bStatus = getChipID(uChipId);
 
-  if(getChipID() != 0x50)
+  if(bStatus)
   {
-    uStatus |= BMP384_ERR_CHIPID;
+    if (uChipId != 0x50)
+    {
+      bStatus = false;
+    }
   }
 
-  setSoftReset();
-  uRes = getEvent();
-
-  if (uRes != 0x01)
+  if (bStatus)
   {
-    uStatus |= BMP384_ERR_SOFTRESET;
+    bStatus = getTrimParam();
   }
 
-  uSensorStatus_ = uStatus;
-
-  if (true == IsInitialized())
+  if (bStatus)
   {
-    getTrimParam();
-    setFilter(EIirFilter::eOff);
-    setTimeStandby(ETimeStandby::e40MS);
-    setOversamplingRegister(EOversampling::eX16, EOversampling::eX2);
-    setPowerMode(EMode::eNormal);
+    bStatus = setFilter(EIirFilter::eOff);
   }
 
+  if (bStatus)
+  {
+    bStatus = setTimeStandby(ETimeStandby::e40MS);
+  }
+
+  if (bStatus)
+  {
+    bStatus = setOversamplingRegister(EOversampling::eX16, EOversampling::eX2);
+  }
+
+  if (bStatus)
+  {
+    bStatus = setPowerMode(EMode::eNormal);
+  }
+
+  if (bStatus)
+  {
+    bIsInitialized_ = true;
+  }
 }
 
 void CBmp384Driver::PollSensor()
@@ -61,13 +74,15 @@ void CBmp384Driver::PollSensor()
     //
     // Here we need to poll sensor data and compensate it
     //
-    uint8_t uReadyRead = isReadyRead();
 
-    if(uReadyRead & (BMP384_DRDY_TEMP | BMP384_DRDY_PRESS))  // Temperature and pressure data is ready read
+    if(isReadyRead())  // Temperature and pressure data is ready read
     {
       oOutput.uTimestampUs_ = GetMicroseconds();
-      getTemperatureAndPressure(oOutput.fTemperature_, oOutput.fPressure_);
-      oOutput.uValid_ = BoolToUint(true);
+
+      if (getTemperatureAndPressure(oOutput.fTemperature_, oOutput.fPressure_))
+      {
+        oOutput.uValid_ = BoolToUint(true);
+      }
     }
     else
     {
@@ -82,27 +97,25 @@ void CBmp384Driver::PollSensor()
   CRte::GetInstance().oPortBmp384Input_.Write(oOutput);
 }
 
-uint8_t CBmp384Driver::getChipID()
+bool CBmp384Driver::getChipID(uint8_t& urChipId)
 {
-  uint8_t uCtrl = 0;
-  readFromAddress(&uCtrl, BMP384_REG_CHIP_ID, 1);
-  return uCtrl;
+  return readFromAddress(&urChipId, BMP384_REG_CHIP_ID, 1);
 }
 
-void CBmp384Driver::setSoftReset()
+bool CBmp384Driver::setSoftReset()
 {
-  writeToAddress(BMP384_REG_CMD, BMP384_SOFTRESET);
-  HAL_Delay(2000);
+  bool bStatus = false;
+
+  if (writeToAddress(BMP384_REG_CMD, BMP384_SOFTRESET))
+  {
+    bStatus = true;
+    HAL_Delay(2000);
+  }
+
+  return bStatus;
 }
 
-uint8_t CBmp384Driver::getEvent()
-{
-  uint8_t uCtrl = 0;
-  readFromAddress(&uCtrl, BMP384_REG_EVENT, 1);
-  return uCtrl;
-}
-
-void CBmp384Driver::setPowerMode(EMode eMode)
+bool CBmp384Driver::setPowerMode(EMode eMode)
 {
   uint8_t uVal = 0;
   switch (eMode)
@@ -119,139 +132,138 @@ void CBmp384Driver::setPowerMode(EMode eMode)
   }
 
   uVal |= (BMP384_TEMP_EN | BMP384_PRESS_EN);
-  writeToAddress(BMP384_REG_PWR_CTRL, uVal);
+
+  return writeToAddress(BMP384_REG_PWR_CTRL, uVal);
 }
 
-uint8_t CBmp384Driver::getPowerControl()
-{
-  uint8_t uCtrl = 0;
-  readFromAddress(&uCtrl, BMP384_REG_PWR_CTRL, 1);
-  return uCtrl;
-}
-
-void CBmp384Driver::getTemperature(float &fTemperature)
-{
-  uint8_t auData[3];
-
-  readFromAddress(auData, BMP384_REG_TEMP0, 3);
-  int32_t iAdcTemp = (int32_t)auData[2] << 16 | (int32_t)auData[1] << 8 | (int32_t)auData[0];
-  fTemperature = compensateTemperature(static_cast<float>(iAdcTemp));
-}
-
-void CBmp384Driver::getPressure(float &fPressure)
-{
-  float fTemperature;
-  getTemperatureAndPressure(fTemperature, fPressure);
-}
-
-void CBmp384Driver::getTemperatureAndPressure(float &fTemperature, float &fPressure)
+bool CBmp384Driver::getTemperatureAndPressure(float& frTemperature, float& frPressure)
 {
   uint8_t auData[6];
+  bool bStatus = false;
 
-  readFromAddress(auData, BMP384_REG_PREES0, 6);
-  int32_t iAdcTemp = (int32_t)auData[5] << 16 | (int32_t)auData[4] << 8 | (int32_t)auData[3];
-  int32_t iAdcPres = (int32_t)auData[2] << 16 | (int32_t)auData[1] << 8 | (int32_t)auData[0];
-  fTemperature = compensateTemperature(static_cast<float>(iAdcTemp));
-  fPressure = compensatePressure(static_cast<float>(iAdcPres), fTemperature);
+  if (readFromAddress(auData, BMP384_REG_PREES0, 6))
+  {
+    int32_t iAdcTemp = (int32_t)auData[5] << 16 | (int32_t)auData[4] << 8 | (int32_t)auData[3];
+    int32_t iAdcPres = (int32_t)auData[2] << 16 | (int32_t)auData[1] << 8 | (int32_t)auData[0];
+    frTemperature = compensateTemperature(static_cast<float>(iAdcTemp));
+    frPressure = compensatePressure(static_cast<float>(iAdcPres), frTemperature);
+    bStatus = true;
+  }
+
+  return bStatus;
 }
 
-void CBmp384Driver::getTrimParam()
+bool CBmp384Driver::getTrimParam()
 {
-  float fVal = 0.0F;
+  bool bStatus = false;
 
-  readFromAddress(reinterpret_cast<uint8_t*>(&oParams_), BMP384_REG_TRIM, sizeof(SParams));
+  if (readFromAddress(reinterpret_cast<uint8_t*>(&oParams_), BMP384_REG_TRIM, sizeof(SParams)))
+  {
+    float fVal = 0.0F;
 
-  oFloatParams_.fT1_ = ldexpf(static_cast<float>(oParams_.uT1_), 8);
-  oFloatParams_.fT2_ = ldexpf(static_cast<float>(oParams_.uT2_), -30);
-  oFloatParams_.fT3_ = ldexpf(static_cast<float>(oParams_.uT3_), -48);
+    oFloatParams_.fT1_ = ldexpf(static_cast<float>(oParams_.uT1_), 8);
+    oFloatParams_.fT2_ = ldexpf(static_cast<float>(oParams_.uT2_), -30);
+    oFloatParams_.fT3_ = ldexpf(static_cast<float>(oParams_.uT3_), -48);
 
-  fVal = static_cast<float>(oParams_.uP1_) - ldexpf(1.0F, 14);
-  oFloatParams_.fP1_ = ldexpf(fVal, -20);
+    fVal = static_cast<float>(oParams_.uP1_) - ldexpf(1.0F, 14);
+    oFloatParams_.fP1_ = ldexpf(fVal, -20);
 
-  fVal = static_cast<float>(oParams_.uP2_) - ldexpf(1.0F, 14);
-  oFloatParams_.fP2_ = ldexpf(fVal, -29);
+    fVal = static_cast<float>(oParams_.uP2_) - ldexpf(1.0F, 14);
+    oFloatParams_.fP2_ = ldexpf(fVal, -29);
 
-  oFloatParams_.fP3_ = ldexpf(static_cast<float>(oParams_.uP3_), -32);
-  oFloatParams_.fP4_ = ldexpf(static_cast<float>(oParams_.uP4_), -37);
-  oFloatParams_.fP5_ = ldexpf(static_cast<float>(oParams_.uP5_), 3);
-  oFloatParams_.fP6_ = ldexpf(static_cast<float>(oParams_.uP6_), -6);
-  oFloatParams_.fP7_ = ldexpf(static_cast<float>(oParams_.uP7_), -8);
-  oFloatParams_.fP8_ = ldexpf(static_cast<float>(oParams_.uP8_), -15);
-  oFloatParams_.fP9_ = ldexpf(static_cast<float>(oParams_.uP9_), -48);
-  oFloatParams_.fP10_ = ldexpf(static_cast<float>(oParams_.uP10_), -48);
-  oFloatParams_.fP11_ = ldexpf(static_cast<float>(oParams_.uP11_), -65);
+    oFloatParams_.fP3_ = ldexpf(static_cast<float>(oParams_.uP3_), -32);
+    oFloatParams_.fP4_ = ldexpf(static_cast<float>(oParams_.uP4_), -37);
+    oFloatParams_.fP5_ = ldexpf(static_cast<float>(oParams_.uP5_), 3);
+    oFloatParams_.fP6_ = ldexpf(static_cast<float>(oParams_.uP6_), -6);
+    oFloatParams_.fP7_ = ldexpf(static_cast<float>(oParams_.uP7_), -8);
+    oFloatParams_.fP8_ = ldexpf(static_cast<float>(oParams_.uP8_), -15);
+    oFloatParams_.fP9_ = ldexpf(static_cast<float>(oParams_.uP9_), -48);
+    oFloatParams_.fP10_ = ldexpf(static_cast<float>(oParams_.uP10_), -48);
+    oFloatParams_.fP11_ = ldexpf(static_cast<float>(oParams_.uP11_), -65);
+
+    bStatus = true;
+  }
+
+  return bStatus;
 }
 
-uint8_t CBmp384Driver::getSensorStatus()
-{
-  return uSensorStatus_;
-}
-
-void CBmp384Driver::setFilter(EIirFilter eFilterType)
+bool CBmp384Driver::setFilter(EIirFilter eFilterType)
 {
   uint8_t uVal = static_cast<uint8_t>(eFilterType);
   uVal = uVal << 1;
-  writeToAddress(BMP384_REG_CONFIG, uVal);
+  return writeToAddress(BMP384_REG_CONFIG, uVal);
 }
 
-void CBmp384Driver::setTimeStandby(ETimeStandby eTimeStandby)
+bool CBmp384Driver::setTimeStandby(ETimeStandby eTimeStandby)
 {
   uint8_t uVal = static_cast<uint8_t>(eTimeStandby);
-  writeToAddress(BMP384_REG_ODR, uVal);
+  return writeToAddress(BMP384_REG_ODR, uVal);
 }
 
-void CBmp384Driver::setOversamplingRegister(EOversampling ePresOversampling, EOversampling eTempOversampling)
+bool CBmp384Driver::setOversamplingRegister(EOversampling ePresOversampling, EOversampling eTempOversampling)
 {
   uint8_t uVal1 = static_cast<uint8_t>(ePresOversampling);
   uint8_t uVal2 = static_cast<uint8_t>(eTempOversampling);
-
   uint8_t val =  uVal2 << 3 |  uVal1;
-  writeToAddress(BMP384_REG_OSR, val);
+  return writeToAddress(BMP384_REG_OSR, val);
 }
 
-void CBmp384Driver::setPresOversampling(EOversampling ePresOversampling)
+bool CBmp384Driver::setPresOversampling(EOversampling ePresOversampling)
 {
   uint8_t uVal = static_cast<uint8_t>(ePresOversampling);
-  writeToAddress(BMP384_REG_OSR, uVal);
+  return writeToAddress(BMP384_REG_OSR, uVal);
 }
 
-void CBmp384Driver::setTempOversampling(EOversampling eTempOversampling)
+bool CBmp384Driver::setTempOversampling(EOversampling eTempOversampling)
 {
   uint8_t uVal = static_cast<uint8_t>(eTempOversampling);
-  writeToAddress(BMP384_REG_OSR, uVal);
+  return writeToAddress(BMP384_REG_OSR, uVal);
 }
 
-uint8_t CBmp384Driver::isReadyRead()
+bool CBmp384Driver::isReadyRead()
 {
   uint8_t uRes = 0;
-  readFromAddress(&uRes, BMP384_REG_STATUS, 1);
-  return uRes;
+  bool bStatus = false;
+
+  if (true == readFromAddress(&uRes, BMP384_REG_STATUS, 1))
+  {
+    if (((uRes & BMP384_DRDY_TEMP) > 0U) && ((uRes & BMP384_DRDY_PRESS) > 0U))
+    {
+      bStatus = true;
+    }
+  }
+
+  return bStatus;
 }
 
 bool CBmp384Driver::IsInitialized()
 {
-  return (BMP384_OK == uSensorStatus_) ? true : false;
+  return bIsInitialized_;
 }
 
-void CBmp384Driver::readFromAddress(uint8_t *upBuffer,  uint8_t uReadAddr,  uint16_t uNumByteToRead)
+bool CBmp384Driver::readFromAddress(uint8_t *upBuffer,  uint8_t uReadAddr,  uint16_t uNumByteToRead)
 {
-  uint8_t uBuff = 0;
+  uint8_t uBuff = 0, uZeroByte = 0U;
 
-  uReadAddr |= (uint8_t)(READWRITE_CMD);
+  uReadAddr |= READWRITE_CMD;
 
   setCsOn();
 
-  spiWriteRead(uReadAddr);
-  spiWriteRead(DUMMY_BYTE);
+  HAL_StatusTypeDef eStatus = HAL_SPI_Transmit(&hspi2, &uReadAddr, 1, 1);
 
-  while(uNumByteToRead > 0x00)
+  if (HAL_OK == eStatus)
   {
-    uBuff = spiWriteRead(DUMMY_BYTE);;
-    *upBuffer = uBuff;
-     uNumByteToRead--;
-     upBuffer++;
+    eStatus = HAL_SPI_TransmitReceive(&hspi2, &uZeroByte, &uBuff, 1, 1); // receive dummy byte
   }
+
+  if (HAL_OK == eStatus)
+  {
+    eStatus = HAL_SPI_TransmitReceive(&hspi2, &uZeroByte, upBuffer, uNumByteToRead, 1);
+  }
+
   setCsOff();
+
+  return (HAL_OK == eStatus) ? true : false;
 }
 
 float CBmp384Driver::compensatePressure(float fUncompensatedPressure, float fCompensatedTemperature)
@@ -283,14 +295,16 @@ float CBmp384Driver::compensateTemperature(float fUncompensatedTemperature)
   return fPartialData2 + fPartialData1 * fPartialData1 * oFloatParams_.fT3_;
 }
 
-void CBmp384Driver::writeToAddress(uint8_t uWriteAddr, uint8_t uVal)
+bool CBmp384Driver::writeToAddress(uint8_t uWriteAddr, uint8_t uVal)
 {
   setCsOn();
 
-  spiWriteRead(uWriteAddr);
-  spiWriteRead(uVal);
+  uint8_t auRxBuffer[2] = { uWriteAddr, uVal };
+  HAL_StatusTypeDef eStatus = HAL_SPI_Transmit(&hspi2, auRxBuffer, 2, 1);
 
   setCsOff();
+
+  return (HAL_OK == eStatus) ? true : false;
 }
 
 void CBmp384Driver::setCsOn()
@@ -301,12 +315,5 @@ void CBmp384Driver::setCsOn()
 void CBmp384Driver::setCsOff()
 {
   HAL_GPIO_WritePin(BMP384_CSB_GPIO_Port, BMP384_CSB_Pin, GPIO_PIN_SET);
-}
-
-uint8_t CBmp384Driver::spiWriteRead(uint8_t uByte)
-{
-  uint8_t uReceivedByte = 0;
-  HAL_SPI_TransmitReceive(&hspi2, &uByte, &uReceivedByte, 1, 1);
-  return uReceivedByte;
 }
 

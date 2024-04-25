@@ -113,9 +113,37 @@ public:
   bool RequestInertialSensorDataDma();
 
   /**
+   * @brief Request pressure data in DMA mode.
+   * When reception is completed, received bytes can be processed in the interrupt handler.
+   * \return Status of the DMA request, true -- OK, false otherwise.
+   */
+  bool RequestPressureSensorDataDma();
+
+  /**
+   * @brief Trigger measuring sequence of the pressure sensor.
+   * @return True -- success, false -- failure.
+   */
+  bool TriggerPressureMeasurement();
+
+  /**
    * @brief Parses IMU data received in DMA mode.
    */
   void ParseReceivedImuDataDma();
+
+  /**
+   * @brief Parses pressure data received in DMA mode.
+   */
+  void ParseReceivedPressureDataDma();
+
+  /**
+   * Writes default invalid data to IMU output port.
+   */
+  void InvalidateImuOutputPort();
+
+  /**
+   * Writes default invalid data to pressure output port.
+   */
+  void InvalidatePressureOutputPort();
 
 private:
   CIcm20789Driver() = delete;
@@ -203,6 +231,7 @@ private:
 
   SCalibParam oCalibParam_;
   uint8_t auImuDataBuffer_[14];
+  uint8_t auPressureDataBuffer_[9];
 
   bool bIsInitialized_ { false };  ///< Sensor status after initialization
   const EIcmIds keSensorId_; ///< ID of the sensor corresponding to the driver instance.

@@ -26,5 +26,35 @@ int Icm20789ImuDataDmaRequest(unsigned uInstanceIndex);
  */
 void Icm20789ParseImuDataDma(unsigned uInstanceIndex);
 
+/**
+ * \brief Initiate data transmission from the pressure sensor in DMA mode.
+ * \param uInstanceIndex Index of the sensor driver instance.
+ * \return 0 -- success, 1 -- failure.
+ */
+int Icm20789PressureDataDmaRequest(unsigned uInstanceIndex);
+
+/**
+ * \brief Trigger pressure measuring process.
+ * \param uInstanceIndex Index of the sensor driver instance.
+ * \return 0 -- success, 1 -- failure.
+ */
+int Icm20789TriggerPressureMeasurement(unsigned uInstanceIndex);
+
+/**
+ * \brief Parse pressure data received by the DMA controller.
+ * \param uInstanceIndex
+ */
+void Icm20789ParsePressureDataDma(unsigned uInstanceIndex);
+
+/**
+ * Invalidate data in the IMU data port of the software component.
+ */
+void Icm20789InvalidateImuOutputPort(unsigned uInstanceIndex);
+
+/**
+ * Invalidate data in the pressure data port of the software component.
+ */
+void Icm20789InvalidatePressureOutputPort(unsigned uInstanceIndex);
+
 #endif /* ICM_20789_DRIVER_C_API_H */
 

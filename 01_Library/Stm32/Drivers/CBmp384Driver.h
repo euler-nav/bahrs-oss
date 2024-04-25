@@ -192,114 +192,91 @@ private:
 
   /**
    * @brief Get the Chip ID value
-   * @return ChipID value
+   * @param urChipId Reference to the chip ID to be filled
+   * @return True -- success, false -- failure.
    */
-  uint8_t getChipID();
-
-  /**
-   * @brief Get the Event bit mask after reset
-   * @return Bit mask
-   */
-  uint8_t getEvent();
-
-  /**
-   * @brief Get the Power Control mask bit
-   * @return Bit mask
-   */
-  uint8_t getPowerControl();
+  bool getChipID(uint8_t& urChipId);
 
   /**
    * @brief Get the Trim Parameters structure
+   * @return True -- success, false -- failure.
    */
-  void getTrimParam();
-
-  /**
-   * @brief Get the Pressure value from the sensor
-   * @param fPressure reference to the pressure variable
-   */
-  void getPressure(float& frPressure);
-
-  /**
-   * @brief Get the Temperature value
-   * @param fTemperature reference to the temperature variable
-   */
-  void getTemperature(float& frTemperature);
+  bool getTrimParam();
 
   /**
    * @brief Get the Temperature And Pressure values
    * @param fTemperature reference to the temperature variable
    * @param fPressure reference to the pressure variable
+   * @return True -- success, false -- failure.
    */
-  void getTemperatureAndPressure(float& frTemperature, float& frPressure);
-
-  /**
-   * @brief Get the Sensor Status error
-   * @return Error status
-   */
-  uint8_t getSensorStatus();
+  bool getTemperatureAndPressure(float& frTemperature, float& frPressure);
 
   /**
    * @brief Request soft reset
+   * @return True -- success, false -- failure.
    */
-  void setSoftReset();
+  bool setSoftReset();
 
   /**
    * @brief Set the Power Mode
    * @param eMode power mode
+   * @return True -- success, false -- failure.
    */
-  void setPowerMode(EMode eMode);
+  bool setPowerMode(EMode eMode);
 
   /**
    * @brief Set the Filter value
    * @param eFilterType Filter value
    */
-  void setFilter(EIirFilter eFilterType);
+  bool setFilter(EIirFilter eFilterType);
 
   /**
    * @brief Set the Time Standby
    * @param eTimeStandby  Time Standby
    */
-  void setTimeStandby(ETimeStandby eTimeStandby);
+  bool setTimeStandby(ETimeStandby eTimeStandby);
 
   /**
    * @brief Set the Pressure Oversampling value
    * @param ePresOversampling  Pressure Oversampling value
    */
-  void setPresOversampling(EOversampling ePresOversampling);
+  bool setPresOversampling(EOversampling ePresOversampling);
 
   /**
    * @brief Set the Temperature oversampling value
    * @param eTempOversampling Temperature oversampling value
    */
-  void setTempOversampling(EOversampling eTempOversampling);
+  bool setTempOversampling(EOversampling eTempOversampling);
 
   /**
    * @brief Set the Oversampling Register value
    * @param ePresOversampling Pressure over sampling value
    * @param eTempOversamping Temperature over sampling value
    */
-  void setOversamplingRegister(EOversampling ePresOversampling, EOversampling eTempOversamping);
+  bool setOversamplingRegister(EOversampling ePresOversampling, EOversampling eTempOversamping);
 
   /**
    * @brief Is the data ready to be read
-   * @return uint8_t Bit mask
+   * @return True -- ready, false -- not ready.
    */
-  uint8_t isReadyRead();
+  bool isReadyRead();
 
   /**
    * @brief Read from address via SPI
    * @param upBuffer Buffer for record
    * @param uReadAddr Register address
    * @param uNumByteToRead Number of bytes to read
+   * @return True -- success, false -- failure.
    */
-  void readFromAddress(uint8_t *upBuffer, uint8_t uReadAddr, uint16_t uNumByteToRead);
+  bool readFromAddress(uint8_t *upBuffer, uint8_t uReadAddr, uint16_t uNumByteToRead);
 
   /**
    * @brief Write to address via SPI
    * @param uWriteAddr Register address
    * @param uVal The resulting value
+   * @return True -- success, false -- failure.
    */
-  void writeToAddress(uint8_t uWriteAddr, uint8_t uVal);
+  bool writeToAddress(uint8_t uWriteAddr, uint8_t uVal);
 
   /**
    * @brief Compensate temperature value
@@ -326,16 +303,9 @@ private:
    */
   void setCsOff();
 
-  /**
-   * @brief Read/Write via SPI
-   * @param uByte Register add or dummy byte
-   * @return The read value via SPI
-   */
-  uint8_t spiWriteRead(uint8_t uByte);
-
   SFloatParams oFloatParams_;  ///< Float point compensation trim parameters
   SParams oParams_;  ///< Compensation trim parameters (coefficients)
-  uint8_t uSensorStatus_ = 0;  ///< Sensor status after initialization
+  bool bIsInitialized_{ false };  ///< Sensor status after initialization
 };
 
 #endif /* C_BMP_384_DRIVER_H */

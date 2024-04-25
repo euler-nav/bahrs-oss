@@ -10,11 +10,6 @@
 #include "GetMicroseconds.h"
 #include "cmsis_os.h"
 
-extern "C" void TaskRoutine1ms()
-{
-  // Nothing to do
-}
-
 extern "C" void TaskRoutine5ms()
 {
   static uint32_t suCounter = 0U;
@@ -25,25 +20,7 @@ extern "C" void TaskRoutine5ms()
     CRs232OutputHandler::GetInstance().QueueTransmissionRequest(CSerialProtocol::EMessageIds::eSoftwareVersion);
   }
 
-  // Poll the BMP384 data at 25 Hz
-  if (0U == (suCounter % 8U))
-  {
-    CBmp384Driver::GetInstance().PollSensor();
-    CBahrsFilterSwc::GetInstance().SetPressureInput();
-  }
-
-  CScha63TDriver::GetInstance().ConvertRawDataset();
   CImuMonitorSwc::GetInstance().Run();
-  CBahrsFilterSwc::GetInstance().SetImuInput();
-
-  // Do the following task at 10Hz
-  if (0U == (suCounter % 20U))
-  {
-    CMmc5983Driver::GetInstance().PollSensor();
-    CBmm150Driver::GetInstance(0).Bmm150ReadMagData();
-    CBmm150Driver::GetInstance(1).Bmm150ReadMagData();
-  }
-
   COutputTransformer::GetInstance().TransformImuSignals();
 
   // Request to send inertial data message
@@ -109,9 +86,33 @@ extern "C" void TaskRoutineRs232Sender(uint8_t uMessageId)
   }
 }
 
-extern "C" void InitializeSensors()
+extern "C" void TaskRoutineReceiveScha63TData()
+{
+  CScha63TDriver::GetInstance().ConvertRawDataset();
+  CBahrsFilterSwc::GetInstance().SetImuInput();
+}
+
+extern "C" void TaskRoutinePollBmm(uint32_t uBmmSensorIndex)
+{
+  CBmm150Driver::GetInstance(uBmmSensorIndex).Bmm150ReadMagData();
+}
+
+extern "C" void TaskRoutinePollBmp()
+{
+  CBmp384Driver::GetInstance().PollSensor();
+  CBahrsFilterSwc::GetInstance().SetPressureInput();
+}
+
+extern "C" void TaskRoutinePollMmc()
+{
+  CMmc5983Driver::GetInstance().PollSensor();
+}
+
+extern "C" void TaskRoutineInit()
 {
   bool bStatus;
+
+  CRte::GetInstance().Init();
 
   CBmp384Driver::GetInstance().Init();
   bStatus = CBmp384Driver::GetInstance().IsInitialized();

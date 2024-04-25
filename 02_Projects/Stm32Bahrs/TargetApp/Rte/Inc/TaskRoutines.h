@@ -13,17 +13,23 @@ extern "C"
 {
 #endif
 
-void TaskRoutine1ms();
-
 void TaskRoutine5ms();
 
 void TaskRoutine10ms();
 
 void TaskRoutineRs232Sender(uint8_t uMessageId);
 
-void InitializeSensors();
+void TaskRoutineInit();
 
 void TaskRoutineProcessSyncPulse(uint64_t uTimestampUs);
+
+void TaskRoutineReceiveScha63TData();
+
+void TaskRoutinePollBmm(uint32_t uBmmSensorIndex);
+
+void TaskRoutinePollBmp();
+
+void TaskRoutinePollMmc();
 
 #ifdef __cplusplus
 }
