@@ -8,11 +8,6 @@ pipeline {
                 bat '05_Jenkins/Build_TargetApp_STM32.bat Debug'
             }
         }
-        stage('Build STM32 Release') {
-            steps {
-                bat '05_Jenkins/Build_TargetApp_STM32.bat Release'
-            }
-        }
     }
     post { 
         success { 
