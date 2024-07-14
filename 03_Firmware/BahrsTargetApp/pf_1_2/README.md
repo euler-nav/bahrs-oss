@@ -1,6 +1,6 @@
 # BAHRS software release PF_1_2
 
-This is a pre-built standard BAHRS software that samples are supplied with starting from May 2025. For pre-built open source version please refer to the 03_Firmware folder.
+This is a pre-built standard BAHRS software that samples are supplied with starting from May 2024. For pre-built open source version please refer to the 03_Firmware folder.
 
 ## Content
 
