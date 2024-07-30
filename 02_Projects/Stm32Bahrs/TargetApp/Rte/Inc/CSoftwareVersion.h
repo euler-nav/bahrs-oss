@@ -23,7 +23,7 @@ public:
 
   static constexpr char skacProjectCode_[3]{'O', 'S', 'S'}; ///< Project code, max 3 characters.
   static constexpr uint16_t skuMajor_{ 1U }; ///< Major version number
-  static constexpr uint16_t skuMinor_{ 2U }; ///< Minor version number
+  static constexpr uint16_t skuMinor_{ 3U }; ///< Minor version number
 };
 
 #endif // C_SOFTWARE_VERSION_H

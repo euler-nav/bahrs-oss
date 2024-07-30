@@ -112,6 +112,6 @@ struct SOutputImuData
 
 #pragma pack(pop)
 
-using CImuDataAfterMonitor = NImuMonitorApi::CImuData;
+using CImuDataAfterMonitor = NImuMonitorApi::COutputData;
 
 #endif /* RTE_TYPES_H */

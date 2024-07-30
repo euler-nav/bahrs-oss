@@ -10,28 +10,10 @@
 
 #include "CQuaternion.h"
 #include "ClosedLoopErrorStateKfApi.h"
+#include "MeasurementStructs.h"
 
 namespace NBahrsFilterApi
 {
-  /**
-   * @brief Input IMU data struct.
-  */
-  struct SImuData
-  {
-    uint64_t uTimestampUs_{ 0U };                        ///< Timestamp in microseconds.
-    Eigen::Vector3f oSpecificForce_{ 0.0F, 0.0F, 0.0F }; ///< Measured specific force.
-    Eigen::Vector3f oAngularRate_{ 0.0F, 0.0F, 0.0F };   ///< Measured angular rate.
-  };
-
-  /**
-   * @brief Input barometer measurements.
-  */
-  struct SPressureData
-  {
-    uint64_t uTimestampUs_{ 0U };      ///< Timestamp in microseconds.
-    float fPressureInPascals{ 0.0F }; ///< Measured pressure in pascals.
-  };
-
   /**
    * @brief BAHRS state vector struct.
   */
@@ -77,39 +59,51 @@ namespace NBahrsFilterApi
    * @brief Pass input to the filter.
    * The function may need to be called within a critical section.
    * @param korImuData Reference to IMU data struct.
+   * @param uFilterIndex Filter instance to call.
   */
-  void BahrsFilterSetInput(const SImuData& korImuData);
+  void BahrsFilterSetInput(const NFusionLibCommon::SImuMeasurement& korImuData, uint32_t uFilterIndex);
 
   /**
    * @brief Pass input to the filter.
    * The function may need to be called within a critical section.
    * @param korPressureData Reference to pressure data struct.
+   * @param uFilterIndex Filter instance to call.
   */
-  void BahrsFilterSetInput(const SPressureData& korPressureData);
+  void BahrsFilterSetInput(const NFusionLibCommon::SBarometerData& korPressureData, uint32_t uFilterIndex);
 
   /**
    * @brief Process inputs or make a snaphot of buffers before Step()
    * The function may need to be called within a critical section.
+   * @param uFilterIndex Filter instance to call.
   */
-  void BahrsFilterPrepareInputs();
+  void BahrsFilterPrepareInputs(uint32_t uFilterIndex);
 
   /**
    * @brief Do estimation.
    * @param uTimeUs Time of the call.
+   * @param uFilterIndex Filter instance to call.
   */
-  void BahrsFilterStep(uint64_t uTimeUs);
+  void BahrsFilterStep(uint64_t uTimeUs, uint32_t uFilterIndex);
 
   /**
    * @brief Clean-up at the end of an epoch.
    * The function may need to be called within a critical section.
+   * @param uFilterIndex Filter instance to call.
   */
-  void BahrsFilterCompleteEpoch();
+  void BahrsFilterCompleteEpoch(uint32_t uFilterIndex);
 
   /**
    * @brief Retrieve output information.
+   * @param uFilterIndex Filter instance to call.
    * @return Filter output data.
   */
-  SOutputData BahrsFilterGetOutput();
+  SOutputData BahrsFilterGetOutput(uint32_t uFilterIndex);
+
+  /**
+   * @brief Get number of available filter instances.
+   * @return Number of filter instances.
+   */
+  uint32_t GetBahrsFilterCount();
 }
 
 #endif /* BAHRS_FILTER_API_H */

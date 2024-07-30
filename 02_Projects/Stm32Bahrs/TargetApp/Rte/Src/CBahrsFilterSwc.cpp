@@ -46,26 +46,29 @@ void CBahrsFilterSwc::SetImuInput()
 
   if ((true == bReadStatus) && (true == UintToBool(oImuData.uValid_)))
   {
-    NBahrsFilterApi::SImuData oBahrsImuData;
+    NFusionLibCommon::SImuMeasurement oBahrsImuData;
 
     oBahrsImuData.uTimestampUs_ = oImuData.uTimestampUs_;
-    oBahrsImuData.oSpecificForce_(0) = oImuData.fSpecificForceX_;
-    oBahrsImuData.oSpecificForce_(1) = oImuData.fSpecificForceY_;
-    oBahrsImuData.oSpecificForce_(2) = oImuData.fSpecificForceZ_;
-    oBahrsImuData.oAngularRate_(0) = oImuData.fAngularRateX_;
-    oBahrsImuData.oAngularRate_(1) = oImuData.fAngularRateY_;
-    oBahrsImuData.oAngularRate_(2) = oImuData.fAngularRateZ_;
+
+    oBahrsImuData.fSpecificForceX_ = oImuData.fSpecificForceX_;
+    oBahrsImuData.fSpecificForceY_ = oImuData.fSpecificForceY_;
+    oBahrsImuData.fSpecificForceZ_ = oImuData.fSpecificForceZ_;
+    oBahrsImuData.fAngularRateX_ = oImuData.fAngularRateX_;
+    oBahrsImuData.fAngularRateY_ = oImuData.fAngularRateY_;
+    oBahrsImuData.fAngularRateZ_ = oImuData.fAngularRateZ_;
+    oBahrsImuData.eSensorId_ = NFusionLibCommon::ESensorId::eScha63T;
+    oBahrsImuData.bValid_ = true;
 
 #ifndef _MSC_VER
     osStatus_t eStatus = osMutexAcquire(pMutexHandle_, 1);
 
     if (osOK == eStatus)
     {
-      NBahrsFilterApi::BahrsFilterSetInput(oBahrsImuData);
+      NBahrsFilterApi::BahrsFilterSetInput(oBahrsImuData, 0);
       osMutexRelease(pMutexHandle_);
     }
 #else
-    NBahrsFilterApi::BahrsFilterSetInput(oBahrsImuData);
+    NBahrsFilterApi::BahrsFilterSetInput(oBahrsImuData, 0);
 #endif /* _MSC_VER */
   }
 }
@@ -77,21 +80,23 @@ void CBahrsFilterSwc::SetPressureInput()
 
   if ((true == bReadStatus) && (true == UintToBool(oPressureData.uValid_)))
   {
-    NBahrsFilterApi::SPressureData oBahrsPressureData;
+    NFusionLibCommon::SBarometerData oBahrsPressureData;
 
     oBahrsPressureData.uTimestampUs_ = oPressureData.uTimestampUs_;
-    oBahrsPressureData.fPressureInPascals = oPressureData.fPressure_;
+    oBahrsPressureData.fPressure_ = oPressureData.fPressure_;
+    oBahrsPressureData.eSensorId_ = NFusionLibCommon::ESensorId::eBmp384;
+    oBahrsPressureData.bValid_ = true;
 
 #ifndef _MSC_VER
     osStatus_t eStatus = osMutexAcquire(pMutexHandle_, 1);
 
     if (osOK == eStatus)
     {
-      NBahrsFilterApi::BahrsFilterSetInput(oBahrsPressureData);
+      NBahrsFilterApi::BahrsFilterSetInput(oBahrsPressureData, 0);
       osMutexRelease(pMutexHandle_);
     }
 #else
-    NBahrsFilterApi::BahrsFilterSetInput(oBahrsPressureData);
+    NBahrsFilterApi::BahrsFilterSetInput(oBahrsPressureData, 0);
 #endif /* _MSC_VER */
   }
 }
@@ -103,27 +108,27 @@ void CBahrsFilterSwc::Step(uint64_t uTimestampUs)
 
   if (osOK == eStatus)
   {
-    NBahrsFilterApi::BahrsFilterPrepareInputs();
+    NBahrsFilterApi::BahrsFilterPrepareInputs(0);
     osMutexRelease(pMutexHandle_);
   }
 #else
-  NBahrsFilterApi::BahrsFilterPrepareInputs();
+  NBahrsFilterApi::BahrsFilterPrepareInputs(0);
 #endif /* _MSC_VER */
 
-  NBahrsFilterApi::BahrsFilterStep(uTimestampUs);
+  NBahrsFilterApi::BahrsFilterStep(uTimestampUs, 0);
 
 #ifndef _MSC_VER
   eStatus = osMutexAcquire(pMutexHandle_, 1);
 
   if (osOK == eStatus)
   {
-    NBahrsFilterApi::BahrsFilterCompleteEpoch();
+    NBahrsFilterApi::BahrsFilterCompleteEpoch(0);
     osMutexRelease(pMutexHandle_);
   }
 #else
-  NBahrsFilterApi::BahrsFilterCompleteEpoch();
+  NBahrsFilterApi::BahrsFilterCompleteEpoch(0);
 #endif /* _MSC_VER */
 
-  CRte::GetInstance().oPortBahrsFilterOutput_.Write(NBahrsFilterApi::BahrsFilterGetOutput());
+  CRte::GetInstance().oPortBahrsFilterOutput_.Write(NBahrsFilterApi::BahrsFilterGetOutput(0));
 }
 

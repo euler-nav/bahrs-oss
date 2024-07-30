@@ -34,7 +34,7 @@ void COutputTransformer::TransformImuSignals()
 
     if (true == bStatus)
     {
-      using EImuSignals = CImuDataAfterMonitor::EImuSignals;
+      using EImuSignals = CImuDataAfterMonitor::EScalarSignals;
 
       const bool kbIsSpecificForceValid = isSpecificForceValidAndSafe(oImuData);
       const bool kbIsAngularRateValid = isAngularRateValidAndSafe(oImuData);
@@ -93,11 +93,11 @@ bool COutputTransformer::isSpecificForceValidAndSafe(const CImuDataAfterMonitor&
 {
   bool bResult{ true };
 
-  using EImuSignals = CImuDataAfterMonitor::EImuSignals;
+  using EImuSignals = CImuDataAfterMonitor::EScalarSignals;
   using EDetectionResult = CImuDataAfterMonitor::EDetectionResult;
   using EIsolationResult = CImuDataAfterMonitor::EIsolationResult;
 
-  std::array<CImuDataAfterMonitor::EImuSignals, 3> oSignalLabels{ EImuSignals::eSpecificForceX, EImuSignals::eSpecificForceY, EImuSignals::eSpecificForceZ};
+  std::array<EImuSignals, 3> oSignalLabels{ EImuSignals::eSpecificForceX, EImuSignals::eSpecificForceY, EImuSignals::eSpecificForceZ};
 
   for (EImuSignals eLabel : oSignalLabels)
   {
@@ -124,11 +124,11 @@ bool COutputTransformer::isAngularRateValidAndSafe(const CImuDataAfterMonitor& k
 {
   bool bResult{ true };
 
-  using EImuSignals = CImuDataAfterMonitor::EImuSignals;
+  using EImuSignals = CImuDataAfterMonitor::EScalarSignals;
   using EDetectionResult = CImuDataAfterMonitor::EDetectionResult;
   using EIsolationResult = CImuDataAfterMonitor::EIsolationResult;
 
-  std::array<CImuDataAfterMonitor::EImuSignals, 3> oSignalLabels{ EImuSignals::eAngularRateX, EImuSignals::eAngularRateY, EImuSignals::eAngularRateZ};
+  std::array<EImuSignals, 3> oSignalLabels{ EImuSignals::eAngularRateX, EImuSignals::eAngularRateY, EImuSignals::eAngularRateZ};
 
   for (EImuSignals eLabel : oSignalLabels)
   {

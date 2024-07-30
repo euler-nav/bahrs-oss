@@ -222,9 +222,9 @@ private:
   SCompensationParameters oCompensationParameters_; ///< Compensation parameters read from the sensor's NVM.
   SScha63TDataset oLatestDataset_; ///< The latest 30 measurements that are transfered periodically to the queue of the dedicated FreeRTOS task.
   SScha63TDataset oOutputDataset_;
+  bool bErrorFlags_ { false }; ///< The flag indicating errors during ASIC operation.
   SScha63TStatusUno oStatusUno_; ///< The latest content of the UNO status registers. Valid only when bErrorFlags_ is true.
   SScha63TStatusDue oStatusDue_; ///< The latest content of the DUE status registers. Valid only when bErrorFlags_ is true.
-  bool bErrorFlags_ { false }; ///< The flag indicating errors during ASIC operation.
   bool bDatasetAvailable_ { false };
 
 };

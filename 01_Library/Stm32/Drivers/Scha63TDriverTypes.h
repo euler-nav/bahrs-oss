@@ -8,55 +8,52 @@
 #ifndef SCHA63T_DRIVER_TYPES_H
 #define SCHA63T_DRIVER_TYPES_H
 
-#ifdef __cplusplus
-extern "C"
-{
+#ifndef __cplusplus
+#error This file must not be included in C code.
 #endif /* __cplusplus */
 
-#define SAMPLE_COUNT 30U ///< With 6.02 kHz sample rate, this produces 200 Hz Output Data Rate (ODR)
+#include <array>
 
-typedef struct SScha63TMeasurement
+#define SAMPLE_COUNT (15U) ///< With 3.01 kHz sample rate, this produces 200 Hz Output Data Rate (ODR)
+
+struct SScha63TMeasurement
 {
-  int16_t iSpecificForceX_;
-  int16_t iSpecificForceY_;
-  int16_t iSpecificForceZ_;
-  int16_t iAngularRateX_;
-  int16_t iAngularRateY_;
-  int16_t iAngularRateZ_;
-  int16_t iTemperatureUno_;
-  int16_t iTemperatureDue_;
-  uint8_t uValid_;
-} SScha63TMeasurement_t;
+  int16_t iSpecificForceX_{ 0 };
+  int16_t iSpecificForceY_{ 0 };
+  int16_t iSpecificForceZ_{ 0 };
+  int16_t iAngularRateX_{ 0 };
+  int16_t iAngularRateY_{ 0 };
+  int16_t iAngularRateZ_{ 0 };
+  int16_t iTemperatureUno_{ 0 };
+  int16_t iTemperatureDue_{ 0 };
+  uint8_t uValid_{ 0U };
+};
 
-typedef struct SScha63TDataset
+struct SScha63TDataset
 {
-  SScha63TMeasurement_t aoMeasurements_[SAMPLE_COUNT];
-  uint64_t uTimestampFirstUs_;
-  uint64_t uTimestampLastUs_;
-} SScha63TDataset_t;
+  std::array<SScha63TMeasurement, SAMPLE_COUNT> oMeasurements_;
+  uint64_t uTimestampFirstUs_{ 0U };
+  uint64_t uTimestampLastUs_{ 0U };
+};
 
-typedef struct SScha63TStatusUno
+struct SScha63TStatusUno
 {
-  uint16_t uSummaryStatus_;
-  uint16_t uRateStatus_;
-  uint16_t uAccelerometerStatus_;
-  uint16_t uCommonStatus1_;
-  uint16_t uCommonStatus2_;
-} SScha63TStatusUno_t;
+  uint16_t uSummaryStatus_{ 0U };
+  uint16_t uRateStatus_{ 0U };
+  uint16_t uAccelerometerStatus_{ 0U };
+  uint16_t uCommonStatus1_{ 0U };
+  uint16_t uCommonStatus2_{ 0U };
+};
 
 
-typedef struct SScha63TStatusDue
+struct SScha63TStatusDue
 {
-  uint16_t uSummaryStatus_;
-  uint16_t uRateStatus1_;
-  uint16_t uRateStatus2_;
-  uint16_t uCommonStatus1_;
-  uint16_t uCommonStatus2_;
-} SScha63TStatusDue_t;
-
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
+  uint16_t uSummaryStatus_{ 0U };
+  uint16_t uRateStatus1_{ 0U };
+  uint16_t uRateStatus2_{ 0U };
+  uint16_t uCommonStatus1_{ 0U };
+  uint16_t uCommonStatus2_{ 0U };
+};
 
 
 #endif /* SCHA63T_DRIVER_TYPES_H */

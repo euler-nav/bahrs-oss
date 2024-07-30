@@ -24,7 +24,11 @@ if testConfig.convertBinaryFile
             [filepath, name, ext] = fileparts(testConfig.binaryFile);
             convertedMatFile = strcat(name, '.mat');
             commandString = sprintf('%s %s %s', testConfig.converterExecutable, testConfig.binaryFile, convertedMatFile);
-            [status, result] = system(commandString, '-echo');
+            [status, result] = system(commandString);
+
+            % Octave has a bug, so we do this instead of using '-echo'
+            % option in the system() call.
+            disp(result);
 
             if status ~= 0
                 warning('script_evaluateBahrs:converterFailed',...

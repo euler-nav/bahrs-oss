@@ -76,6 +76,9 @@ int main(void)
 {
   /* USER CODE BEGIN 1 */
 
+  // Ensure that TIM6 driving tick for HAL gets low-enough priority.
+  uwTickPrio = configLIBRARY_LOWEST_INTERRUPT_PRIORITY;
+
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/

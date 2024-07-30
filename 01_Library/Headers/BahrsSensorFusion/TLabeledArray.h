@@ -9,6 +9,7 @@
 #define T_LABELED_ARRAY_H
 
 #include <type_traits>
+#include <array>
 
 /**
  * @brief A labeled array class template. MUST NOT be instatiated directly.
@@ -112,6 +113,7 @@ private:
   ArrayElementType data_[skuSize_];
 };
 
+
 #define DECLARE_LABELED_ARRAY_TEMPLATE(TemplateName, ... ) \
 struct TemplateName \
 { \
@@ -122,6 +124,20 @@ struct TemplateName \
   }; \
 \
   template<typename ArrayElementType> using TLabeledArray = TLabeledArrayInternal<ArrayElementType, EnumType>; \
+\
+  using CArrayOfAllLabels = std::array<EnumType, static_cast<size_t>(EnumType::eCount)>; \
+\
+  static CArrayOfAllLabels GetArrayOfAllLabels() \
+  { \
+    CArrayOfAllLabels oAllLabels; \
+\
+    for (uint32_t uIndex = 0U; uIndex < oAllLabels.size(); ++uIndex) \
+    { \
+      oAllLabels[uIndex] = static_cast<EnumType>(uIndex); \
+    } \
+\
+    return oAllLabels; \
+  } \
 };
 
 

@@ -37,7 +37,7 @@ void CImuMonitorSwc::Run()
 {
   SImuDataScha63T oImuData1;
   SImuMeasurement oImuData2, oImuData3;
-  NImuMonitorApi::CRedundantImuData oRedundantImuData;
+  NImuMonitorApi::CRedundantInputData oRedundantImuData;
 
   if (true == CRte::GetInstance().oScha63TDriverPort_.Read(oImuData1))
   {
@@ -99,7 +99,7 @@ void CImuMonitorSwc::Run()
     }
   }
 
-  NImuMonitorApi::CImuData oDataAfterMonitor = NImuMonitorApi::ImuMonitorRun(oRedundantImuData);
+  NImuMonitorApi::COutputData oDataAfterMonitor = NImuMonitorApi::ImuMonitorRun(oRedundantImuData);
 
   CRte::GetInstance().oPortImuDataAfterMonitor_.Write(oDataAfterMonitor);
 }

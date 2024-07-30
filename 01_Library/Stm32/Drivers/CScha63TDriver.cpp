@@ -195,95 +195,128 @@ bool CScha63TDriver::IsInitialized()
 
 void CScha63TDriver::PollSensor()
 {
-  static uint32_t uCounter = 0U;
+  static uint32_t suCounter = 0U;
+  static uint32_t suTimeoutCounter = 0U;
 
   if (true == bIsInitialized_)
   {
-    uint32_t auFrames[eFrameCount] = { 0U };
-
-    ++uCounter;
-
-    __disable_irq();
-
-    if (1U == uCounter)
+    if (0U == suTimeoutCounter)
     {
-      oLatestDataset_.uTimestampFirstUs_ = GetMicroseconds();
-    }
-    else if (SAMPLE_COUNT == uCounter)
-    {
-      oLatestDataset_.uTimestampLastUs_ = GetMicroseconds();
-    }
-    else
-    {
-      // Do nothing
-    }
+      std::array<uint32_t, static_cast<size_t>(eFrameCount)> oFrames{ 0U };
+      SScha63TMeasurement oMeasurement = { 0 };
 
-    spiWriteReadDue(SPI_FRAME_READ_GYRO_Y);
-    auFrames[eAngularRateY] = spiWriteReadDue(SPI_FRAME_READ_GYRO_Z);
-    auFrames[eAngularRateZ] =  spiWriteReadDue(SPI_FRAME_READ_TEMP);
-    auFrames[eTemperatureDue] = spiWriteReadDue(SPI_FRAME_READ_TEMP);
+      ++suCounter;
 
-    spiWriteReadUno(SPI_FRAME_READ_GYRO_X);
-    auFrames[eAngularRateX] = spiWriteReadUno(SPI_FRAME_READ_ACC_X);
-    auFrames[eSpecificForceX] = spiWriteReadUno(SPI_FRAME_READ_ACC_Y);
-    auFrames[eSpecificForceY] = spiWriteReadUno(SPI_FRAME_READ_ACC_Z);
-    auFrames[eSpecificForceZ] = spiWriteReadUno(SPI_FRAME_READ_TEMP);
-    auFrames[eTemperatureUno] = spiWriteReadUno(SPI_FRAME_READ_TEMP);
-
-    __enable_irq();
-
-    bErrorFlags_ = checkRsErrorInFrames(auFrames, eFrameCount);
-
-    SScha63TMeasurement oMeasurement = { 0 };
-
-    if (false == bErrorFlags_)
-    {
-      oMeasurement.iSpecificForceX_ = frameToInt16(auFrames[eSpecificForceX]);
-      oMeasurement.iSpecificForceY_ = frameToInt16(auFrames[eSpecificForceY]);
-      oMeasurement.iSpecificForceZ_ = frameToInt16(auFrames[eSpecificForceZ]);
-      oMeasurement.iAngularRateX_ = frameToInt16(auFrames[eAngularRateX]);
-      oMeasurement.iAngularRateY_ = frameToInt16(auFrames[eAngularRateY]);
-      oMeasurement.iAngularRateZ_ = frameToInt16(auFrames[eAngularRateZ]);
-      oMeasurement.iTemperatureUno_ = frameToInt16(auFrames[eTemperatureUno]);
-      oMeasurement.iTemperatureDue_ = frameToInt16(auFrames[eTemperatureDue]);
-      oMeasurement.uValid_ = 1U;
-    }
-    else
-    {
       __disable_irq();
 
-      spiWriteReadUno(SPI_FRAME_READ_SUMMARY_STATUS);
-      oStatusUno_.uSummaryStatus_ = frameToUint16(spiWriteReadUno(SPI_FRAME_READ_RATE_STATUS_1));
-      oStatusUno_.uRateStatus_ = frameToUint16(spiWriteReadUno(SPI_FRAME_READ_ACC_STATUS_1));
-      oStatusUno_.uAccelerometerStatus_ = frameToUint16(spiWriteReadUno(SPI_FRAME_READ_COMMON_STATUS_1));
-      oStatusUno_.uCommonStatus1_ = frameToUint16(spiWriteReadUno(SPI_FRAME_READ_COMMON_STATUS_2));
-      oStatusUno_.uCommonStatus2_ = frameToUint16(spiWriteReadUno(SPI_FRAME_READ_COMMON_STATUS_2));
-
-      spiWriteReadDue(SPI_FRAME_READ_SUMMARY_STATUS);
-      oStatusDue_.uSummaryStatus_ = frameToUint16(spiWriteReadDue(SPI_FRAME_READ_RATE_STATUS_1));
-      oStatusDue_.uRateStatus1_ = frameToUint16(spiWriteReadDue(SPI_FRAME_READ_RATE_STATUS_2));
-      oStatusDue_.uRateStatus2_ = frameToUint16(spiWriteReadDue(SPI_FRAME_READ_COMMON_STATUS_1));
-      oStatusDue_.uCommonStatus1_ = frameToUint16(spiWriteReadDue(SPI_FRAME_READ_COMMON_STATUS_2));
-      oStatusDue_.uCommonStatus2_ = frameToUint16(spiWriteReadDue(SPI_FRAME_READ_COMMON_STATUS_2));
-
-      __enable_irq();
-    }
-
-    oLatestDataset_.aoMeasurements_[uCounter - 1U] = oMeasurement;
-
-    if (SAMPLE_COUNT == uCounter)
-    {
-      __disable_irq();
-
-      if (false == bDatasetAvailable_)
+      if (1U == suCounter)
       {
-        bDatasetAvailable_ = true;
-        oOutputDataset_ = oLatestDataset_;
+        oLatestDataset_.uTimestampFirstUs_ = GetMicroseconds();
+      }
+      else if (SAMPLE_COUNT == suCounter)
+      {
+        oLatestDataset_.uTimestampLastUs_ = GetMicroseconds();
+      }
+      else
+      {
+        // Do nothing
       }
 
+      spiWriteReadDue(SPI_FRAME_READ_GYRO_Y);
+      oFrames[eAngularRateY] = spiWriteReadDue(SPI_FRAME_READ_GYRO_Z);
+      oFrames[eAngularRateZ] =  spiWriteReadDue(SPI_FRAME_READ_TEMP);
+      oFrames[eTemperatureDue] = spiWriteReadDue(SPI_FRAME_READ_TEMP);
+
+      spiWriteReadUno(SPI_FRAME_READ_GYRO_X);
+      oFrames[eAngularRateX] = spiWriteReadUno(SPI_FRAME_READ_ACC_X);
+      oFrames[eSpecificForceX] = spiWriteReadUno(SPI_FRAME_READ_ACC_Y);
+      oFrames[eSpecificForceY] = spiWriteReadUno(SPI_FRAME_READ_ACC_Z);
+      oFrames[eSpecificForceZ] = spiWriteReadUno(SPI_FRAME_READ_TEMP);
+      oFrames[eTemperatureUno] = spiWriteReadUno(SPI_FRAME_READ_TEMP);
+
       __enable_irq();
 
-      uCounter = 0U;
+      bErrorFlags_ = false;
+
+      // Check for zero frames -> error during SPI communication.
+      // TODO: do CRC instead.
+      for (uint32_t uFrame : oFrames)
+      {
+        if (0U == uFrame)
+        {
+          bErrorFlags_ = true;
+          break;
+        }
+      }
+
+      if (false == bErrorFlags_)
+      {
+        bErrorFlags_ = checkRsErrorInFrames(oFrames.begin(), oFrames.size());
+
+        if (bErrorFlags_)
+        {
+          // Start timeout
+          suTimeoutCounter = SAMPLE_COUNT;
+
+          __disable_irq();
+
+          // Drop collected data
+          suCounter = 0U;
+          oLatestDataset_ = SScha63TDataset();
+
+          // Poll status information. The flags persist until status registers are read.
+          spiWriteReadUno(SPI_FRAME_READ_SUMMARY_STATUS);
+          oStatusUno_.uSummaryStatus_ = frameToUint16(spiWriteReadUno(SPI_FRAME_READ_RATE_STATUS_1));
+          oStatusUno_.uRateStatus_ = frameToUint16(spiWriteReadUno(SPI_FRAME_READ_ACC_STATUS_1));
+          oStatusUno_.uAccelerometerStatus_ = frameToUint16(spiWriteReadUno(SPI_FRAME_READ_COMMON_STATUS_1));
+          oStatusUno_.uCommonStatus1_ = frameToUint16(spiWriteReadUno(SPI_FRAME_READ_COMMON_STATUS_2));
+          oStatusUno_.uCommonStatus2_ = frameToUint16(spiWriteReadUno(SPI_FRAME_READ_COMMON_STATUS_2));
+
+          spiWriteReadDue(SPI_FRAME_READ_SUMMARY_STATUS);
+          oStatusDue_.uSummaryStatus_ = frameToUint16(spiWriteReadDue(SPI_FRAME_READ_RATE_STATUS_1));
+          oStatusDue_.uRateStatus1_ = frameToUint16(spiWriteReadDue(SPI_FRAME_READ_RATE_STATUS_2));
+          oStatusDue_.uRateStatus2_ = frameToUint16(spiWriteReadDue(SPI_FRAME_READ_COMMON_STATUS_1));
+          oStatusDue_.uCommonStatus1_ = frameToUint16(spiWriteReadDue(SPI_FRAME_READ_COMMON_STATUS_2));
+          oStatusDue_.uCommonStatus2_ = frameToUint16(spiWriteReadDue(SPI_FRAME_READ_COMMON_STATUS_2));
+
+          __enable_irq();
+        }
+      }
+
+      if (false == bErrorFlags_)
+      {
+        oMeasurement.iSpecificForceX_ = frameToInt16(oFrames[eSpecificForceX]);
+        oMeasurement.iSpecificForceY_ = frameToInt16(oFrames[eSpecificForceY]);
+        oMeasurement.iSpecificForceZ_ = frameToInt16(oFrames[eSpecificForceZ]);
+        oMeasurement.iAngularRateX_ = frameToInt16(oFrames[eAngularRateX]);
+        oMeasurement.iAngularRateY_ = frameToInt16(oFrames[eAngularRateY]);
+        oMeasurement.iAngularRateZ_ = frameToInt16(oFrames[eAngularRateZ]);
+        oMeasurement.iTemperatureUno_ = frameToInt16(oFrames[eTemperatureUno]);
+        oMeasurement.iTemperatureDue_ = frameToInt16(oFrames[eTemperatureDue]);
+        oMeasurement.uValid_ = 1U;
+
+        assert(((suCounter - 1U) >= 0) && ((suCounter - 1U) < oLatestDataset_.oMeasurements_.size()));
+        oLatestDataset_.oMeasurements_[suCounter - 1U] = oMeasurement;
+
+        if (SAMPLE_COUNT == suCounter)
+        {
+          __disable_irq();
+
+          if (false == bDatasetAvailable_)
+          {
+            bDatasetAvailable_ = true;
+            oOutputDataset_ = oLatestDataset_;
+          }
+
+          __enable_irq();
+
+          suCounter = 0U;
+        }
+      }
+    }
+    else
+    {
+      --suTimeoutCounter;
     }
   }
 }
@@ -291,7 +324,7 @@ void CScha63TDriver::PollSensor()
 void CScha63TDriver::ConvertRawDataset()
 {
   SImuDataScha63T oImuData;
-  SScha63TDataset_t oDataset;
+  SScha63TDataset oDataset;
   CRte& orRte = CRte::GetInstance();
 
   __disable_irq();
@@ -310,17 +343,17 @@ void CScha63TDriver::ConvertRawDataset()
   {
     unsigned iMeasurementCount = 0U;
 
-    for (unsigned iIndex = 0; iIndex < SAMPLE_COUNT; ++iIndex)
+    for (const auto& korMeasurement : oDataset.oMeasurements_)
     {
-      if (1U == oDataset.aoMeasurements_[iIndex].uValid_)
+      if (1U == korMeasurement.uValid_)
       {
         ++iMeasurementCount;
-        oImuData.fSpecificForceX_ += static_cast<float>(oDataset.aoMeasurements_[iIndex].iSpecificForceX_);
-        oImuData.fSpecificForceY_ += static_cast<float>(oDataset.aoMeasurements_[iIndex].iSpecificForceY_);
-        oImuData.fSpecificForceZ_ += static_cast<float>(oDataset.aoMeasurements_[iIndex].iSpecificForceZ_);
-        oImuData.fAngularRateX_ += static_cast<float>(oDataset.aoMeasurements_[iIndex].iAngularRateX_);
-        oImuData.fAngularRateY_ += static_cast<float>(oDataset.aoMeasurements_[iIndex].iAngularRateY_);
-        oImuData.fAngularRateZ_ += static_cast<float>(oDataset.aoMeasurements_[iIndex].iAngularRateZ_);
+        oImuData.fSpecificForceX_ += static_cast<float>(korMeasurement.iSpecificForceX_);
+        oImuData.fSpecificForceY_ += static_cast<float>(korMeasurement.iSpecificForceY_);
+        oImuData.fSpecificForceZ_ += static_cast<float>(korMeasurement.iSpecificForceZ_);
+        oImuData.fAngularRateX_ += static_cast<float>(korMeasurement.iAngularRateX_);
+        oImuData.fAngularRateY_ += static_cast<float>(korMeasurement.iAngularRateY_);
+        oImuData.fAngularRateZ_ += static_cast<float>(korMeasurement.iAngularRateZ_);
       }
     }
 
@@ -336,7 +369,7 @@ void CScha63TDriver::ConvertRawDataset()
       oImuData.fAngularRateY_ *= fTmp;
       oImuData.fAngularRateZ_ *= fTmp;
 
-      SImuDataScha63T oImuDataTmp;
+      SImuMeasurement oImuDataTmp;
       const SCompensationParameters& korParams = oCompensationParameters_;
 
       oImuDataTmp.fSpecificForceX_ = (korParams.fBxx_ * oImuData.fSpecificForceX_) + (korParams.fBxy_ * oImuData.fSpecificForceY_) + (korParams.fBxz_ * oImuData.fSpecificForceZ_);
@@ -442,33 +475,38 @@ uint32_t CScha63TDriver::spiWriteReadDue(uint32_t uDataOut)
 uint32_t CScha63TDriver::spiWriteRead(uint32_t uDataOut, GPIO_TypeDef* opGpioX, uint16_t uGpioPin)
 {
   uint32_t uResp = 0;
-  uint8_t uDataByte[4];
-  uint8_t uRespByte[4];
+  uint8_t uDataBytes[sizeof(uResp)];
+  uint8_t uRespBytes[sizeof(uResp)];
   HAL_StatusTypeDef eMurataSpiStatus;
   HAL_SPI_StateTypeDef eMurataSpiState;
 
   HAL_GPIO_WritePin(opGpioX, uGpioPin, GPIO_PIN_RESET); // Set CS active
 
   // We send data in 8-bits. As STM32 is little-endian, we need to change the byte order.
-  uDataByte[3] = static_cast<uint8_t>(uDataOut & 0x000000FF);
-  uDataByte[2] = static_cast<uint8_t>((uDataOut >> 8) & 0x000000FF);
-  uDataByte[1] = static_cast<uint8_t>((uDataOut >> 16) & 0x000000FF);
-  uDataByte[0] = static_cast<uint8_t>((uDataOut >> 24) & 0x000000FF);
+  uDataBytes[3] = static_cast<uint8_t>(uDataOut & 0x000000FF);
+  uDataBytes[2] = static_cast<uint8_t>((uDataOut >> 8) & 0x000000FF);
+  uDataBytes[1] = static_cast<uint8_t>((uDataOut >> 16) & 0x000000FF);
+  uDataBytes[0] = static_cast<uint8_t>((uDataOut >> 24) & 0x000000FF);
+
+  uint64_t uStartWaitingTime = GetMicroseconds();
 
   do
   {
     eMurataSpiState = HAL_SPI_GetState(&hspi1);
   }
-  while(eMurataSpiState != HAL_SPI_STATE_READY);
+  while((eMurataSpiState != HAL_SPI_STATE_READY) && ((GetMicroseconds() - uStartWaitingTime) < 20U));
 
-  eMurataSpiStatus = HAL_SPI_TransmitReceive(&hspi1, &uDataByte[0], &uRespByte[0], 4, 1);
-
-  if(eMurataSpiStatus == HAL_OK)
+  if (eMurataSpiState == HAL_SPI_STATE_READY)
   {
-    uResp = (static_cast<uint32_t>(uRespByte[0]) << 24) & 0xFF000000;
-    uResp |= (static_cast<uint32_t>(uRespByte[1]) << 16) & 0x00FF0000;
-    uResp |= (static_cast<uint32_t>(uRespByte[2]) << 8) & 0x0000FF00;
-    uResp |= static_cast<uint32_t>(uRespByte[3]) & 0x000000FF;
+    eMurataSpiStatus = HAL_SPI_TransmitReceive(&hspi1, &uDataBytes[0], &uRespBytes[0], sizeof(uResp), 1);
+
+    if(eMurataSpiStatus == HAL_OK)
+    {
+      uResp = (static_cast<uint32_t>(uRespBytes[0]) << 24) & 0xFF000000;
+      uResp |= (static_cast<uint32_t>(uRespBytes[1]) << 16) & 0x00FF0000;
+      uResp |= (static_cast<uint32_t>(uRespBytes[2]) << 8) & 0x0000FF00;
+      uResp |= static_cast<uint32_t>(uRespBytes[3]) & 0x000000FF;
+    }
   }
 
   HAL_GPIO_WritePin(opGpioX, uGpioPin, GPIO_PIN_SET); // Set CS non-active
