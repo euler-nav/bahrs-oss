@@ -76,8 +76,8 @@ int main(void)
 {
   /* USER CODE BEGIN 1 */
 
-  // Ensure that TIM6 driving tick for HAL gets low-enough priority.
-  uwTickPrio = configLIBRARY_LOWEST_INTERRUPT_PRIORITY;
+  // Ensure that TIM6 driving tick for HAL has priority higher than interrupts calling HAL functions.
+  uwTickPrio = 1;
 
   /* USER CODE END 1 */
 

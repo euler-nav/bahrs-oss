@@ -195,6 +195,9 @@ bool CScha63TDriver::IsInitialized()
 
 void CScha63TDriver::PollSensor()
 {
+  // Function shall be called within ISR context
+  assert(SCB->ICSR & SCB_ICSR_VECTACTIVE_Msk);
+
   static uint32_t suCounter = 0U;
   static uint32_t suTimeoutCounter = 0U;
 
@@ -206,8 +209,6 @@ void CScha63TDriver::PollSensor()
       SScha63TMeasurement oMeasurement = { 0 };
 
       ++suCounter;
-
-      __disable_irq();
 
       if (1U == suCounter)
       {
@@ -234,8 +235,6 @@ void CScha63TDriver::PollSensor()
       oFrames[eSpecificForceZ] = spiWriteReadUno(SPI_FRAME_READ_TEMP);
       oFrames[eTemperatureUno] = spiWriteReadUno(SPI_FRAME_READ_TEMP);
 
-      __enable_irq();
-
       bErrorFlags_ = false;
 
       // Check for zero frames -> error during SPI communication.
@@ -258,8 +257,6 @@ void CScha63TDriver::PollSensor()
           // Start timeout
           suTimeoutCounter = SAMPLE_COUNT;
 
-          __disable_irq();
-
           // Drop collected data
           suCounter = 0U;
           oLatestDataset_ = SScha63TDataset();
@@ -278,8 +275,6 @@ void CScha63TDriver::PollSensor()
           oStatusDue_.uRateStatus2_ = frameToUint16(spiWriteReadDue(SPI_FRAME_READ_COMMON_STATUS_1));
           oStatusDue_.uCommonStatus1_ = frameToUint16(spiWriteReadDue(SPI_FRAME_READ_COMMON_STATUS_2));
           oStatusDue_.uCommonStatus2_ = frameToUint16(spiWriteReadDue(SPI_FRAME_READ_COMMON_STATUS_2));
-
-          __enable_irq();
         }
       }
 
@@ -300,16 +295,8 @@ void CScha63TDriver::PollSensor()
 
         if (SAMPLE_COUNT == suCounter)
         {
-          __disable_irq();
-
-          if (false == bDatasetAvailable_)
-          {
-            bDatasetAvailable_ = true;
-            oOutputDataset_ = oLatestDataset_;
-          }
-
-          __enable_irq();
-
+          bDatasetAvailable_ = true;
+          oOutputDataset_ = oLatestDataset_;
           suCounter = 0U;
         }
       }
@@ -327,7 +314,9 @@ void CScha63TDriver::ConvertRawDataset()
   SScha63TDataset oDataset;
   CRte& orRte = CRte::GetInstance();
 
-  __disable_irq();
+  // Ensure that the callback that polls the sensor does not change the data while we are copying it.
+  taskENTER_CRITICAL();
+  NVIC_DisableIRQ(TIM7_IRQn);
 
   bool bDatasetAvailable = bDatasetAvailable_;
 
@@ -337,7 +326,8 @@ void CScha63TDriver::ConvertRawDataset()
     bDatasetAvailable_ = false;
   }
 
-  __enable_irq();
+  NVIC_EnableIRQ(TIM7_IRQn);
+  taskEXIT_CRITICAL();
 
   if ((true == bIsInitialized_) && (true == bDatasetAvailable))
   {
@@ -498,7 +488,7 @@ uint32_t CScha63TDriver::spiWriteRead(uint32_t uDataOut, GPIO_TypeDef* opGpioX, 
 
   if (eMurataSpiState == HAL_SPI_STATE_READY)
   {
-    eMurataSpiStatus = HAL_SPI_TransmitReceive(&hspi1, &uDataBytes[0], &uRespBytes[0], sizeof(uResp), 1);
+    eMurataSpiStatus = HAL_SPI_TransmitReceive(&hspi1, &uDataBytes[0], &uRespBytes[0], sizeof(uResp), 2);
 
     if(eMurataSpiStatus == HAL_OK)
     {

@@ -261,7 +261,13 @@ bool CIcm20789Driver::RequestInertialSensorDataDma()
   // Receive bytes in DMA mode
   if (true == bStatus)
   {
-    HAL_StatusTypeDef eHalStatus = HAL_I2C_Master_Receive_DMA(opkI2CHandle_, ICM20789_ADDRESS_IMU << 1, auImuDataBuffer_, 14);
+    /* Check if I2C bus is ready */
+    HAL_StatusTypeDef eHalStatus = HAL_BUSY;
+    uint32_t uStart = HAL_GetTick();
+    if (i2cWaitOnFlag(I2C_FLAG_BUSY, SET, ICM20789_BUSY_TIMEOUT, uStart))
+    {
+      eHalStatus = HAL_I2C_Master_Receive_DMA(opkI2CHandle_, ICM20789_ADDRESS_IMU << 1, auImuDataBuffer_, 14);
+    }
     bStatus = (eHalStatus == HAL_OK);
   }
 
@@ -270,7 +276,13 @@ bool CIcm20789Driver::RequestInertialSensorDataDma()
 
 bool CIcm20789Driver::RequestPressureSensorDataDma()
 {
-  HAL_StatusTypeDef eHalStatus = HAL_I2C_Master_Receive_DMA(opkI2CHandle_, ICM20789_ADDRESS_PRESS << 1, auPressureDataBuffer_, 9);
+  /* Check if I2C bus is ready */
+  HAL_StatusTypeDef eHalStatus = HAL_BUSY;
+  uint32_t uStart = HAL_GetTick();
+  if (i2cWaitOnFlag(I2C_FLAG_BUSY, SET, ICM20789_BUSY_TIMEOUT, uStart))
+  {
+    eHalStatus = HAL_I2C_Master_Receive_DMA(opkI2CHandle_, ICM20789_ADDRESS_PRESS << 1, auPressureDataBuffer_, 9);
+  }
   return (eHalStatus == HAL_OK);
 }
 
@@ -774,22 +786,40 @@ bool CIcm20789Driver::setImuFilter()
 
 bool CIcm20789Driver::i2cRead(uint8_t uIicAddress, uint8_t* upData, uint8_t uLen)
 {
-  HAL_StatusTypeDef uSts = HAL_OK;
-  uSts = HAL_I2C_Master_Receive(opkI2CHandle_, ((uIicAddress << 1)), upData, uLen, ICM20789_TIMEOUT);
+  HAL_StatusTypeDef uSts = HAL_BUSY;
+  uint32_t uStart = HAL_GetTick();
+
+  /* Check if I2C bus is ready */
+  if (i2cWaitOnFlag(I2C_FLAG_BUSY, SET, ICM20789_BUSY_TIMEOUT, uStart))
+  {
+    uSts = HAL_I2C_Master_Receive(opkI2CHandle_, ((uIicAddress << 1)), upData, uLen, ICM20789_TIMEOUT);
+  }
   return (uSts == HAL_OK ? true : false);
 }
 
 bool CIcm20789Driver::i2cReadOtp(uint8_t uIicAddress, uint8_t* upData, uint8_t uLen)
 {
-  HAL_StatusTypeDef uSts = HAL_OK;
-  uSts = HAL_I2C_Master_Receive(opkI2CHandle_, ((uIicAddress << 1)), upData, uLen, ICM20789_TIMEOUT_OTP);
+  HAL_StatusTypeDef uSts = HAL_BUSY;
+  uint32_t uStart = HAL_GetTick();
+
+  /* Check if I2C bus is ready */
+  if (i2cWaitOnFlag(I2C_FLAG_BUSY, SET, ICM20789_BUSY_TIMEOUT, uStart))
+  {
+    uSts = HAL_I2C_Master_Receive(opkI2CHandle_, ((uIicAddress << 1)), upData, uLen, ICM20789_TIMEOUT_OTP);
+  }
   return (uSts == HAL_OK ? true : false);
 }
 
 bool CIcm20789Driver::i2cWrite(uint8_t uIicAddress, uint8_t* upData, uint8_t uLen)
 {
-  HAL_StatusTypeDef uSts = HAL_OK;
-  uSts = HAL_I2C_Master_Transmit(opkI2CHandle_, (uIicAddress << 1), upData, uLen, ICM20789_TIMEOUT);
+  HAL_StatusTypeDef uSts = HAL_BUSY;
+  uint32_t uStart = HAL_GetTick();
+
+  /* Check if I2C bus is ready */
+  if (i2cWaitOnFlag(I2C_FLAG_BUSY, SET, ICM20789_BUSY_TIMEOUT, uStart))
+  {
+    uSts = HAL_I2C_Master_Transmit(opkI2CHandle_, (uIicAddress << 1), upData, uLen, ICM20789_TIMEOUT);
+  }
   return (uSts == HAL_OK ? true : false);
 }
 
@@ -809,6 +839,25 @@ bool CIcm20789Driver:: writeImuRegister(uint8_t uReg, uint8_t uData)
 {
   uint8_t auData[2] = { uReg, uData };
   return i2cWrite(ICM20789_ADDRESS_IMU, auData, 2);
+}
+
+bool CIcm20789Driver::i2cWaitOnFlag(uint32_t Flag, FlagStatus Status, uint32_t Timeout, uint32_t Tickstart)
+{
+  /* Wait while flag status matches */
+  while (__HAL_I2C_GET_FLAG(opkI2CHandle_, Flag) == Status)
+  {
+    /* Check for the Timeout */
+    if (Timeout != HAL_MAX_DELAY)
+    {
+      if (((HAL_GetTick() - Tickstart) > Timeout) || (Timeout == 0U))
+      {
+        return false;
+      }
+    }
+    /* Yield if we have all the tasks already running */
+    osDelayIfInitTaskCompleted(1);
+  }
+  return true;
 }
 
 bool CIcm20789Driver::imuSelfTest()

@@ -39,7 +39,14 @@ extern I2C_HandleTypeDef hi2c2;
 extern I2C_HandleTypeDef hi2c3;
 
 /* USER CODE BEGIN Private defines */
-
+#define __OS_YIELD()                                           \
+  extern osThreadId_t TaskInitHandle;                          \
+  do{                                                          \
+      if (osThreadRunning != osThreadGetState(TaskInitHandle)) \
+      {                                                        \
+        osDelay(1);                                            \
+      }                                                        \
+  } while (0U)
 /* USER CODE END Private defines */
 
 void MX_I2C1_Init(void);

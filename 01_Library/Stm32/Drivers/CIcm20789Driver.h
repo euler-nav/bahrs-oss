@@ -11,12 +11,16 @@
 #include <stdint.h>
 #include "General/CSoftwareComponentBase.h"
 #include "i2c.h"
+#include "cmsis_os2.h"
+
+extern osThreadId_t TaskInitHandle;
 
 // Sensor constants
 #define ICM20789_ADDRESS_IMU                ((uint8_t)0x68) ///< Address of the sensor
 #define ICM20789_ADDRESS_PRESS              ((uint8_t)0x63) ///< Address of the pressure sensor
 #define ICM20789_TIMEOUT                    (2U) ///< A timeout for read/write operations
 #define ICM20789_TIMEOUT_OTP                (5U) ///< A timeout for pressure calibration parameters read operations
+#define ICM20789_BUSY_TIMEOUT               (25U) ///< A timeout for bus busy check
 #define ICM20789_IMU_ID                     ((uint8_t)0x03) ///< IMU ID stored in the WHO_AM_I register
 #define ICM20789_PRESSURE_ID                ((uint8_t)0x08) ///< ID of the pressure sensor stored in the sensor register
 #define ICM20789_GYRO_ENGINE_UP_TIME        (50) ///< Gyroscope start-up time, [ms]
@@ -411,11 +415,36 @@ private:
   bool writeImuRegister(uint8_t uReg, uint8_t uData);
 
   /**
+   * Checks the status and waits till I2C bus flags are ready
+   * \param  Flag specifies the I2C flag to check.
+   * \param  Status The new Flag status (SET or RESET).
+   * \param  Timeout Timeout duration
+   * \param  Tickstart Tick start value
+   * \return True -- success, false -- failure.
+   */
+  bool i2cWaitOnFlag(uint32_t Flag, FlagStatus Status, uint32_t Timeout, uint32_t Tickstart);
+
+  /**
    * \brief Get an I2C handle corresponding to the chip.
    * \param eIcmChipId An ID of the ICM20789 chip.
    * \return nullptr if an ID is invalid, a pointer to a valid bus handle otherwise.
    */
   I2C_HandleTypeDef* getI2CHandle(EIcmIds eIcmChipId);
+
+  /**
+   * \brief Delay the task if initialization was completed.
+   * The function does nothing if Init task is running and delays for the given number
+   * of milliseconds otherwise.
+   *
+   * \param uDelay Delay duration in [ms].
+   */
+  static inline void osDelayIfInitTaskCompleted(uint32_t uDelay)
+  {
+    if (osThreadRunning != osThreadGetState(TaskInitHandle))
+    {
+      osDelay(uDelay);
+    }
+  }
 };
 
 #endif /* C_ICM_20789_DRIVER_H */

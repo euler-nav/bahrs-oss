@@ -8,6 +8,8 @@
 #ifndef GET_MICROSECONDS_H
 #define GET_MICROSECONDS_H
 
+#include <stdint.h>
+
 #ifdef __cplusplus
 extern "C"
 {
