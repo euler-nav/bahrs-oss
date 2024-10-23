@@ -1,0 +1,30 @@
+@startuml bahrs_sw_class_diagram.png
+class "BAHRS Software" as bahrssw
+class "Application Software" as asw
+class "Basic Software" as bsw
+class "Runtime Environment" as rte
+
+bahrssw "1" o-- "1" asw
+bahrssw "1" o-- "1" bsw
+bahrssw "1" o-- "1" rte
+@enduml
+@startuml bb_view_level_2_bsw.png
+"Basic Software" "1" o-- "1" RTOS
+"Basic Software" "1" o-- "1" "STM32 Hardware Abstraction Layer"
+"Basic Software" "1" o-- "*" "Base Software Component"
+RTOS "1" o-- "1" "CMSIS-OS"
+RTOS "1" o-- "1" FreeRTOS
+@enduml
+@startuml bb_view_level_2_rte.png
+CRte "1" *-- "*" "Software Component Port"
+
+class CRte {
++GetInstance()
+}
+
+class "Software Component Port" {
++Init()
++Read()
++Write()
+}
+@enduml

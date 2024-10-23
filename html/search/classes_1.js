@@ -1,0 +1,20 @@
+var searchData=
+[
+  ['sattitudeoutputdata_0',['SAttitudeOutputData',['../struct_n_fusion_lib_common_1_1_s_attitude_output_data.html',1,'NFusionLibCommon']]],
+  ['sbahrsstate_1',['SBahrsState',['../struct_n_bahrs_filter_api_1_1_s_bahrs_state.html',1,'NBahrsFilterApi']]],
+  ['sbahrsstatestd_2',['SBahrsStateStd',['../struct_n_bahrs_filter_api_1_1_s_bahrs_state_std.html',1,'NBahrsFilterApi']]],
+  ['sbarometerdata_3',['SBarometerData',['../struct_n_fusion_lib_common_1_1_s_barometer_data.html',1,'NFusionLibCommon']]],
+  ['simumeasurement_4',['SImuMeasurement',['../struct_n_fusion_lib_common_1_1_s_imu_measurement.html',1,'NFusionLibCommon']]],
+  ['smagnetometerdata_5',['SMagnetometerData',['../struct_n_fusion_lib_common_1_1_s_magnetometer_data.html',1,'NFusionLibCommon']]],
+  ['smagnetometermeasurement_6',['SMagnetometerMeasurement',['../struct_n_magnetic_heading_filter_api_1_1_s_magnetometer_measurement.html',1,'NMagneticHeadingFilterApi']]],
+  ['smeasurementbase_7',['SMeasurementBase',['../struct_n_fusion_lib_common_1_1_s_measurement_base.html',1,'NFusionLibCommon']]],
+  ['smultidimensionalsignalbase_8',['SMultidimensionalSignalBase',['../struct_n_monitor_types_1_1_s_multidimensional_signal_base.html',1,'NMonitorTypes']]],
+  ['soutputdata_9',['SOutputData',['../struct_n_bahrs_filter_api_1_1_s_output_data.html',1,'NBahrsFilterApi::SOutputData'],['../struct_n_magnetic_heading_filter_api_1_1_s_output_data.html',1,'NMagneticHeadingFilterApi::SOutputData']]],
+  ['sscalarsignal_10',['SScalarSignal',['../struct_n_monitor_types_1_1_s_multidimensional_signal_base_1_1_s_scalar_signal.html',1,'NMonitorTypes::SMultidimensionalSignalBase']]],
+  ['sscha63tdataset_11',['SScha63TDataset',['../struct_s_scha63_t_dataset.html',1,'']]],
+  ['sscha63tmeasurement_12',['SScha63TMeasurement',['../struct_s_scha63_t_measurement.html',1,'']]],
+  ['sscha63tstatusdue_13',['SScha63TStatusDue',['../struct_s_scha63_t_status_due.html',1,'']]],
+  ['sscha63tstatusuno_14',['SScha63TStatusUno',['../struct_s_scha63_t_status_uno.html',1,'']]],
+  ['strimregdata_15',['STrimRegData',['../struct_c_bmm150_driver_1_1_s_trim_reg_data.html',1,'CBmm150Driver']]],
+  ['sverticalchanneldata_16',['SVerticalChannelData',['../struct_n_fusion_lib_common_1_1_s_vertical_channel_data.html',1,'NFusionLibCommon']]]
+];
