@@ -18,22 +18,41 @@ CSerialProtocol::SInertialDataMessage CSerialProtocol::BuildInertialDataMessage(
 
   oMessage.oInertialData_.uSequenceCounter_ = uInertialDataSequenceCounter_;
 
+  auto encodeSignal = [](float fSignal, float fScale, float fMaxValue, uint8_t uValidityFlag, int16_t& irOutputSignal, uint8_t& urValidityBitfield)
+    {
+      if ((fSignal <= fMaxValue) && (fSignal >= -fMaxValue))
+      {
+        irOutputSignal = static_cast<int16_t>(fSignal * fScale);
+        urValidityBitfield |= uValidityFlag;
+      }
+    };
+
   if (true == UintToBool(korImuData.uSpecificForceValid_))
   {
-    float fTmp = 1.0F / skfSpecificForceScale_;
-    oMessage.oInertialData_.iSpecificForceX_ = static_cast<int16_t>(korImuData.fSpecificForceX_ * fTmp);
-    oMessage.oInertialData_.iSpecificForceY_ = static_cast<int16_t>(korImuData.fSpecificForceY_ * fTmp);
-    oMessage.oInertialData_.iSpecificForceZ_ = static_cast<int16_t>(korImuData.fSpecificForceZ_ * fTmp);
-    oMessage.oInertialData_.uValidity_ |= 0x07; // 0000 0111
+    static constexpr float skfScaleFloatToInt = 1.0F / skfSpecificForceScale_;
+
+    encodeSignal(korImuData.fSpecificForceX_, skfScaleFloatToInt, skfMaxSpecificForce_, BIT_VALID_SPECIFIC_FORCE_X,
+                 oMessage.oInertialData_.iSpecificForceX_, oMessage.oInertialData_.uValidity_);
+
+    encodeSignal(korImuData.fSpecificForceY_, skfScaleFloatToInt, skfMaxSpecificForce_, BIT_VALID_SPECIFIC_FORCE_Y,
+                 oMessage.oInertialData_.iSpecificForceY_, oMessage.oInertialData_.uValidity_);
+
+    encodeSignal(korImuData.fSpecificForceZ_, skfScaleFloatToInt, skfMaxSpecificForce_, BIT_VALID_SPECIFIC_FORCE_Z,
+                 oMessage.oInertialData_.iSpecificForceZ_, oMessage.oInertialData_.uValidity_);
   }
 
   if (true == UintToBool(korImuData.uAngularRateValid_))
   {
-    float fTmp = 1.0F / skfAngularRateScale_;
-    oMessage.oInertialData_.iAngularRateX_ = static_cast<int16_t>(korImuData.fAngularRateX_ * fTmp);
-    oMessage.oInertialData_.iAngularRateY_ = static_cast<int16_t>(korImuData.fAngularRateY_ * fTmp);
-    oMessage.oInertialData_.iAngularRateZ_ = static_cast<int16_t>(korImuData.fAngularRateZ_ * fTmp);
-    oMessage.oInertialData_.uValidity_ |= 0x38; // 0011 1000
+    static constexpr float skfScaleFloatToInt = 1.0F / skfAngularRateScale_;
+
+    encodeSignal(korImuData.fAngularRateX_, skfScaleFloatToInt, skfMaxAngularRate_, BIT_VALID_ANGULAR_RATE_X,
+                 oMessage.oInertialData_.iAngularRateX_, oMessage.oInertialData_.uValidity_);
+
+    encodeSignal(korImuData.fAngularRateY_, skfScaleFloatToInt, skfMaxAngularRate_, BIT_VALID_ANGULAR_RATE_Y,
+                 oMessage.oInertialData_.iAngularRateY_, oMessage.oInertialData_.uValidity_);
+
+    encodeSignal(korImuData.fAngularRateZ_, skfScaleFloatToInt, skfMaxAngularRate_, BIT_VALID_ANGULAR_RATE_Z,
+                 oMessage.oInertialData_.iAngularRateZ_, oMessage.oInertialData_.uValidity_);
   }
 
   memset(oMessage.auPadding_, 0, sizeof(oMessage.auPadding_));
@@ -199,8 +218,35 @@ CSerialProtocol::SSoftwareVersionMessage CSerialProtocol::BuildSoftwareVersionMe
   return oMessage;
 }
 
+CSerialProtocol::SHardwareVersionMessage CSerialProtocol::BuildHardwareVersionMessage()
+{
+  static const uint16_t skuMcuId{static_cast<uint16_t>(HAL_GetDEVID())};
+  static const uint32_t skuUniqueId1{HAL_GetUIDw0()};
+  static const uint32_t skuUniqueId2{HAL_GetUIDw1()};
+  static const uint32_t skuUniqueId3{HAL_GetUIDw2()};
+
+  SHardwareVersionMessage oMessage;
+  oMessage.oHardwareVersion_.uMcuId_ = skuMcuId;
+  oMessage.oHardwareVersion_.uUniqueId1_ = skuUniqueId1;
+  oMessage.oHardwareVersion_.uUniqueId2_ = skuUniqueId2;
+  oMessage.oHardwareVersion_.uUniqueId3_ = skuUniqueId3;
+
+  memset(oMessage.auPadding_, 0, sizeof(oMessage.auPadding_));
+  oMessage.uCrc_ = CalculateCrc(reinterpret_cast<uint32_t*>(&oMessage), (sizeof(oMessage) / PROTOCOL_WORD_LEN) - 1);
+
+  return oMessage;
+}
+
 uint32_t CSerialProtocol::CalculateCrc(uint32_t* pData, uint32_t uNumberOfWords_)
 {
   return HAL_CRC_Calculate(&hcrc, pData, uNumberOfWords_);
 }
+
+#ifdef SEND_DEBUG_OUTPUT
+void CSerialProtocol::putBytesIntoArray(uint8_t** upAddress, const uint8_t* upData, unsigned uLen)
+{
+  memcpy(*upAddress, upData, uLen);
+  *upAddress += uLen;
+}
+#endif /* SEND_DEBUG_OUTPUT */
 

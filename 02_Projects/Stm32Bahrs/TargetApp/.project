@@ -32,9 +32,9 @@
 	</natures>
 	<linkedResources>
 		<link>
-			<name>libcanard-master</name>
-			<type>2</type>
-			<locationURI>PARENT-3-PROJECT_LOC/99_3rd_party/libcanard-master</locationURI>
+			<name>Rte/Inc/AmsAssert.h</name>
+			<type>1</type>
+			<locationURI>PARENT-3-PROJECT_LOC/01_Library/Stm32/Lib/AmsAssert.h</locationURI>
 		</link>
 		<link>
 			<name>Rte/Inc/CBmm150Driver.h</name>
@@ -75,6 +75,11 @@
 			<name>Rte/Inc/Scha63TDriverTypes.h</name>
 			<type>1</type>
 			<locationURI>$%257BPARENT-3-PROJECT_LOC%257D/01_Library/Stm32/Drivers/Scha63TDriverTypes.h</locationURI>
+		</link>
+		<link>
+			<name>Rte/Src/AmsAssert.cpp</name>
+			<type>1</type>
+			<locationURI>PARENT-3-PROJECT_LOC/01_Library/Stm32/Lib/AmsAssert.cpp</locationURI>
 		</link>
 		<link>
 			<name>Rte/Src/CBmm150Driver.cpp</name>

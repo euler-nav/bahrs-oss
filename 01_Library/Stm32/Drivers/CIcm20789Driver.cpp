@@ -11,10 +11,12 @@
 #include "GetMicroseconds.h"
 #include "UintToBool.h"
 #include <string.h>
-
+#include "AmsAssert.h"
 
 CIcm20789Driver::CIcm20789Driver(EIcmIds eIcmChipId) :
   keSensorId_(eIcmChipId),
+  kuShutdownPin_(getShutdownPinId(eIcmChipId)),
+  opkShutdownPinPort_(getPortOfShutdownPin(eIcmChipId)),
   opkI2CHandle_(getI2CHandle(eIcmChipId))
 {
   if (EIcmIds::eInvalid == keSensorId_)
@@ -73,18 +75,7 @@ void CIcm20789Driver::Init()
   // Initialize the IMU
   if(true == bStatus)
   {
-    bStatus = imuSelfTest();
-
-    if (true == bStatus)
-    {
-      // We need a reset, because we want to revert the settings configured during the self-test.
-      bStatus = softResetImu();
-    }
-
-    if(true == bStatus)
-    {
-      bStatus = setAccelerometerDynamicRange(skeAccelDynamicRange_);
-    }
+    bStatus = setAccelerometerDynamicRange(skeAccelDynamicRange_);
 
     if(true == bStatus)
     {
@@ -215,17 +206,25 @@ void CIcm20789Driver::PollInertialSensor()
       iGyroY = (auCtrl[10] << 8) | auCtrl[11];
       iGyroZ = (auCtrl[12] << 8) | auCtrl[13];
 
-      oOutput.fTemperature_ = (((static_cast<float>(iTemp)) - skfTempOffset_) / skfTempScale_) + skfTempOffset_;
-      oOutput.fSpecificForceX_ = -skfAccelRawToMetersPerSecondSquared_ * static_cast<float>(iAccelX);
-      oOutput.fSpecificForceY_ = skfAccelRawToMetersPerSecondSquared_ * static_cast<float>(iAccelY);
-      oOutput.fSpecificForceZ_ = -skfAccelRawToMetersPerSecondSquared_ * static_cast<float>(iAccelZ);
+      if (hasSignalSaturated(iAccelX) || hasSignalSaturated(iAccelY) || hasSignalSaturated(iAccelZ) ||
+          hasSignalSaturated(iGyroX) || hasSignalSaturated(iGyroY) || hasSignalSaturated(iGyroZ))
+      {
+        oOutput.uValid_ = BoolToUint(false);
+      }
+      else
+      {
+        oOutput.fTemperature_ = (((static_cast<float>(iTemp)) - skfTempOffset_) / skfTempScale_) + skfTempOffset_;
+        oOutput.fSpecificForceX_ = -skfAccelRawToMetersPerSecondSquared_ * static_cast<float>(iAccelX);
+        oOutput.fSpecificForceY_ = skfAccelRawToMetersPerSecondSquared_ * static_cast<float>(iAccelY);
+        oOutput.fSpecificForceZ_ = -skfAccelRawToMetersPerSecondSquared_ * static_cast<float>(iAccelZ);
 
-      oOutput.fAngularRateX_ = -skfGyroRawToRadiansPerSecond_ * static_cast<float>(iGyroX);
-      oOutput.fAngularRateY_ = skfGyroRawToRadiansPerSecond_ * static_cast<float>(iGyroY);
-      oOutput.fAngularRateZ_ = -skfGyroRawToRadiansPerSecond_ * static_cast<float>(iGyroZ);
+        oOutput.fAngularRateX_ = -skfGyroRawToRadiansPerSecond_ * static_cast<float>(iGyroX);
+        oOutput.fAngularRateY_ = skfGyroRawToRadiansPerSecond_ * static_cast<float>(iGyroY);
+        oOutput.fAngularRateZ_ = -skfGyroRawToRadiansPerSecond_ * static_cast<float>(iGyroZ);
 
-      oOutput.uTimestampUs_ = uTimestamp;
-      oOutput.uValid_ = BoolToUint(true);
+        oOutput.uTimestampUs_ = uTimestamp;
+        oOutput.uValid_ = BoolToUint(true);
+      }
     }
     else
     {
@@ -268,7 +267,18 @@ bool CIcm20789Driver::RequestInertialSensorDataDma()
     {
       eHalStatus = HAL_I2C_Master_Receive_DMA(opkI2CHandle_, ICM20789_ADDRESS_IMU << 1, auImuDataBuffer_, 14);
     }
+
     bStatus = (eHalStatus == HAL_OK);
+  }
+
+  if (false == bStatus)
+  {
+    ++uI2CBusErrorCounter_;
+  }
+
+  if (uI2CBusErrorCounter_ > skuMaxI2CBusErrorCounterToReset_)
+  {
+    HardReset();
   }
 
   return bStatus;
@@ -283,7 +293,20 @@ bool CIcm20789Driver::RequestPressureSensorDataDma()
   {
     eHalStatus = HAL_I2C_Master_Receive_DMA(opkI2CHandle_, ICM20789_ADDRESS_PRESS << 1, auPressureDataBuffer_, 9);
   }
-  return (eHalStatus == HAL_OK);
+
+  bool bStatus = (eHalStatus == HAL_OK);
+
+  if (false == bStatus)
+  {
+    ++uI2CBusErrorCounter_;
+  }
+
+  if (uI2CBusErrorCounter_ > skuMaxI2CBusErrorCounterToReset_)
+  {
+    HardReset();
+  }
+
+  return bStatus;
 }
 
 bool CIcm20789Driver::TriggerPressureMeasurement()
@@ -313,16 +336,24 @@ void CIcm20789Driver::ParseReceivedImuDataDma()
     iGyroY = (auImuDataBuffer_[10] << 8) | auImuDataBuffer_[11];
     iGyroZ = (auImuDataBuffer_[12] << 8) | auImuDataBuffer_[13];
 
-    oOutput.fTemperature_ = (((static_cast<float>(iTemp)) - skfTempOffset_) / skfTempScale_) + skfTempOffset_;
-    oOutput.fSpecificForceX_ = -skfAccelRawToMetersPerSecondSquared_ * static_cast<float>(iAccelX);
-    oOutput.fSpecificForceY_ = skfAccelRawToMetersPerSecondSquared_ * static_cast<float>(iAccelY);
-    oOutput.fSpecificForceZ_ = -skfAccelRawToMetersPerSecondSquared_ * static_cast<float>(iAccelZ);
+    if (hasSignalSaturated(iAccelX) || hasSignalSaturated(iAccelY) || hasSignalSaturated(iAccelZ) ||
+        hasSignalSaturated(iGyroX) || hasSignalSaturated(iGyroY) || hasSignalSaturated(iGyroZ))
+    {
+      oOutput.uValid_ = BoolToUint(false);
+    }
+    else
+    {
+      oOutput.fTemperature_ = (((static_cast<float>(iTemp)) - skfTempOffset_) / skfTempScale_) + skfTempOffset_;
+      oOutput.fSpecificForceX_ = -skfAccelRawToMetersPerSecondSquared_ * static_cast<float>(iAccelX);
+      oOutput.fSpecificForceY_ = skfAccelRawToMetersPerSecondSquared_ * static_cast<float>(iAccelY);
+      oOutput.fSpecificForceZ_ = -skfAccelRawToMetersPerSecondSquared_ * static_cast<float>(iAccelZ);
 
-    oOutput.fAngularRateX_ = -skfGyroRawToRadiansPerSecond_ * static_cast<float>(iGyroX);
-    oOutput.fAngularRateY_ = skfGyroRawToRadiansPerSecond_ * static_cast<float>(iGyroY);
-    oOutput.fAngularRateZ_ = -skfGyroRawToRadiansPerSecond_ * static_cast<float>(iGyroZ);
+      oOutput.fAngularRateX_ = -skfGyroRawToRadiansPerSecond_ * static_cast<float>(iGyroX);
+      oOutput.fAngularRateY_ = skfGyroRawToRadiansPerSecond_ * static_cast<float>(iGyroY);
+      oOutput.fAngularRateZ_ = -skfGyroRawToRadiansPerSecond_ * static_cast<float>(iGyroZ);
 
-    oOutput.uValid_ = BoolToUint(true);
+      oOutput.uValid_ = BoolToUint(true);
+    }
   }
   else
   {
@@ -421,6 +452,46 @@ void CIcm20789Driver::InvalidatePressureOutputPort()
   else
   {
     // do nothing
+  }
+}
+
+void CIcm20789Driver::HardReset()
+{
+  InvalidateImuOutputPort();
+  InvalidatePressureOutputPort();
+
+  osThreadId_t pId{osThreadGetId()};
+  osPriority_t eThreadPriority{osThreadGetPriority(pId)};
+
+  if (osPriorityError != eThreadPriority)
+  {
+    bIsInitialized_ = false;
+    uI2CBusErrorCounter_ = 0U;
+
+    do
+    {
+      osStatus_t eStatus = osThreadSetPriority(pId, osPriorityBelowNormal);
+
+      if (eStatus == osOK)
+      {
+        // Power off, wait, then power on.
+        HAL_GPIO_WritePin(opkShutdownPinPort_, kuShutdownPin_, GPIO_PIN_SET);
+        HAL_I2C_DeInit(opkI2CHandle_);
+
+        osDelay(2000U);
+
+        HAL_GPIO_WritePin(opkShutdownPinPort_, kuShutdownPin_, GPIO_PIN_RESET);
+        HAL_I2C_Init(opkI2CHandle_);
+
+        osDelay(500U);
+
+        Init();
+
+        // Restore the original thread priority
+        osThreadSetPriority(pId, eThreadPriority);
+      }
+    }
+    while (false == bIsInitialized_);
   }
 }
 
@@ -1261,8 +1332,48 @@ I2C_HandleTypeDef* CIcm20789Driver::getI2CHandle(EIcmIds eIcmChipId)
   }
   else
   {
-    opHandle = nullptr;
+    AMS_HARD_ASSERT(false);
   }
 
   return opHandle;
+}
+
+uint16_t CIcm20789Driver::getShutdownPinId(EIcmIds eIcmChipId)
+{
+  uint16_t uPin{0U};
+
+  if (EIcmIds::eIcm1 == eIcmChipId)
+  {
+    uPin = ICM1_SHDN_Pin;
+  }
+  else if (EIcmIds::eIcm2 == eIcmChipId)
+  {
+    uPin = ICM2_SHDN_Pin;
+  }
+  else
+  {
+    AMS_HARD_ASSERT(false);
+  }
+
+  return uPin;
+}
+
+GPIO_TypeDef* CIcm20789Driver::getPortOfShutdownPin(EIcmIds eIcmChipId)
+{
+  GPIO_TypeDef* opGpioPort{nullptr};
+
+  if (EIcmIds::eIcm1 == eIcmChipId)
+  {
+    opGpioPort = ICM1_SHDN_GPIO_Port;
+  }
+  else if (EIcmIds::eIcm2 == eIcmChipId)
+  {
+    opGpioPort = ICM2_SHDN_GPIO_Port;
+  }
+  else
+  {
+    AMS_HARD_ASSERT(false);
+  }
+
+  return opGpioPort;
 }

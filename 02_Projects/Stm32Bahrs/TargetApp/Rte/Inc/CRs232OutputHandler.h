@@ -1,5 +1,5 @@
 /**
- * @file CRs323OutputHandler.h
+ * @file CRs232OutputHandler.h
  * @brief Declaration of the CRs232OutputHandler class (RS232 output handler software component).
  * @author Fedor Baklanov
  * @date 07 June 2022
@@ -62,6 +62,11 @@ public:
    * @brief Compose and send the software version message.
   */
   void SendSoftwareVersionMessage();
+
+  /**
+   * @brief Compose and send the hardware version message.
+  */
+  void SendHardwareVersionMessage();
 
 protected:
 

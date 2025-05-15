@@ -59,6 +59,8 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define BMP384_INT_Pin GPIO_PIN_14
 #define BMP384_INT_GPIO_Port GPIOC
+#define ICM1_SHDN_Pin GPIO_PIN_15
+#define ICM1_SHDN_GPIO_Port GPIOC
 #define BMP384_CSB_Pin GPIO_PIN_0
 #define BMP384_CSB_GPIO_Port GPIOC
 #define MMC_MOSI_Pin GPIO_PIN_1
@@ -93,6 +95,8 @@ void Error_Handler(void);
 #define RS232_SHDN_GPIO_Port GPIOB
 #define BMP384_SCK_Pin GPIO_PIN_13
 #define BMP384_SCK_GPIO_Port GPIOB
+#define ICM2_SHDN_Pin GPIO_PIN_14
+#define ICM2_SHDN_GPIO_Port GPIOB
 #define BMM1_SCL_Pin GPIO_PIN_6
 #define BMM1_SCL_GPIO_Port GPIOC
 #define BMM1_SDA_Pin GPIO_PIN_7

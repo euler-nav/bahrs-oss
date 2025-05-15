@@ -27,7 +27,10 @@ namespace NFusionLibCommon
     eIcm20789Baro2 = 6, ///< The second TDK ICM20789 barometer
     eBmm150X1 = 7, ///< The first Bosch BMM150 magnetometer
     eBmm150X2 = 8, ///< The second Bosch BMM150 magnetometer
-    eMmc5983 = 9 ///< MEMSIC MMC5983 magnetometer
+    eMmc5983 = 9, ///< MEMSIC MMC5983 magnetometer
+    eBahrsFilter1 = 10, ///< Virtual sensor: output of BAHRS filter
+    eBahrsFilter2 = 11, ///< Virtual sensor: output of BAHRS filter
+    eBahrsFilter3 = 12 ///< Virtual sensor: output of BAHRS filter
   };
 
   struct SMeasurementBase
@@ -94,6 +97,48 @@ namespace NFusionLibCommon
     }
 
     float fPressure_{ 0.0F }; ///< Pressure in Pascals 
+  };
+
+  /**
+   * @brief A virtual measurement created from attitude output of a BAHRS filter.
+   * The measurement is used as input type for the dedicated parity monitor.
+   */
+  struct SAttitudeOutputData : public SMeasurementBase
+  {
+    SAttitudeOutputData() = default;
+
+    SAttitudeOutputData(float fRoll, float fPitch,
+                        uint64_t uTimestampUs, ESensorId eSensorId, bool bValid) :
+      SMeasurementBase(uTimestampUs, eSensorId, bValid),
+      fRoll_(fRoll),
+      fPitch_(fPitch)
+    {
+      // Do nothing
+    }
+
+    float fRoll_{ 0.0F };
+    float fPitch_{ 0.0F };
+  };
+
+  /**
+   * @brief A virtual measurement created from height and velocity down output of a BAHRS filter.
+   * The measurement is used as input type for the dedicated parity monitor.
+   */
+  struct SVerticalChannelData : public SMeasurementBase
+  {
+    SVerticalChannelData() = default;
+
+    SVerticalChannelData(float fHeight, float fVelocityDown,
+                         uint64_t uTimestampUs, ESensorId eSensorId, bool bValid) :
+      SMeasurementBase(uTimestampUs, eSensorId, bValid),
+      fHeight_(fHeight),
+      fVelocityDown_(fVelocityDown)
+    {
+      // Do nothing
+    }
+
+    float fHeight_{ 0.0F };
+    float fVelocityDown_{ 0.0F };
   };
 }
 

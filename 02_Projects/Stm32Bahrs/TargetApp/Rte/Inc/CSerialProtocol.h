@@ -11,6 +11,9 @@
 #include <stdint.h>
 #include "RteTypes.h"
 #include "BahrsFilterApi.h"
+#include "CMathConstants.h"
+#include "CGeoConstants.h"
+#include <limits>
 
 #define PROTOCOL_WORD_LEN (4)
 #define PADDING_SIZE(SPayloadType) (PROTOCOL_WORD_LEN - ((sizeof(SMessageHeader) + sizeof(SPayloadType)) % PROTOCOL_WORD_LEN))
@@ -20,6 +23,15 @@
 #define BIT_VALID_ROLL             (0x04)
 #define BIT_VALID_PITCH            (0x08)
 #define BIT_VALID_MAGNETIC_HEADING (0x10)
+#define BIT_VALID_SPECIFIC_FORCE_X (0x01)
+#define BIT_VALID_SPECIFIC_FORCE_Y (0x02)
+#define BIT_VALID_SPECIFIC_FORCE_Z (0x04)
+#define BIT_VALID_ANGULAR_RATE_X   (0x08)
+#define BIT_VALID_ANGULAR_RATE_Y   (0x10)
+#define BIT_VALID_ANGULAR_RATE_Z   (0x20)
+
+using NNavigationUtilities::CMathConstants;
+using NNavigationUtilities::CGeoConstants;
 
 /**
  * @brief The class that describes and implements the BAHRS serial protocol.
@@ -34,18 +46,20 @@ public:
   static constexpr uint8_t uMarker2_ { 0x45 }; ///< Sync char 2, symbol 'E'
   static constexpr uint16_t uVersion_ { 2U }; ///< Protocol version
 
-  static constexpr float skfSpecificForceScale_ { 1.495384e-3F }; ///< Integer to float, +-5g range
-  static constexpr float skfAngularRateScale_ { 1.597921e-4F }; ///< Integer to float, +-300 deg/s range
-  static constexpr float skfHeightScale_ { 0.16784924F }; ///< Integer to float, -1000 to 10000 m range
-  static constexpr float skfHeighOffset_ { 1000.0F }; ///< An offset to convert unsigned integer to float
-  static constexpr float skfVelocityDownScale_ { 9.155413e-3F }; ///< Integer to float, -300 to 300 m/s range
-  static constexpr float skfAngleScale_ { 9.587526e-5F }; ///< Integer to float, -pi to pi or 0 to 2 pi range
-
   // Signal ranges
   static constexpr float skfMaxHeight_ { 10000.0F };
   static constexpr float skfMinHeight_ { -1000.0F };
   static constexpr float skfMaxVelocityDown_ { 300.0F };
   static constexpr float skfMinVelocityDown_ { -300.0F };
+  static constexpr float skfMaxAngularRate_ { 300.0F * (CMathConstants::skfPi_ / 180.0F) }; ///< +-300 [deg/s] in [rad/s]
+  static constexpr float skfMaxSpecificForce_ { CGeoConstants::skfGravity * 5.0F }; ///< +-5 [g] in [m/s^2]
+
+  static constexpr float skfSpecificForceScale_ { skfMaxSpecificForce_ / static_cast<float>(std::numeric_limits<int16_t>::max()) }; ///< Integer to float, +-5g range
+  static constexpr float skfAngularRateScale_ { skfMaxAngularRate_ / static_cast<float>(std::numeric_limits<int16_t>::max()) }; ///< Integer to float, +-300 deg/s range
+  static constexpr float skfHeightScale_ { 0.16784924F }; ///< Integer to float, -1000 to 10000 m range
+  static constexpr float skfHeighOffset_ { 1000.0F }; ///< An offset to convert unsigned integer to float
+  static constexpr float skfVelocityDownScale_ { 9.155413e-3F }; ///< Integer to float, -300 to 300 m/s range
+  static constexpr float skfAngleScale_ { 9.587526e-5F }; ///< Integer to float, -pi to pi or 0 to 2 pi range
 
   enum class EMessageIds : uint8_t
   {
@@ -57,6 +71,7 @@ public:
     eTimeOfInertialData = 0x05, ///< "Time of inertial data" message
     eTimeOfSyncPulse = 0x06, ///< "Time of the latest sync pulse" message
     eSoftwareVersion = 0x0F, ///< "Software version" message
+    eHardwareVersion = 0x1F, ///< "Hardware version" message
 
     eDebugEventWriteToPort = 0xC0, ///< Debug information: SWC port data
     eDebugEventRunnableCall = 0xC1, ///< Debug information: SWC API call
@@ -161,6 +176,17 @@ public:
     char acProjectCode_[3] { '\0', '\0', '\0' };
     uint16_t uMajor_ { 0U };
     uint16_t uMinor_ { 0U };
+  };
+
+  /**
+   * @brief Payload of the "Hardware version" message.
+   */
+  struct SHardwareVersionData
+  {
+    uint16_t uMcuId_{0U};
+    uint32_t uUniqueId1_{0U};
+    uint32_t uUniqueId2_{0U};
+    uint32_t uUniqueId3_{0U};
   };
 
   /**
@@ -288,6 +314,18 @@ public:
     CrcType_t uCrc_ { 0U };
   };
 
+  struct SHardwareVersionMessage
+  {
+    SMessageHeader oHeader_ { CSerialProtocol::uMarker1_,
+                              CSerialProtocol::uMarker2_,
+                              CSerialProtocol::uVersion_,
+                              static_cast<uint8_t>(EMessageIds::eHardwareVersion) };
+
+    SHardwareVersionData oHardwareVersion_;
+    uint8_t auPadding_[PADDING_SIZE(SHardwareVersionData)];
+    CrcType_t uCrc_ { 0U };
+  };
+
   /**
    * @brief A debug message with runnable call data.
   */
@@ -382,6 +420,12 @@ public:
    * @return The software version message struct.
    */
   SSoftwareVersionMessage BuildSoftwareVersionMessage();
+
+  /**
+   * @brief Build the hardware version message.
+   * @return The hardware version message struct.
+   */
+  SHardwareVersionMessage BuildHardwareVersionMessage();
 
   /**
    * @brief Calculate CRC.

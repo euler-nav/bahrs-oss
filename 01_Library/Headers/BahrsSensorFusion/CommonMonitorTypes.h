@@ -70,7 +70,7 @@ namespace NMonitorTypes
 
     /**
      * @brief Set sensor data from a single sensor measurement.
-     * @param korImuMeasurement Reference to the data.
+     * @param korMeasurement Reference to the data.
      * @return True -- success, false -- failure.
     */
     bool Set(const SensorDataType& korMeasurement);

@@ -9,9 +9,12 @@
 #define C_ICM_20789_DRIVER_H
 
 #include <stdint.h>
+#include <limits>
 #include "General/CSoftwareComponentBase.h"
 #include "i2c.h"
 #include "cmsis_os2.h"
+#include "CGeoConstants.h"
+#include "CMathConstants.h"
 
 extern osThreadId_t TaskInitHandle;
 
@@ -82,6 +85,88 @@ extern osThreadId_t TaskInitHandle;
 #define ICM20789_BIT_YG_ST                  ((uint8_t)0x40) ///< Self-test enabler bits in the dedicated register
 #define ICM20789_BIT_ZG_ST                  ((uint8_t)0x20) ///< Self-test enabler bits in the dedicated register
 
+namespace NIcm20789DriverConfig
+{
+  enum class EAccelDynamicRange : uint8_t
+  {
+    e2g    = 0x00,
+    e4g    = 0x01,
+    e8g    = 0x02,
+    e16g   = 0x03,
+  };
+
+  enum class EGyroDynamicRange : uint8_t
+  {
+    e250dps    = 0x00,
+    e500dps    = 0x01,
+    e1000dps   = 0x02,
+    e2000dps   = 0x03,
+  };
+
+  /**
+   * @brief A template function to get gyroscope range from an enum value.
+   */
+  template <EGyroDynamicRange Range> static constexpr float getGyroscopeRangeInDegreesPerSecond()
+  {
+    float fRange{0.0F};
+
+    if constexpr (Range == EGyroDynamicRange::e250dps)
+    {
+      fRange = 250.0F;
+    }
+    else if constexpr (Range == EGyroDynamicRange::e500dps)
+    {
+      fRange = 500.0F;
+    }
+    else if constexpr (Range == EGyroDynamicRange::e1000dps)
+    {
+      fRange = 1000.0F;
+    }
+    else if constexpr (Range == EGyroDynamicRange::e2000dps)
+    {
+      fRange = 2000.0F;
+    }
+    else
+    {
+      static_assert("Unsupported gyroscope dynamic range");
+    }
+
+    return fRange;
+  }
+
+  /**
+   * @brief A template function to get accelerometer range from an enum value.
+   */
+  template <EAccelDynamicRange Range> static constexpr float getAccelerometerRangeInG()
+  {
+    float fRange{0.0F};
+
+    if constexpr (Range == EAccelDynamicRange::e2g)
+    {
+      fRange = 2.0F;
+    }
+    else if constexpr (Range == EAccelDynamicRange::e4g)
+    {
+      fRange = 4.0F;
+    }
+    else if constexpr (Range == EAccelDynamicRange::e8g)
+    {
+      fRange = 8.0F;
+    }
+    else if constexpr (Range == EAccelDynamicRange::e16g)
+    {
+      fRange = 16.0F;
+    }
+    else
+    {
+      static_assert("Unsupported accelerometer dynamic range");
+    }
+
+    return fRange;
+  }
+} // namespace NIcm20789DriverConfig
+
+
 class CIcm20789Driver : public CSoftwareComponent<CIcm20789Driver, 2U>
 {
   friend class CSoftwareComponent<CIcm20789Driver, 2U>;
@@ -149,6 +234,15 @@ public:
    */
   void InvalidatePressureOutputPort();
 
+  /**
+   * @brief Execute a hard-reset if the ICM chip hangs.
+   * Powers down the sensor, waits, then powers on and initializes it again.
+   * The function lowers priority of the calling task for the duration of
+   * the reset procedure. In re-initialization fails, then the function will
+   * keep on re-trying.
+   */
+  void HardReset();
+
 private:
   CIcm20789Driver() = delete;
 
@@ -170,22 +264,6 @@ private:
     float fLutUpper_;
     float fQuadrFactor_;
     float fOffstFactor_;
-  };
-
-  enum class EGyroDynamicRange
-  {
-    e250dps    = 0x00,
-    e500dps    = 0x01,
-    e1000dps   = 0x02,
-    e2000dps   = 0x03,
-  };
-
-  enum class EAccelDynamicRange
-  {
-    e2g    = 0x00,
-    e4g    = 0x01,
-    e8g    = 0x02,
-    e16g   = 0x03,
   };
 
   const uint16_t kauSelfTestEquation[256] =
@@ -224,21 +302,32 @@ private:
     30903, 31212, 31524, 31839, 32157, 32479, 32804
   };
 
+  using EAccelDynamicRange = NIcm20789DriverConfig::EAccelDynamicRange;
+  using EGyroDynamicRange = NIcm20789DriverConfig::EGyroDynamicRange;
+
   static constexpr float skfTempScale_ {333.87F}; ///< A scale factor for converting raw temperature readings to degrees Celsius
   static constexpr float skfTempOffset_ {21.0F}; ///< An offset for converting raw temperature readings to degrees Celsius
   static constexpr EAccelDynamicRange skeAccelDynamicRange_ {EAccelDynamicRange::e8g}; ///< Configured accelerometer dynamic range
   static constexpr EGyroDynamicRange skeGyroDynamicRange_ {EGyroDynamicRange::e500dps}; ///< Configured gyroscope dynamic range
-  static constexpr float skfAccelRawToMetersPerSecondSquared_ {(1.0F / static_cast<float>(32768)) * \
-                                                               (9.8F * static_cast<float>(2 << static_cast<int>(skeAccelDynamicRange_)))};
-  static constexpr float skfGyroRawToRadiansPerSecond_ {(1.0F / static_cast<float>(32768)) * \
-                                                        ((3.141592F / 180.0F) * static_cast<float>(250 * (1 << static_cast<int>(skeGyroDynamicRange_))))};
+
+  static constexpr float skfAccelRawToMetersPerSecondSquared_ {(NNavigationUtilities::CGeoConstants::skfGravity \
+                                                                * NIcm20789DriverConfig::getAccelerometerRangeInG<skeAccelDynamicRange_>()) \
+                                                                / static_cast<float>(std::numeric_limits<int16_t>::max())};
+
+  static constexpr float skfGyroRawToRadiansPerSecond_ {((NNavigationUtilities::CMathConstants::skfPi_ / 180.0F) \
+                                                         * NIcm20789DriverConfig::getGyroscopeRangeInDegreesPerSecond<skeGyroDynamicRange_>()) \
+                                                         / static_cast<float>(std::numeric_limits<int16_t>::max())};
 
   SCalibParam oCalibParam_;
   uint8_t auImuDataBuffer_[14];
   uint8_t auPressureDataBuffer_[9];
+  uint32_t uI2CBusErrorCounter_{ 0U }; ///< I2C bus error counter
+  static constexpr uint32_t skuMaxI2CBusErrorCounterToReset_{ 300U }; ///< Maximum bus error counter before the chip is reset
 
   bool bIsInitialized_ { false };  ///< Sensor status after initialization
   const EIcmIds keSensorId_; ///< ID of the sensor corresponding to the driver instance.
+  const uint16_t kuShutdownPin_; ///< ID of the shutdown pin.
+  GPIO_TypeDef* const opkShutdownPinPort_; ///< GPIO port to which the shutdown pin belongs.
   I2C_HandleTypeDef* const opkI2CHandle_; ///< Pointer to the I2C handle.
 
   /**
@@ -432,6 +521,16 @@ private:
   I2C_HandleTypeDef* getI2CHandle(EIcmIds eIcmChipId);
 
   /**
+   * @brief Get ID of the shutdown pin for the ICM chip instance.
+   */
+  uint16_t getShutdownPinId(EIcmIds eIcmChipId);
+
+  /**
+   * @brief Get GPIO port that the shutdown pin belongs to.
+   */
+  GPIO_TypeDef* getPortOfShutdownPin(EIcmIds eIcmChipId);
+
+  /**
    * \brief Delay the task if initialization was completed.
    * The function does nothing if Init task is running and delays for the given number
    * of milliseconds otherwise.
@@ -444,6 +543,14 @@ private:
     {
       osDelay(uDelay);
     }
+  }
+
+  /**
+   * @brief Return true if 16bit integer signal saturated.
+   */
+  static inline bool hasSignalSaturated(int16_t iValue)
+  {
+    return (std::numeric_limits<int16_t>::min() == iValue) || (std::numeric_limits<int16_t>::max() == iValue);
   }
 };
 

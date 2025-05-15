@@ -18,6 +18,7 @@ extern "C" void TaskRoutine5ms()
   if (0U == suCounter)
   {
     CRs232OutputHandler::GetInstance().QueueTransmissionRequest(CSerialProtocol::EMessageIds::eSoftwareVersion);
+    CRs232OutputHandler::GetInstance().QueueTransmissionRequest(CSerialProtocol::EMessageIds::eHardwareVersion);
   }
 
   CImuMonitorSwc::GetInstance().Run();
@@ -80,6 +81,9 @@ extern "C" void TaskRoutineRs232Sender(uint8_t uMessageId)
       break;
     case CSerialProtocol::EMessageIds::eSoftwareVersion:
       CRs232OutputHandler::GetInstance().SendSoftwareVersionMessage();
+      break;
+    case CSerialProtocol::EMessageIds::eHardwareVersion:
+      CRs232OutputHandler::GetInstance().SendHardwareVersionMessage();
       break;
     default:
       break;

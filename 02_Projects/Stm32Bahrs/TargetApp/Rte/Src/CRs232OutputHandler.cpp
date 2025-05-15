@@ -1,5 +1,5 @@
 /**
- * @file CRs323OutputHandler.cpp
+ * @file CRs232OutputHandler.cpp
  * @brief Implementation of the RS232 Output Handler software component.
  * @author Fedor Baklanov
  * @date 07 June 2022
@@ -122,6 +122,12 @@ void CRs232OutputHandler::SendTimeOfLatestSyncPulseMessage()
 void CRs232OutputHandler::SendSoftwareVersionMessage()
 {
   CSerialProtocol::SSoftwareVersionMessage oMessage = oProtocol_.BuildSoftwareVersionMessage();
+  transmitMessage(reinterpret_cast<uint8_t*>(&oMessage), sizeof(oMessage));
+}
+
+void CRs232OutputHandler::SendHardwareVersionMessage()
+{
+  CSerialProtocol::SHardwareVersionMessage oMessage = oProtocol_.BuildHardwareVersionMessage();
   transmitMessage(reinterpret_cast<uint8_t*>(&oMessage), sizeof(oMessage));
 }
 

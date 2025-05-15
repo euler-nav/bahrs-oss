@@ -35,7 +35,7 @@ public:
 
   /**
    * @brief Initialize all the array elements with the given value.
-   * @param  Value
+   * @param element Value
   */
   TLabeledArrayInternal(const ArrayElementType& element)
   {

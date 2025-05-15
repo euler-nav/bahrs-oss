@@ -49,10 +49,11 @@ namespace NBahrsFilterApi
   */
   struct SOutputData
   {
-    SBahrsState oState_;                              ///< State estimate.
-    SBahrsStateStd oStateStd_;                        ///< Estimated standard deviation of the state estimate.
+    SBahrsState oState_;                             ///< State estimate.
+    SBahrsStateStd oStateStd_;                       ///< Estimated standard deviation of the state estimate.
     uint64_t uTimestampUs_{ 0U };                    ///< Timestamp in microseconds.
     EFilterModes eFilterMode_{ EFilterModes::IDLE }; ///< Current filter mode.
+    bool bVerticalChannelDiverged_{ false };         ///< A flag indicating that vertical channel diverged and shall not be trusted
   };
 
   /**
