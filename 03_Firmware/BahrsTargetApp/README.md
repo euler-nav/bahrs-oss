@@ -8,3 +8,5 @@
 | PF_1_3         | 14.07.2024 | $${\color{red}\mathbf{Unstable}}$$  |
 | PF_1_4         | 20.09.2024 | $${\color{green}\mathbf{Stable}}$$  |
 | PF_2_0_beta1   | 19.10.2024 | $${\color{green}\mathbf{Stable}}$$  |
+| PF_1_5         | 18.12.2024 | $${\color{green}\mathbf{Stable}}$$  |
+| PF_1_6         | 26.08.2025 | $${\color{green}\mathbf{Stable}}$$  |
