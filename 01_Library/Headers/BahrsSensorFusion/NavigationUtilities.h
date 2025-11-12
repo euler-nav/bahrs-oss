@@ -14,6 +14,13 @@
 
 namespace NNavigationUtilities
 {
+  struct SEulerAngles
+  {
+    float fRoll_{ 0.0F };
+    float fPitch_{ 0.0F };
+    float fYaw_{ 0.0F };
+  };
+
   /**
    * @brief Compute height above mean sea level from pressure.
    * Valid input range [22700.0 127780.0]. The range corresponds to height from approximately -2000m to 11000m.
@@ -78,6 +85,17 @@ namespace NNavigationUtilities
    * @return Rotation matrix.
   */
   Eigen::Matrix3f DcmFromQuaternion(const CQuaternion& korQuaternion);
+
+  /**
+   * @brief Compute Euler angles defined in the 3-1-2 sequence from conventional Euler angles.
+   * 
+   * The function implements conversion of Euler angles as described in the section
+   * @link p_ccc_subsubsec_euler_angles_to_euler_angles_312 Euler angles 3-1-2 to rotation matrix @endlink
+   * 
+   * @param korEulerAngles Conventional (aerospace) Euler angles.
+   * @return Equivalent Euler angles defined using the 3-1-2 rotation sequence.
+   */
+  SEulerAngles EulerAnglesToEulerAngles312(const SEulerAngles& korEulerAngles);
 
   /**
    * @brief Computes a signed difference of two unsigned numbers.

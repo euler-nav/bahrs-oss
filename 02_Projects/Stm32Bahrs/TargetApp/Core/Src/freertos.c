@@ -494,8 +494,12 @@ void StartTask10ms(void *argument)
   /* Infinite loop */
   for(;;)
   {
-    osSemaphoreAcquire(SemaphoreTask10msHandle, osWaitForever);
-    TaskRoutine10ms();
+    osStatus_t eStatus = osSemaphoreAcquire(SemaphoreTask10msHandle, 12U);
+
+    if ((osOK == eStatus) || (osErrorTimeout == eStatus))
+    {
+      TaskRoutine10ms();
+    }
   }
   /* USER CODE END StartTask10ms */
 }
@@ -855,15 +859,8 @@ void TimerCyclicTaskTriggerCallback(void *argument)
   if ( 0U == (suCounter % skuPeriod5msInTicks) )
   {
     osSemaphoreRelease(SemaphoreTask5msHandle);
-    osSemaphoreRelease(SemTaskReceiveScha63TDataHandle);
     osSemaphoreRelease(SemaphoreTdk1Handle);
     osSemaphoreRelease(SemaphoreTdk2Handle);
-  }
-
-  // Trigger 10ms tasks
-  if ( 0U == (suCounter % skuPeriod10msInTicks) )
-  {
-    osSemaphoreRelease(SemaphoreTask10msHandle);
   }
 
   // Trigger 40ms tasks

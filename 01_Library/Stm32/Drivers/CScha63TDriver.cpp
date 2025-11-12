@@ -121,8 +121,8 @@ void CScha63TDriver::Init()
 
     HAL_Delay(70);                                       // Wait minimum 70ms (includes UNO 50ms 'SPI accessible' wait)
 
-    spiWriteReadUno(SPI_FRAME_WRITE_FILTER_300HZ_RATE);  // Select UNO 300Hz filter for RATE
-    spiWriteReadUno(SPI_FRAME_WRITE_FILTER_300HZ_ACC);   // Select UNO 300Hz filter for ACC
+    spiWriteReadUno(SPI_FRAME_WRITE_FILTER_46HZ_RATE);  // Select UNO 46Hz filter for RATE
+    spiWriteReadUno(SPI_FRAME_WRITE_FILTER_46HZ_ACC);   // Select UNO 46Hz filter for ACC
 
     // Restart DUE
     spiWriteReadDue(SPI_FRAME_WRITE_RESET);              // Reset DUE again
@@ -134,7 +134,7 @@ void CScha63TDriver::Init()
 
     HAL_Delay(1);                                        // Wait 1 ms for SPI to be accessible
 
-    spiWriteReadDue(SPI_FRAME_WRITE_FILTER_300HZ_RATE);  // Select DUE 300Hz filter for RATE
+    spiWriteReadDue(SPI_FRAME_WRITE_FILTER_46HZ_RATE);  // Select DUE 46Hz filter for RATE
 
     for (int iAttempt = 0; iAttempt < skiMaxAttemptsToConfigure_; iAttempt++)
     {
@@ -163,9 +163,9 @@ void CScha63TDriver::Init()
 
         HAL_Delay(50);                                       // Wait 50ms before communicating with UNO
 
-        spiWriteReadUno(SPI_FRAME_WRITE_FILTER_300HZ_RATE);  // Select UNO 300Hz filter for RATE
-        spiWriteReadUno(SPI_FRAME_WRITE_FILTER_300HZ_ACC);   // Select UNO 300Hz filter for ACC
-        spiWriteReadDue(SPI_FRAME_WRITE_FILTER_300HZ_RATE);  // Select DUE 300Hz filter for RATE
+        spiWriteReadUno(SPI_FRAME_WRITE_FILTER_46HZ_RATE);  // Select UNO 46Hz filter for RATE
+        spiWriteReadUno(SPI_FRAME_WRITE_FILTER_46HZ_ACC);   // Select UNO 46Hz filter for ACC
+        spiWriteReadDue(SPI_FRAME_WRITE_FILTER_46HZ_RATE);  // Select DUE 46Hz filter for RATE
 
         HAL_Delay(45);                                       // Adjust restart duration to 500 ms
       }
@@ -199,111 +199,109 @@ void CScha63TDriver::PollSensor()
   assert(SCB->ICSR & SCB_ICSR_VECTACTIVE_Msk);
 
   static uint32_t suCounter = 0U;
-  static uint32_t suTimeoutCounter = 0U;
 
   if (true == bIsInitialized_)
   {
-    if (0U == suTimeoutCounter)
+    std::array<uint32_t, static_cast<size_t>(eFrameCount)> oFrames{ 0U };
+    SScha63TMeasurement oMeasurement{};
+
+    ++suCounter;
+
+    if (1U == suCounter)
     {
-      std::array<uint32_t, static_cast<size_t>(eFrameCount)> oFrames{ 0U };
-      SScha63TMeasurement oMeasurement = { 0 };
-
-      ++suCounter;
-
-      if (1U == suCounter)
-      {
-        oLatestDataset_.uTimestampFirstUs_ = GetMicroseconds();
-      }
-      else if (SAMPLE_COUNT == suCounter)
-      {
-        oLatestDataset_.uTimestampLastUs_ = GetMicroseconds();
-      }
-      else
-      {
-        // Do nothing
-      }
-
-      spiWriteReadDue(SPI_FRAME_READ_GYRO_Y);
-      oFrames[eAngularRateY] = spiWriteReadDue(SPI_FRAME_READ_GYRO_Z);
-      oFrames[eAngularRateZ] =  spiWriteReadDue(SPI_FRAME_READ_TEMP);
-      oFrames[eTemperatureDue] = spiWriteReadDue(SPI_FRAME_READ_TEMP);
-
-      spiWriteReadUno(SPI_FRAME_READ_GYRO_X);
-      oFrames[eAngularRateX] = spiWriteReadUno(SPI_FRAME_READ_ACC_X);
-      oFrames[eSpecificForceX] = spiWriteReadUno(SPI_FRAME_READ_ACC_Y);
-      oFrames[eSpecificForceY] = spiWriteReadUno(SPI_FRAME_READ_ACC_Z);
-      oFrames[eSpecificForceZ] = spiWriteReadUno(SPI_FRAME_READ_TEMP);
-      oFrames[eTemperatureUno] = spiWriteReadUno(SPI_FRAME_READ_TEMP);
-
-      bErrorFlags_ = false;
-
-      // Check for zero frames -> error during SPI communication.
-      // TODO: do CRC instead.
-      for (uint32_t uFrame : oFrames)
-      {
-        if (0U == uFrame)
-        {
-          bErrorFlags_ = true;
-          break;
-        }
-      }
-
-      if (false == bErrorFlags_)
-      {
-        bErrorFlags_ = checkRsErrorInFrames(oFrames.begin(), oFrames.size());
-
-        if (bErrorFlags_)
-        {
-          // Start timeout
-          suTimeoutCounter = SAMPLE_COUNT;
-
-          // Drop collected data
-          suCounter = 0U;
-          oLatestDataset_ = SScha63TDataset();
-
-          // Poll status information. The flags persist until status registers are read.
-          spiWriteReadUno(SPI_FRAME_READ_SUMMARY_STATUS);
-          oStatusUno_.uSummaryStatus_ = frameToUint16(spiWriteReadUno(SPI_FRAME_READ_RATE_STATUS_1));
-          oStatusUno_.uRateStatus_ = frameToUint16(spiWriteReadUno(SPI_FRAME_READ_ACC_STATUS_1));
-          oStatusUno_.uAccelerometerStatus_ = frameToUint16(spiWriteReadUno(SPI_FRAME_READ_COMMON_STATUS_1));
-          oStatusUno_.uCommonStatus1_ = frameToUint16(spiWriteReadUno(SPI_FRAME_READ_COMMON_STATUS_2));
-          oStatusUno_.uCommonStatus2_ = frameToUint16(spiWriteReadUno(SPI_FRAME_READ_COMMON_STATUS_2));
-
-          spiWriteReadDue(SPI_FRAME_READ_SUMMARY_STATUS);
-          oStatusDue_.uSummaryStatus_ = frameToUint16(spiWriteReadDue(SPI_FRAME_READ_RATE_STATUS_1));
-          oStatusDue_.uRateStatus1_ = frameToUint16(spiWriteReadDue(SPI_FRAME_READ_RATE_STATUS_2));
-          oStatusDue_.uRateStatus2_ = frameToUint16(spiWriteReadDue(SPI_FRAME_READ_COMMON_STATUS_1));
-          oStatusDue_.uCommonStatus1_ = frameToUint16(spiWriteReadDue(SPI_FRAME_READ_COMMON_STATUS_2));
-          oStatusDue_.uCommonStatus2_ = frameToUint16(spiWriteReadDue(SPI_FRAME_READ_COMMON_STATUS_2));
-        }
-      }
-
-      if (false == bErrorFlags_)
-      {
-        oMeasurement.iSpecificForceX_ = frameToInt16(oFrames[eSpecificForceX]);
-        oMeasurement.iSpecificForceY_ = frameToInt16(oFrames[eSpecificForceY]);
-        oMeasurement.iSpecificForceZ_ = frameToInt16(oFrames[eSpecificForceZ]);
-        oMeasurement.iAngularRateX_ = frameToInt16(oFrames[eAngularRateX]);
-        oMeasurement.iAngularRateY_ = frameToInt16(oFrames[eAngularRateY]);
-        oMeasurement.iAngularRateZ_ = frameToInt16(oFrames[eAngularRateZ]);
-        oMeasurement.iTemperatureUno_ = frameToInt16(oFrames[eTemperatureUno]);
-        oMeasurement.iTemperatureDue_ = frameToInt16(oFrames[eTemperatureDue]);
-        oMeasurement.uValid_ = 1U;
-
-        assert(((suCounter - 1U) >= 0) && ((suCounter - 1U) < oLatestDataset_.oMeasurements_.size()));
-        oLatestDataset_.oMeasurements_[suCounter - 1U] = oMeasurement;
-
-        if (SAMPLE_COUNT == suCounter)
-        {
-          bDatasetAvailable_ = true;
-          oOutputDataset_ = oLatestDataset_;
-          suCounter = 0U;
-        }
-      }
+      oLatestDataset_.uTimestampFirstUs_ = GetMicroseconds();
+    }
+    else if (SAMPLE_COUNT == suCounter)
+    {
+      oLatestDataset_.uTimestampLastUs_ = GetMicroseconds();
     }
     else
     {
-      --suTimeoutCounter;
+      // Do nothing
+    }
+
+    spiWriteReadDue(SPI_FRAME_READ_GYRO_Y);
+    oFrames[eAngularRateY] = spiWriteReadDue(SPI_FRAME_READ_GYRO_Z);
+    oFrames[eAngularRateZ] =  spiWriteReadDue(SPI_FRAME_READ_TEMP);
+    oFrames[eTemperatureDue] = spiWriteReadDue(SPI_FRAME_READ_TEMP);
+
+    spiWriteReadUno(SPI_FRAME_READ_GYRO_X);
+    oFrames[eAngularRateX] = spiWriteReadUno(SPI_FRAME_READ_ACC_X);
+    oFrames[eSpecificForceX] = spiWriteReadUno(SPI_FRAME_READ_ACC_Y);
+    oFrames[eSpecificForceY] = spiWriteReadUno(SPI_FRAME_READ_ACC_Z);
+    oFrames[eSpecificForceZ] = spiWriteReadUno(SPI_FRAME_READ_TEMP);
+    oFrames[eTemperatureUno] = spiWriteReadUno(SPI_FRAME_READ_TEMP);
+
+    bErrorFlags_ = false;
+
+    // Check for zero frames -> error during SPI communication.
+    // TODO: do CRC instead.
+    for (uint32_t uFrame : oFrames)
+    {
+      if (0U == uFrame)
+      {
+        bErrorFlags_ = true;
+        break;
+      }
+    }
+
+    if (false == bErrorFlags_)
+    {
+      bErrorFlags_ = checkRsErrorInFrames(oFrames.begin(), oFrames.size());
+
+      if (bErrorFlags_)
+      {
+        // Poll status information. The flags persist until status registers are read.
+        spiWriteReadUno(SPI_FRAME_READ_SUMMARY_STATUS);
+        oStatusUno_.uSummaryStatus_ = frameToUint16(spiWriteReadUno(SPI_FRAME_READ_RATE_STATUS_1));
+        oStatusUno_.uRateStatus_ = frameToUint16(spiWriteReadUno(SPI_FRAME_READ_ACC_STATUS_1));
+        oStatusUno_.uAccelerometerStatus_ = frameToUint16(spiWriteReadUno(SPI_FRAME_READ_COMMON_STATUS_1));
+        oStatusUno_.uCommonStatus1_ = frameToUint16(spiWriteReadUno(SPI_FRAME_READ_COMMON_STATUS_2));
+        oStatusUno_.uCommonStatus2_ = frameToUint16(spiWriteReadUno(SPI_FRAME_READ_COMMON_STATUS_2));
+
+        spiWriteReadDue(SPI_FRAME_READ_SUMMARY_STATUS);
+        oStatusDue_.uSummaryStatus_ = frameToUint16(spiWriteReadDue(SPI_FRAME_READ_RATE_STATUS_1));
+        oStatusDue_.uRateStatus1_ = frameToUint16(spiWriteReadDue(SPI_FRAME_READ_RATE_STATUS_2));
+        oStatusDue_.uRateStatus2_ = frameToUint16(spiWriteReadDue(SPI_FRAME_READ_COMMON_STATUS_1));
+        oStatusDue_.uCommonStatus1_ = frameToUint16(spiWriteReadDue(SPI_FRAME_READ_COMMON_STATUS_2));
+        oStatusDue_.uCommonStatus2_ = frameToUint16(spiWriteReadDue(SPI_FRAME_READ_COMMON_STATUS_2));
+      }
+    }
+
+    if (false == bErrorFlags_)
+    {
+      oMeasurement.iSpecificForceX_ = frameToInt16(oFrames[eSpecificForceX]);
+      oMeasurement.iSpecificForceY_ = frameToInt16(oFrames[eSpecificForceY]);
+      oMeasurement.iSpecificForceZ_ = frameToInt16(oFrames[eSpecificForceZ]);
+      oMeasurement.iAngularRateX_ = frameToInt16(oFrames[eAngularRateX]);
+      oMeasurement.iAngularRateY_ = frameToInt16(oFrames[eAngularRateY]);
+      oMeasurement.iAngularRateZ_ = frameToInt16(oFrames[eAngularRateZ]);
+      oMeasurement.iTemperatureUno_ = frameToInt16(oFrames[eTemperatureUno]);
+      oMeasurement.iTemperatureDue_ = frameToInt16(oFrames[eTemperatureDue]);
+      oMeasurement.uValid_ = 1U;
+    }
+
+    assert(((suCounter - 1U) >= 0) && ((suCounter - 1U) < oLatestDataset_.oMeasurements_.size()));
+    oLatestDataset_.oMeasurements_[suCounter - 1U] = oMeasurement;
+
+    if (SAMPLE_COUNT == suCounter)
+    {
+      if (false == bDatasetAvailable_) // Ensure that the dataset was processed by the receiver
+      {
+        oOutputDataset_ = oLatestDataset_;
+        __DMB();
+        bDatasetAvailable_ = true;
+
+        HAL_NVIC_SetPendingIRQ(TIM1_UP_TIM10_IRQn); // Trigger lower priority interrupt to pass data to FreeRTOS
+      }
+
+      // Invalidate the dataset
+      for (auto& orMeasurement : oLatestDataset_.oMeasurements_)
+      {
+        orMeasurement.uValid_ = BoolToUint(false);
+      }
+
+      suCounter = 0U;
     }
   }
 }
@@ -311,29 +309,29 @@ void CScha63TDriver::PollSensor()
 void CScha63TDriver::ConvertRawDataset()
 {
   SImuDataScha63T oImuData;
-  SScha63TDataset oDataset;
   CRte& orRte = CRte::GetInstance();
+  bool bGotNewDataset{false};
+  SScha63TDataset oNewDataset{};
 
-  // Ensure that the callback that polls the sensor does not change the data while we are copying it.
   taskENTER_CRITICAL();
   NVIC_DisableIRQ(TIM7_IRQn);
 
-  bool bDatasetAvailable = bDatasetAvailable_;
-
-  if (true == bDatasetAvailable)
+  if (bDatasetAvailable_)
   {
-    oDataset = oOutputDataset_;
+    __DMB();
+    oNewDataset = oOutputDataset_;
     bDatasetAvailable_ = false;
+    bGotNewDataset = true;
   }
 
   NVIC_EnableIRQ(TIM7_IRQn);
   taskEXIT_CRITICAL();
 
-  if ((true == bIsInitialized_) && (true == bDatasetAvailable))
+  if (bIsInitialized_ && bGotNewDataset)
   {
     unsigned iMeasurementCount = 0U;
 
-    for (const auto& korMeasurement : oDataset.oMeasurements_)
+    for (const auto& korMeasurement : oNewDataset.oMeasurements_)
     {
       if (1U == korMeasurement.uValid_)
       {
@@ -347,7 +345,7 @@ void CScha63TDriver::ConvertRawDataset()
       }
     }
 
-    if (iMeasurementCount > (SAMPLE_COUNT - 3U))
+    if (iMeasurementCount > 0U)
     {
       float fTmp = skfGravity_ / (skfAccelerometerSensitivity_ * static_cast<float>(iMeasurementCount));
       oImuData.fSpecificForceX_ *= fTmp;
@@ -383,7 +381,7 @@ void CScha63TDriver::ConvertRawDataset()
       oImuData.fAngularRateY_ = -oImuDataTmp.fAngularRateX_;
       oImuData.fAngularRateZ_ = -oImuDataTmp.fAngularRateZ_;
 
-      oImuData.uTimestampUs_ = (oDataset.uTimestampLastUs_ >> 1) + (oDataset.uTimestampFirstUs_ >> 1);
+      oImuData.uTimestampUs_ = (oNewDataset.uTimestampLastUs_ >> 1) + (oNewDataset.uTimestampFirstUs_ >> 1);
       oImuData.uValid_ = BoolToUint(true);
     }
     else

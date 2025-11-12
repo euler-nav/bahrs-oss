@@ -46,7 +46,7 @@
 #define SPI_FRAME_WRITE_FILTER_300HZ_RATE 0xD82424EE ///< Set 300 Hz filter for rate (register 16h)
 
 #define SPI_FRAME_WRITE_FILTER_13HZ_ACC   0xE800006D ///< Set 13 Hz filter for acceleration (register 1Ah)
-#define SPI_FRAME_WRITE_FILTER_20HZ_ACC   0xE800006D ///< Set 20 Hz filter for acceleration (register 1Ah)
+#define SPI_FRAME_WRITE_FILTER_20HZ_ACC   0xE80111F1 ///< Set 20 Hz filter for acceleration (register 1Ah)
 #define SPI_FRAME_WRITE_FILTER_46HZ_ACC   0xE8022248 ///< Set 46 Hz filter for acceleration (register 1Ah)
 #define SPI_FRAME_WRITE_FILTER_200HZ_ACC  0xE80333D4 ///< Set 200 Hz filter for acceleration (register 1Ah)
 #define SPI_FRAME_WRITE_FILTER_300HZ_ACC  0xE8044427 ///< Set 300 Hz filter for acceleration (register 1Ah)
@@ -225,7 +225,7 @@ private:
   bool bErrorFlags_ { false }; ///< The flag indicating errors during ASIC operation.
   SScha63TStatusUno oStatusUno_; ///< The latest content of the UNO status registers. Valid only when bErrorFlags_ is true.
   SScha63TStatusDue oStatusDue_; ///< The latest content of the DUE status registers. Valid only when bErrorFlags_ is true.
-  bool bDatasetAvailable_ { false };
+  volatile bool bDatasetAvailable_ { false };
 
 };
 

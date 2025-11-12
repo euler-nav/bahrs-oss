@@ -388,8 +388,6 @@ public:
   /**
    * @brief Build navigation data message from BAHRS filter output information.
    * @param korBahrsOutput Reference to BAHRS filter output.
-   * @param korOrientationData Reference to orientation data compensated for installation alignment.
-   * @param korMagneticHeading Reference to the estimated magnetic heading data compensated for installation alignment
    * @return Navigation data message struct.
   */
   SNavigationDataMessage BuildNavigationDataMessage(const NBahrsFilterApi::SOutputData& korBahrsOutput);

@@ -19,6 +19,8 @@ namespace NNavigationUtilities
     static constexpr double skdHalfPi_{ skdPi_ / 2.0 }; ///< Definition of double pi / 2.
     static constexpr float skfTwoPi_{ skfPi_ * 2.0F }; ///< Definition of float 2 pi.
     static constexpr double skdTwoPi_{ skdPi_ * 2.0 }; ///< Definition of double 2 pi.
+    static constexpr float skfDegToRad_{ skfPi_ / 180.0F }; ///< Definition of float degrees to radians.
+    static constexpr double skdDegToRad_{ skdPi_ / 180.0 }; ///< Definition of double degrees to radians.
 
   protected:
 

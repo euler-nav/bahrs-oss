@@ -10,6 +10,8 @@
 #include "GetMicroseconds.h"
 #include "cmsis_os.h"
 
+extern osSemaphoreId_t SemaphoreTask10msHandle;
+
 extern "C" void TaskRoutine5ms()
 {
   static uint32_t suCounter = 0U;
@@ -92,8 +94,16 @@ extern "C" void TaskRoutineRs232Sender(uint8_t uMessageId)
 
 extern "C" void TaskRoutineReceiveScha63TData()
 {
+  static uint32_t suCounter{0U};
   CScha63TDriver::GetInstance().ConvertRawDataset();
   CBahrsFilterSwc::GetInstance().SetImuInput();
+
+  if (suCounter % 2 == 0U)
+  {
+    osSemaphoreRelease(SemaphoreTask10msHandle);
+  }
+
+  ++suCounter;
 }
 
 extern "C" void TaskRoutinePollBmm(uint32_t uBmmSensorIndex)

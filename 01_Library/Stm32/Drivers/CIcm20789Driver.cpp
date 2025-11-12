@@ -828,6 +828,7 @@ bool CIcm20789Driver::setImuSampleRate()
 
 bool CIcm20789Driver::setImuFilter()
 {
+  // Configure rate sensor filter.
   // We need to configure some bits in two registers
   uint8_t uRegisterValue;
 
@@ -835,8 +836,8 @@ bool CIcm20789Driver::setImuFilter()
 
   if (true == bStatus)
   {
-    // We make sure that bits 0 to 2 are zeros
-    uRegisterValue &= static_cast<uint8_t>(~0x07);
+    uRegisterValue &= static_cast<uint8_t>(~0x07); // Clear bits 0 to 2
+    uRegisterValue |= static_cast<uint8_t>(0x03); // Set 41Hz filter
     bStatus = writeImuRegister(ICM20789_IMU_REG_CONFIG, uRegisterValue);
   }
 
@@ -850,6 +851,19 @@ bool CIcm20789Driver::setImuFilter()
     // We set to zero the bits 0 and 1
     uRegisterValue &= static_cast<uint8_t>(~0x03);
     bStatus = writeImuRegister(ICM20789_IMU_REG_GYRO_CONFIG, uRegisterValue);
+  }
+
+  // Configure accelerometer filter
+  if (true == bStatus)
+  {
+    bStatus = readFromImuRegisters(ICM20789_IMU_REG_ACCEL_CONFIG_2, &uRegisterValue, 1);
+  }
+
+  if (true == bStatus)
+  {
+    uRegisterValue &= static_cast<uint8_t>(~0x0F); // Clear bits 0 to 3
+    uRegisterValue |= static_cast<uint8_t>(0x03); // Set 44Hz filter
+    bStatus = writeImuRegister(ICM20789_IMU_REG_ACCEL_CONFIG_2, uRegisterValue);
   }
 
   return bStatus;

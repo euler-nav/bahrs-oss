@@ -24,6 +24,8 @@ namespace NBahrsFilterApi
     CQuaternion oQuaternionBodyToNed_;
     Eigen::Vector3f oAccelerometerBias_{ 0.0F, 0.0F, 0.0F };
     Eigen::Vector3f oGyroscopeBias_{ 0.0F, 0.0F, 0.0F };
+    Eigen::Vector3f oAccelerometerScaleFactor_{ 1.0F, 1.0F, 1.0F };
+    Eigen::Vector3f oGyroscopeScaleFactor_{ 1.0F, 1.0F, 1.0F };
 
     SBahrsState& operator+=(const SBahrsState& korRight);
     SBahrsState operator+(const SBahrsState& korRight);
@@ -40,6 +42,8 @@ namespace NBahrsFilterApi
     Eigen::Vector3f oAttitude_{ 0.0F, 0.0F, 0.0F };
     Eigen::Vector3f oAccelerometerBias_{ 0.0F, 0.0F, 0.0F };
     Eigen::Vector3f oGyroscopeBias_{ 0.0F, 0.0F, 0.0F };
+    Eigen::Vector3f oAccelerometerScaleFactor_{ 0.0F, 0.0F, 0.0F };
+    Eigen::Vector3f oGyroscopeScaleFactor_{ 0.0F, 0.0F, 0.0F };
   };
 
   using EFilterModes = CClosedLoopErrorStateKfApi::EFilterModes;

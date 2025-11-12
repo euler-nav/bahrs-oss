@@ -241,12 +241,3 @@ uint32_t CSerialProtocol::CalculateCrc(uint32_t* pData, uint32_t uNumberOfWords_
 {
   return HAL_CRC_Calculate(&hcrc, pData, uNumberOfWords_);
 }
-
-#ifdef SEND_DEBUG_OUTPUT
-void CSerialProtocol::putBytesIntoArray(uint8_t** upAddress, const uint8_t* upData, unsigned uLen)
-{
-  memcpy(*upAddress, upData, uLen);
-  *upAddress += uLen;
-}
-#endif /* SEND_DEBUG_OUTPUT */
-

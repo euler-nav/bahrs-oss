@@ -113,6 +113,7 @@ int main(void)
   MX_I2C1_Init();
   MX_I2C3_Init();
   MX_TIM3_Init();
+  MX_TIM10_Init();
   /* USER CODE BEGIN 2 */
   HAL_TIM_Base_Start(&htim2);
   HAL_TIM_Base_Start(&htim5);
