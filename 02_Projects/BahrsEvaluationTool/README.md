@@ -6,7 +6,7 @@ The source code is distributed under the 3-Clause BSD License. See the License.t
 
 # How to use
 
-You can use the script *script_evaluateBahrs.m* to plot BAHRS signals from a binary COM port log file. Use GNU Octave 8.2.0 or Matlab.
+You can use the script *script_evaluateBahrs.m* to plot BAHRS signals from a binary COM port log file. Use GNU Octave 9.3.0 or Matlab.
 
 # Sample log files
 1. Software PF_1_7, HW V2: *data/eulernav_log_20260101_115823.bin*
