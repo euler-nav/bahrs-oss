@@ -4,16 +4,28 @@ clear
 close all
 warning('on', 'backtrace')
 
-addpath(genpath('lib'))
+addpath('lib')
 
 tic
 
 %% Configuration
 
-testConfig.binaryFile = 'sample_bahrs_log.bin';
+testConfig.binaryFile = 'data/eulernav_log_20260101_115823.bin';
 testConfig.convertBinaryFile = true;
-testConfig.converterExecutable = '..\..\03_Firmware\BahrsTargetApp\pf_1_0\Utilities\SerialProtocolToMat.exe';
-testConfig.matFile = '';
+testConfig.software_version = '<=1.7'; % Valid options: '<=1.7', '>=1.8'
+testConfig.matFile = ''; % Needs to be set if convertBinaryFile is false
+
+%% Derive parameters from configuration
+if strcmp(testConfig.software_version, '<=1.7')
+    testConfig.converterExecutable = '..\..\03_Firmware\BahrsTargetApp\pf_1_0\Utilities\SerialProtocolToMat.exe';
+    addpath('lib/up_to_pf_1_7');
+elseif strcmp(testConfig.software_version, '>=1.8')
+    testConfig.converterExecutable = '..\..\03_Firmware\BahrsTargetApp\pf_1_8\Tools\SerialProtocolToMat.exe';
+    addpath('lib/from_pf_1_8');
+else
+    error('Invalid software version provided');
+end
+
 
 %% Convert binary file
 
