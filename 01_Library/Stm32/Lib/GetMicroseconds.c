@@ -9,10 +9,15 @@
 
 uint64_t GetMicroseconds()
 {
-  uint64_t uRetVal = 0;
-  uint64_t uTim5Count = TIM5->CNT;
-  uRetVal = (uTim5Count << 32) | TIM2->CNT;
+  uint32_t uHigh1, uHigh2, uLow;
 
-  return uRetVal;
+  do
+  {
+    uHigh1 = TIM5->CNT;
+    uLow   = TIM2->CNT;
+    uHigh2 = TIM5->CNT;
+  } while (uHigh1 != uHigh2);
+
+  return ((uint64_t)uHigh1 << 32) | uLow;
 }
 

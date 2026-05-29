@@ -146,7 +146,7 @@ private:
    * @brief Set BMM150 sensor preset configuration
    * @param uXYRep - set xy repetitions
    * @param uZRep - set z repetitions
-   * @Param uODR - set operating data rate
+   * @param uODR - set operating data rate
    * @return true on success else false number
    */
   bool setPresetConfig(uint8_t uXYRep, uint8_t uZRep, uint8_t uODR);

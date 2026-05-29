@@ -6,6 +6,6 @@ set STM32_CUBE_HEADLESS_BAT_PATH="C:\ST\STM32CubeIDE_1.9.0\STM32CubeIDE\headless
 set PROJECT_PATH_REL="02_Projects\Stm32Bahrs\TargetApp"
 set BUILD_VARIANT=%1
 
-%STM32_CUBE_HEADLESS_BAT_PATH% -import %PROJECT_PATH_REL% -cleanBuild BahrsTargetApp/%BUILD_VARIANT%
+%STM32_CUBE_HEADLESS_BAT_PATH% -import %PROJECT_PATH_REL% -cleanBuild BahrsTargetApp/%BUILD_VARIANT% -data "%CD%/tmp_workspace"
 
 endlocal

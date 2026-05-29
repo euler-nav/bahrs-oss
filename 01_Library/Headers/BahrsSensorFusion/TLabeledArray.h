@@ -125,11 +125,11 @@ struct TemplateName \
 \
   template<typename ArrayElementType> using TLabeledArray = TLabeledArrayInternal<ArrayElementType, EnumType>; \
 \
-  using CArrayOfAllLabels = std::array<EnumType, static_cast<size_t>(EnumType::eCount)>; \
+  using CSensorLabels = std::array<EnumType, static_cast<size_t>(EnumType::eCount)>; \
 \
-  static CArrayOfAllLabels GetArrayOfAllLabels() \
+  static CSensorLabels GetSensorLabels() \
   { \
-    CArrayOfAllLabels oAllLabels; \
+    CSensorLabels oAllLabels; \
 \
     for (uint32_t uIndex = 0U; uIndex < oAllLabels.size(); ++uIndex) \
     { \

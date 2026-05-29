@@ -167,11 +167,11 @@ void CIcm20789Driver::PollPressureSensor()
 
   if (EIcmIds::eIcm1 == keSensorId_)
   {
-    CRte::GetInstance().oPortIcm20789BaroInput1_.Write(oOutput);
+    CRte::GetInstance().oPortPressureInput2_.Write(oOutput);
   }
   else if (EIcmIds::eIcm2 == keSensorId_)
   {
-    CRte::GetInstance().oPortIcm20789BaroInput2_.Write(oOutput);
+    CRte::GetInstance().oPortPressureInput3_.Write(oOutput);
   }
   else
   {
@@ -209,7 +209,7 @@ void CIcm20789Driver::PollInertialSensor()
       if (hasSignalSaturated(iAccelX) || hasSignalSaturated(iAccelY) || hasSignalSaturated(iAccelZ) ||
           hasSignalSaturated(iGyroX) || hasSignalSaturated(iGyroY) || hasSignalSaturated(iGyroZ))
       {
-        oOutput.uValid_ = BoolToUint(false);
+        oOutput.uImuValid_ = BoolToUint(false);
       }
       else
       {
@@ -223,26 +223,26 @@ void CIcm20789Driver::PollInertialSensor()
         oOutput.fAngularRateZ_ = -skfGyroRawToRadiansPerSecond_ * static_cast<float>(iGyroZ);
 
         oOutput.uTimestampUs_ = uTimestamp;
-        oOutput.uValid_ = BoolToUint(true);
+        oOutput.uImuValid_ = BoolToUint(true);
       }
     }
     else
     {
-      oOutput.uValid_ = BoolToUint(false);
+      oOutput.uImuValid_ = BoolToUint(false);
     }
   }
   else
   {
-    oOutput.uValid_ = BoolToUint(false);
+    oOutput.uImuValid_ = BoolToUint(false);
   }
 
   if (EIcmIds::eIcm1 == keSensorId_)
   {
-    CRte::GetInstance().oPortIcm20789ImuInput1_.Write(oOutput);
+    CRte::GetInstance().oPortImuInput2_.Write(oOutput);
   }
   else if (EIcmIds::eIcm2 == keSensorId_)
   {
-    CRte::GetInstance().oPortIcm20789ImuInput2_.Write(oOutput);
+    CRte::GetInstance().oPortImuInput3_.Write(oOutput);
   }
   else
   {
@@ -339,7 +339,7 @@ void CIcm20789Driver::ParseReceivedImuDataDma()
     if (hasSignalSaturated(iAccelX) || hasSignalSaturated(iAccelY) || hasSignalSaturated(iAccelZ) ||
         hasSignalSaturated(iGyroX) || hasSignalSaturated(iGyroY) || hasSignalSaturated(iGyroZ))
     {
-      oOutput.uValid_ = BoolToUint(false);
+      oOutput.uImuValid_ = BoolToUint(false);
     }
     else
     {
@@ -352,21 +352,21 @@ void CIcm20789Driver::ParseReceivedImuDataDma()
       oOutput.fAngularRateY_ = skfGyroRawToRadiansPerSecond_ * static_cast<float>(iGyroY);
       oOutput.fAngularRateZ_ = -skfGyroRawToRadiansPerSecond_ * static_cast<float>(iGyroZ);
 
-      oOutput.uValid_ = BoolToUint(true);
+      oOutput.uImuValid_ = BoolToUint(true);
     }
   }
   else
   {
-    oOutput.uValid_ = BoolToUint(false);
+    oOutput.uImuValid_ = BoolToUint(false);
   }
 
   if (EIcmIds::eIcm1 == keSensorId_)
   {
-    CRte::GetInstance().oPortIcm20789ImuInput1_.Write(oOutput);
+    CRte::GetInstance().oPortImuInput2_.Write(oOutput);
   }
   else if (EIcmIds::eIcm2 == keSensorId_)
   {
-    CRte::GetInstance().oPortIcm20789ImuInput2_.Write(oOutput);
+    CRte::GetInstance().oPortImuInput3_.Write(oOutput);
   }
   else
   {
@@ -402,11 +402,11 @@ void CIcm20789Driver::ParseReceivedPressureDataDma()
 
   if (EIcmIds::eIcm1 == keSensorId_)
   {
-    CRte::GetInstance().oPortIcm20789BaroInput1_.Write(oOutput);
+    CRte::GetInstance().oPortPressureInput2_.Write(oOutput);
   }
   else if (EIcmIds::eIcm2 == keSensorId_)
   {
-    CRte::GetInstance().oPortIcm20789BaroInput2_.Write(oOutput);
+    CRte::GetInstance().oPortPressureInput3_.Write(oOutput);
   }
   else
   {
@@ -420,15 +420,15 @@ void CIcm20789Driver::ParseReceivedPressureDataDma()
 void CIcm20789Driver::InvalidateImuOutputPort()
 {
   SImuMeasurement oOutput;
-  oOutput.uValid_ = BoolToUint(false);
+  oOutput.uImuValid_ = BoolToUint(false);
 
   if (EIcmIds::eIcm1 == keSensorId_)
   {
-    CRte::GetInstance().oPortIcm20789ImuInput1_.Write(oOutput);
+    CRte::GetInstance().oPortImuInput2_.Write(oOutput);
   }
   else if (EIcmIds::eIcm2 == keSensorId_)
   {
-    CRte::GetInstance().oPortIcm20789ImuInput2_.Write(oOutput);
+    CRte::GetInstance().oPortImuInput3_.Write(oOutput);
   }
   else
   {
@@ -443,11 +443,11 @@ void CIcm20789Driver::InvalidatePressureOutputPort()
 
   if (EIcmIds::eIcm1 == keSensorId_)
   {
-    CRte::GetInstance().oPortIcm20789BaroInput1_.Write(oOutput);
+    CRte::GetInstance().oPortPressureInput2_.Write(oOutput);
   }
   else if (EIcmIds::eIcm2 == keSensorId_)
   {
-    CRte::GetInstance().oPortIcm20789BaroInput2_.Write(oOutput);
+    CRte::GetInstance().oPortPressureInput3_.Write(oOutput);
   }
   else
   {

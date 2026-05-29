@@ -90,7 +90,9 @@ namespace NNavigationUtilities
    * @brief Compute Euler angles defined in the 3-1-2 sequence from conventional Euler angles.
    * 
    * The function implements conversion of Euler angles as described in the section
+   * @internal
    * @link p_ccc_subsubsec_euler_angles_to_euler_angles_312 Euler angles 3-1-2 to rotation matrix @endlink
+   * @endinternal
    * 
    * @param korEulerAngles Conventional (aerospace) Euler angles.
    * @return Equivalent Euler angles defined using the 3-1-2 rotation sequence.

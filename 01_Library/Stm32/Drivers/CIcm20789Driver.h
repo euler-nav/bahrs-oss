@@ -332,7 +332,7 @@ private:
 
   /**
    * @brief Get the Chip ID value barometr part
-   * @param uId reference to the ID variable
+   * @param urId reference to the ID variable
    * @return True -- success, false -- failure.
    */
   bool getChipIDBaro(uint8_t& urId);
@@ -357,8 +357,8 @@ private:
 
   /**
    * @brief Get the Temperature And Pressure values
-   * @param fTemperature reference to the temperature variable
-   * @param fPressure reference to the pressure variable
+   * @param frTemperature reference to the temperature variable
+   * @param frPressure reference to the pressure variable
    * @return True -- success, false -- failure.
    */
   bool getTemperatureAndPressure(float& frTemperature, float& frPressure);
@@ -367,8 +367,8 @@ private:
    * @brief Processing the raw data
    * @param iPressData - Raw pressure data from sensor
    * @param iTempData - Raw temperature data from sensor
-   * @param fTemperature reference to the temperature variable
-   * @param fPressure reference to the pressure variable
+   * @param frTemperature reference to the temperature variable
+   * @param frPressure reference to the pressure variable
    */
   void processDataBaro(uint32_t iPressData, uint32_t iTempData, float& frPressure, float& frTemperature);
 

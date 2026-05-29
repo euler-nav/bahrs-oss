@@ -34,82 +34,82 @@
 		<link>
 			<name>Rte/Inc/AmsAssert.h</name>
 			<type>1</type>
-			<locationURI>PARENT-3-PROJECT_LOC/01_Library/Stm32/Lib/AmsAssert.h</locationURI>
+			<locationURI>PARENT-3-PROJECT_LOC/01_Library/up-to-oss-1-7/Stm32/Lib/AmsAssert.h</locationURI>
 		</link>
 		<link>
 			<name>Rte/Inc/CBmm150Driver.h</name>
 			<type>1</type>
-			<locationURI>$%7BPARENT-3-PROJECT_LOC%7D/01_Library/Stm32/Drivers/CBmm150Driver.h</locationURI>
+			<locationURI>$%7BPARENT-3-PROJECT_LOC%7D/01_Library/up-to-oss-1-7/Stm32/Drivers/CBmm150Driver.h</locationURI>
 		</link>
 		<link>
 			<name>Rte/Inc/CBmp384Driver.h</name>
 			<type>1</type>
-			<locationURI>$%257BPARENT-3-PROJECT_LOC%257D/01_Library/Stm32/Drivers/CBmp384Driver.h</locationURI>
+			<locationURI>$%257BPARENT-3-PROJECT_LOC%257D/01_Library/up-to-oss-1-7/Stm32/Drivers/CBmp384Driver.h</locationURI>
 		</link>
 		<link>
 			<name>Rte/Inc/CIcm20789Driver.h</name>
 			<type>1</type>
-			<locationURI>$%257BPARENT-3-PROJECT_LOC%257D/01_Library/Stm32/Drivers/CIcm20789Driver.h</locationURI>
+			<locationURI>$%257BPARENT-3-PROJECT_LOC%257D/01_Library/up-to-oss-1-7/Stm32/Drivers/CIcm20789Driver.h</locationURI>
 		</link>
 		<link>
 			<name>Rte/Inc/CMmc5983Driver.h</name>
 			<type>1</type>
-			<locationURI>$%7BPARENT-3-PROJECT_LOC%7D/01_Library/Stm32/Drivers/CMmc5983Driver.h</locationURI>
+			<locationURI>$%7BPARENT-3-PROJECT_LOC%7D/01_Library/up-to-oss-1-7/Stm32/Drivers/CMmc5983Driver.h</locationURI>
 		</link>
 		<link>
 			<name>Rte/Inc/CScha63TDriver.h</name>
 			<type>1</type>
-			<locationURI>$%257BPARENT-3-PROJECT_LOC%257D/01_Library/Stm32/Drivers/CScha63TDriver.h</locationURI>
+			<locationURI>$%257BPARENT-3-PROJECT_LOC%257D/01_Library/up-to-oss-1-7/Stm32/Drivers/CScha63TDriver.h</locationURI>
 		</link>
 		<link>
 			<name>Rte/Inc/GetMicroseconds.h</name>
 			<type>1</type>
-			<locationURI>$%7BPARENT-3-PROJECT_LOC%7D/01_Library/Stm32/Lib/GetMicroseconds.h</locationURI>
+			<locationURI>$%7BPARENT-3-PROJECT_LOC%7D/01_Library/up-to-oss-1-7/Stm32/Lib/GetMicroseconds.h</locationURI>
 		</link>
 		<link>
 			<name>Rte/Inc/Scha63TDriverInterruptCallback.h</name>
 			<type>1</type>
-			<locationURI>$%257BPARENT-3-PROJECT_LOC%257D/01_Library/Stm32/Drivers/Scha63TDriverInterruptCallback.h</locationURI>
+			<locationURI>$%257BPARENT-3-PROJECT_LOC%257D/01_Library/up-to-oss-1-7/Stm32/Drivers/Scha63TDriverInterruptCallback.h</locationURI>
 		</link>
 		<link>
 			<name>Rte/Inc/Scha63TDriverTypes.h</name>
 			<type>1</type>
-			<locationURI>$%257BPARENT-3-PROJECT_LOC%257D/01_Library/Stm32/Drivers/Scha63TDriverTypes.h</locationURI>
+			<locationURI>$%257BPARENT-3-PROJECT_LOC%257D/01_Library/up-to-oss-1-7/Stm32/Drivers/Scha63TDriverTypes.h</locationURI>
 		</link>
 		<link>
 			<name>Rte/Src/AmsAssert.cpp</name>
 			<type>1</type>
-			<locationURI>PARENT-3-PROJECT_LOC/01_Library/Stm32/Lib/AmsAssert.cpp</locationURI>
+			<locationURI>PARENT-3-PROJECT_LOC/01_Library/up-to-oss-1-7/Stm32/Lib/AmsAssert.cpp</locationURI>
 		</link>
 		<link>
 			<name>Rte/Src/CBmm150Driver.cpp</name>
 			<type>1</type>
-			<locationURI>$%7BPARENT-3-PROJECT_LOC%7D/01_Library/Stm32/Drivers/CBmm150Driver.cpp</locationURI>
+			<locationURI>$%7BPARENT-3-PROJECT_LOC%7D/01_Library/up-to-oss-1-7/Stm32/Drivers/CBmm150Driver.cpp</locationURI>
 		</link>
 		<link>
 			<name>Rte/Src/CBmp384Driver.cpp</name>
 			<type>1</type>
-			<locationURI>$%7BPARENT-3-PROJECT_LOC%7D/01_Library/Stm32/Drivers/CBmp384Driver.cpp</locationURI>
+			<locationURI>$%7BPARENT-3-PROJECT_LOC%7D/01_Library/up-to-oss-1-7/Stm32/Drivers/CBmp384Driver.cpp</locationURI>
 		</link>
 		<link>
 			<name>Rte/Src/CIcm20789Driver.cpp</name>
 			<type>1</type>
-			<locationURI>$%7BPARENT-3-PROJECT_LOC%7D/01_Library/Stm32/Drivers/CIcm20789Driver.cpp</locationURI>
+			<locationURI>$%7BPARENT-3-PROJECT_LOC%7D/01_Library/up-to-oss-1-7/Stm32/Drivers/CIcm20789Driver.cpp</locationURI>
 		</link>
 		<link>
 			<name>Rte/Src/CMmc5983Driver.cpp</name>
 			<type>1</type>
-			<locationURI>$%7BPARENT-3-PROJECT_LOC%7D/01_Library/Stm32/Drivers/CMmc5983Driver.cpp</locationURI>
+			<locationURI>$%7BPARENT-3-PROJECT_LOC%7D/01_Library/up-to-oss-1-7/Stm32/Drivers/CMmc5983Driver.cpp</locationURI>
 		</link>
 		<link>
 			<name>Rte/Src/CScha63TDriver.cpp</name>
 			<type>1</type>
-			<locationURI>$%7BPARENT-3-PROJECT_LOC%7D/01_Library/Stm32/Drivers/CScha63TDriver.cpp</locationURI>
+			<locationURI>$%7BPARENT-3-PROJECT_LOC%7D/01_Library/up-to-oss-1-7/Stm32/Drivers/CScha63TDriver.cpp</locationURI>
 		</link>
 		<link>
 			<name>Rte/Src/GetMicroseconds.c</name>
 			<type>1</type>
-			<locationURI>$%7BPARENT-3-PROJECT_LOC%7D/01_Library/Stm32/Lib/GetMicroseconds.c</locationURI>
+			<locationURI>$%7BPARENT-3-PROJECT_LOC%7D/01_Library/up-to-oss-1-7/Stm32/Lib/GetMicroseconds.c</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>

@@ -11,7 +11,7 @@
 #include "GetMicroseconds.h"
 #include "stm32f4xx_hal_fmpi2c.h"
 #include "stm32f4xx_hal.h"
-#include "RteTypes.h"
+#include "UintToBool.h"
 
 extern FMPI2C_HandleTypeDef hfmpi2c1;
 extern I2C_HandleTypeDef hi2c2;
@@ -460,12 +460,12 @@ void CBmm150Driver::Bmm150ReadMagData(void)
   int16_t iRawY;
   int16_t iRawZ;
   int16_t iRawR;
-  SMagneticData oMagData;
+  SMagneticMeasurement oMagData;
   int16_t iTmpMsb;
 
   if(IsInitialized())
   {
-    oMagData.uTimeStampUs_ = GetMicroseconds();
+    oMagData.uTimestampUs_ = GetMicroseconds();
 
     if (readFromAddr(0x42, auRawData, 8))
     {
@@ -486,29 +486,29 @@ void CBmm150Driver::Bmm150ReadMagData(void)
       float fValZ = compensateZ(iRawZ, iRawR);
 
       /* Convert uTesla to Gauss, 1uT => 0.01 Gauss  */
-      oMagData.fXAxisVal_ = (-fValY) * 0.01;
-      oMagData.fYAxisVal_ = (-fValX) * 0.01;
-      oMagData.fZAxisVal_ = (-fValZ) * 0.01;
+      oMagData.fVectorX_ = (-fValY) * 0.01;
+      oMagData.fVectorY_ = (-fValX) * 0.01;
+      oMagData.fVectorZ_ = (-fValZ) * 0.01;
 
-      oMagData.bDataIsValid_ = true;
+      oMagData.uValid_ = BoolToUint(true);
     }
     else
     {
-      oMagData.bDataIsValid_ = false;
+      oMagData.uValid_ = BoolToUint(false);
     }
   }
   else
   {
-    oMagData.bDataIsValid_ = false;
+    oMagData.uValid_ = BoolToUint(false);
   }
 
   if (EBmmIds::eBmm1 == keSensorId_)
   {
-    CRte::GetInstance().oPortBmm150Input1_.Write(oMagData);
+    CRte::GetInstance().oPortMagnetometerInput2_.Write(oMagData);
   }
   else if (EBmmIds::eBmm2 == keSensorId_)
   {
-    CRte::GetInstance().oPortBmm150Input2_.Write(oMagData);
+    CRte::GetInstance().oPortMagnetometerInput3_.Write(oMagData);
   }
   else
   {

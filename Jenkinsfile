@@ -6,6 +6,7 @@ pipeline {
             steps {
                 bitbucketStatusNotify(buildState: 'INPROGRESS')
                 bat '05_Jenkins/Build_TargetApp_STM32.bat Debug'
+                bat '05_Jenkins/Build_TargetApp_STM32_V3.bat Debug'
             }
         }
     }

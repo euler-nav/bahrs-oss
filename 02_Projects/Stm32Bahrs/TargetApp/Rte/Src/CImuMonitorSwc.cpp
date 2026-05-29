@@ -10,12 +10,6 @@
 
 #include "CRte.h"
 
-#ifdef SEND_DEBUG_OUTPUT
-
-#include "GetMicroseconds.h"
-
-#endif /* SEND_DEBUG_OUTPUT */
-
 void CImuMonitorSwc::Init()
 {
   // Do nothing

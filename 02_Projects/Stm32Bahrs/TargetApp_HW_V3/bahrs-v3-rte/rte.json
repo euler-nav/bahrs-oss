@@ -1,0 +1,558 @@
+{
+	"class_name": "CRte",
+	"inclusion_guard": "C_RTE_H",
+	"supported_port_field_types": ["char", "int8_t", "uint8_t", "int16_t", "uint16_t", "int32_t", "uint32_t", "int64_t", "uint64_t", "float", "double"],
+	"ports": [
+		{
+			"name": "ImuInput1",
+			"type": "ImuMeasurement",
+			"generated": true,
+			"record_by_default": true
+		},
+		{
+			"name": "ImuInput2",
+			"type": "ImuMeasurement",
+			"generated": true,
+			"record_by_default": true
+		},
+		{
+			"name": "ImuInput3",
+			"type": "ImuMeasurement",
+			"generated": true,
+			"record_by_default": true
+		},
+		{
+			"name": "PressureInput1",
+			"type": "BarometerMeasurement",
+			"generated": true,
+			"record_by_default": true
+		},
+		{
+			"name": "PressureInput2",
+			"type": "BarometerMeasurement",
+			"generated": true,
+			"record_by_default": true
+		},
+		{
+			"name": "PressureInput3",
+			"type": "BarometerMeasurement",
+			"generated": true,
+			"record_by_default": true
+		},
+		{
+			"name": "CompensatedPressureInput1",
+			"type": "BarometerMeasurement",
+			"generated": true,
+			"record_by_default": false
+		},
+		{
+			"name": "CompensatedPressureInput2",
+			"type": "BarometerMeasurement",
+			"generated": true,
+			"record_by_default": false
+		},
+		{
+			"name": "CompensatedPressureInput3",
+			"type": "BarometerMeasurement",
+			"generated": true,
+			"record_by_default": false
+		},
+		{
+			"name": "MagnetometerInput1",
+			"type": "MagneticMeasurement",
+			"generated": true,
+			"record_by_default": true
+		},
+		{
+			"name": "MagnetometerInput2",
+			"type": "MagneticMeasurement",
+			"generated": true,
+			"record_by_default": true
+		},
+		{
+			"name": "MagnetometerInput3",
+			"type": "MagneticMeasurement",
+			"generated": true,
+			"record_by_default": true
+		},
+		{
+			"name": "SyncPulseTime",
+			"type": "TimeOfSyncPulse",
+			"generated": true,
+			"record_by_default": true
+		},
+		{
+			"name": "ImuOutput",
+			"type": "SOutputImuData",
+			"generated": false,
+			"record_by_default": false
+		},
+		{
+			"name": "CompensatedMagnetometerData",
+			"type": "MagneticMeasurement",
+			"generated": true,
+			"record_by_default": false
+		},
+		{
+			"name": "MagneticHeading",
+			"type": "MagneticHeading",
+			"generated": true,
+			"record_by_default": false
+		},
+		{
+			"name": "CompensatedMagnetometerDataInVehicleFrame",
+			"type": "MagneticMeasurement",
+			"generated": true,
+			"record_by_default": false
+		},
+		{
+			"name": "ImuDataAfterMonitor",
+			"type": "CImuDataAfterMonitor",
+			"generated": false,
+			"record_by_default": false
+		},
+		{
+			"name": "SafePressureData1",
+			"type": "BarometerMeasurement",
+			"generated": true,
+			"record_by_default": false
+		},
+		{
+			"name": "SafePressureData2",
+			"type": "BarometerMeasurement",
+			"generated": true,
+			"record_by_default": false
+		},
+		{
+			"name": "SafePressureData3",
+			"type": "BarometerMeasurement",
+			"generated": true,
+			"record_by_default": false
+		},
+		{
+			"name": "BahrsFilterOutput1",
+			"type": "CBahrsFilterOutput",
+			"generated": false,
+			"record_by_default": false
+		},
+		{
+			"name": "BahrsFilterOutput2",
+			"type": "CBahrsFilterOutput",
+			"generated": false,
+			"record_by_default": false
+		},
+		{
+			"name": "BahrsFilterOutput3",
+			"type": "CBahrsFilterOutput",
+			"generated": false,
+			"record_by_default": false
+		},
+		{
+			"name": "VehicleAttitude1",
+			"type": "AttitudeData",
+			"generated": true,
+			"record_by_default": false
+		},
+		{
+			"name": "VehicleAttitude2",
+			"type": "AttitudeData",
+			"generated": true,
+			"record_by_default": false
+		},
+		{
+			"name": "VehicleAttitude3",
+			"type": "AttitudeData",
+			"generated": true,
+			"record_by_default": false
+		},
+		{
+			"name": "SafeVehicleAttitude",
+			"type": "SSafeAttitudeData",
+			"generated": false,
+			"record_by_default": true
+		},
+		{
+			"name": "SafeVerticalChannelData",
+			"type": "SSafeVerticalChannelData",
+			"generated": false,
+			"record_by_default": true
+		}
+	],
+	"components": [
+		{
+			"class_name": "CBmi270Driver",
+			"header_file": "CBmi270Driver.h",
+			"include_in_resimulation": false
+		},
+		{
+			"class_name": "CAsm330lhhDriver",
+			"header_file": "CAsm330lhhDriver.h",
+			"include_in_resimulation": false
+		},
+		{
+			"class_name": "CRs232OutputHandler",
+			"header_file": "CRs232OutputHandler.h",
+			"include_in_resimulation": false
+		},
+		{
+			"class_name": "CSpiHandler",
+			"header_file": "CSpiHandler.h",
+			"include_in_resimulation": false
+		},
+		{
+			"class_name": "CI2CHandler",
+			"header_file": "CI2CHandler.h",
+			"include_in_resimulation": false
+		},
+		{
+			"class_name": "CBmp384Driver",
+			"header_file": "CBmp384Driver.h",
+			"include_in_resimulation": false
+		},
+		{
+			"class_name": "CLps22hhDriver",
+			"header_file": "CLps22hhDriver.h",
+			"include_in_resimulation": false
+		},
+		{
+			"class_name": "CScha63TDriver",
+			"header_file": "CScha63TDriver.h",
+			"include_in_resimulation": false
+		},
+		{
+			"class_name": "CIcp20100Driver",
+			"header_file": "CIcp20100Driver.h",
+			"include_in_resimulation": false
+		},
+		{
+			"class_name": "CMmc5983Driver",
+			"header_file": "CMmc5983Driver.h",
+			"include_in_resimulation": false
+		},
+		{
+			"class_name": "CLis3mdlDriver",
+			"header_file": "CLis3mdlDriver.h",
+			"include_in_resimulation": false
+		},
+		{
+			"class_name": "CBmm350Driver",
+			"header_file": "CBmm350Driver.h",
+			"include_in_resimulation": false
+		},
+		{
+			"class_name": "COutputTransformer",
+			"header_file": "COutputTransformer.h",
+			"include_in_resimulation": true
+		},
+		{
+			"class_name": "CPressureCompensator",
+			"header_file": "CPressureCompensator.h",
+			"include_in_resimulation": true
+		},
+		{
+			"class_name": "CImuMonitorSwc",
+			"header_file": "CImuMonitorSwc.h",
+			"include_in_resimulation": true
+		},
+		{
+			"class_name": "CBaroMonitorSwc",
+			"header_file": "CBaroMonitorSwc.h",
+			"include_in_resimulation": true
+		},
+		{
+			"class_name": "CBahrsFilterSwc",
+			"header_file": "CBahrsFilterSwc.h",
+			"include_in_resimulation": true
+		},
+		{
+			"class_name": "CAttitudeMonitorSwc",
+			"header_file": "CAttitudeMonitorSwc.h",
+			"include_in_resimulation": true
+		},
+		{
+			"class_name": "CVerticalChannelMonitorSwc",
+			"header_file": "CVerticalChannelMonitorSwc.h",
+			"include_in_resimulation": true
+		},
+		{
+			"class_name": "CSyncPulseHandler",
+			"header_file": "CSyncPulseHandler.h",
+			"include_in_resimulation": false
+		}
+	],
+	"port_data_types": [
+		{
+			"name": "ImuMeasurement",
+			"fields": [
+				{
+					"name": "SpecificForceX",
+					"type": "float",
+					"length": 1,
+					"default_value": 0.0,
+					"description": "Specific force X, [m/s^2]"
+				},
+				{
+					"name": "SpecificForceY",
+					"type": "float",
+					"length": 1,
+					"default_value": 0.0,
+					"description": "Specific force Y, [m/s^2]"
+				},
+				{
+					"name": "SpecificForceZ",
+					"type": "float",
+					"length": 1,
+					"default_value": 0.0,
+					"description": "Specific force Z, [m/s^2]"
+				},
+				{
+					"name": "AngularRateX",
+					"type": "float",
+					"length": 1,
+					"default_value": 0.0,
+					"description": "Angular rate X, [rad/s]"
+				},
+				{
+					"name": "AngularRateY",
+					"type": "float",
+					"length": 1,
+					"default_value": 0.0,
+					"description": "Angular rate Y, [rad/s]"
+				},
+				{
+					"name": "AngularRateZ",
+					"type": "float",
+					"length": 1,
+					"default_value": 0.0,
+					"description": "Angular rate Z, [rad/s]"
+				},
+				{
+					"name": "Temperature",
+					"type": "float",
+					"length": 1,
+					"default_value": 0.0,
+					"description": "Temperature in degrees Celsius"
+				},
+				{
+					"name": "TimestampUs",
+					"type": "uint64_t",
+					"length": 1,
+					"default_value": 0,
+					"description": "Timestamp in microseconds"
+				},
+				{
+					"name": "ImuValid",
+					"type": "uint8_t",
+					"length": 1,
+					"default_value": 0,
+					"description": "Validity flag"
+				},
+				{
+					"name": "TemperatureValid",
+					"type": "uint8_t",
+					"length": 1,
+					"default_value": 0,
+					"description": "Validity flag"
+				}
+			]
+		},
+		{
+			"name": "AttitudeData",
+			"fields": [
+				{
+					"name": "Roll",
+					"type": "float",
+					"length": 1,
+					"default_value": 0.0,
+					"description": "Roll angle, [rad]"
+				},
+				{
+					"name": "Pitch",
+					"type": "float",
+					"length": 1,
+					"default_value": 0.0,
+					"description": "Pitch angle, [rad]"
+				},
+				{
+					"name": "AttitudeStd1",
+					"type": "float",
+					"length": 1,
+					"default_value": 0.0,
+					"description": "Standard deviation of attitude estimate, [rad]"
+				},
+				{
+					"name": "AttitudeStd2",
+					"type": "float",
+					"length": 1,
+					"default_value": 0.0,
+					"description": "Standard deviation of attitude estimate, [rad]"
+				},
+				{
+					"name": "TimestampUs",
+					"type": "uint64_t",
+					"length": 1,
+					"default_value": 0,
+					"description": "Timestamp in microseconds"
+				},
+				{
+					"name": "Valid",
+					"type": "uint8_t",
+					"length": 1,
+					"default_value": 0,
+					"description": "Validity flag"
+				}
+			]
+		},
+		{
+			"name": "MagneticHeading",
+			"fields": [
+				{
+					"name": "MagneticHeading",
+					"type": "float",
+					"length": 1,
+					"default_value": 0.0,
+					"description": "Magnetic heading, [rad]"
+				},
+				{
+					"name": "TimestampUs",
+					"type": "uint64_t",
+					"length": 1,
+					"default_value": 0,
+					"description": "Timestamp in microseconds"
+				},
+				{
+					"name": "Valid",
+					"type": "uint8_t",
+					"length": 1,
+					"default_value": 0,
+					"description": "Validity flag"
+				}
+			]
+		},
+		{
+			"name": "TimeOfSyncPulse",
+			"fields": [
+				{
+					"name": "PulseTimeUs",
+					"type": "uint64_t",
+					"length": 1,
+					"default_value": 0,
+					"description": "Timestamp in microseconds"
+				}
+			]
+		},
+		{
+			"name": "BarometerMeasurement",
+			"fields": [
+				{
+					"name": "Pressure",
+					"type": "float",
+					"length": 1,
+					"default_value": 0.0,
+					"description": "Pressure in Pascals"
+				},
+				{
+					"name": "Temperature",
+					"type": "float",
+					"length": 1,
+					"default_value": 0.0,
+					"description": "Temperature in degrees Celsius"
+				},
+				{
+					"name": "TimestampUs",
+					"type": "uint64_t",
+					"length": 1,
+					"default_value": 0,
+					"description": "Timestamp in microseconds"
+				},
+				{
+					"name": "Valid",
+					"type": "uint8_t",
+					"length": 1,					
+					"default_value": 0,
+					"description": "Validity flag"
+				}
+			]
+		},
+		{
+			"name": "MagneticMeasurement",
+			"fields": [
+				{
+					"name": "VectorX",
+					"type": "float",
+					"length": 1,
+					"default_value": 0.0,
+					"description": "Magnetic field vector in mG axis X"
+				},
+				{
+					"name": "VectorY",
+					"type": "float",
+					"length": 1,
+					"default_value": 0.0,
+					"description": "Magnetic field vector in mG axis Y"
+				},
+				{
+					"name": "VectorZ",
+					"type": "float",
+					"default_value": 0.0,
+					"length": 1,
+					"description": "Magnetic field vector in mG axis Z"
+				},
+				{
+					"name": "Temperature",
+					"type": "float",
+					"length": 1,
+					"default_value": 0.0,
+					"description": "Temperature in degrees Celsius"
+				},
+				{
+					"name": "TimestampUs",
+					"type": "uint64_t",
+					"length": 1,
+					"default_value": 0,
+					"description": "Timestamp in microseconds"
+				},
+				{
+					"name": "Valid",
+					"type": "uint8_t",
+					"length": 1,
+					"default_value": 0,
+					"description": "Validity flag"
+				}
+			]
+		},
+		{
+			"name": "VerticalChannelData",
+			"fields": [
+				{
+					"name": "Height",
+					"type": "float",
+					"length": 1,
+					"default_value": 0.0,
+					"description": "Height, [m]"
+				},
+				{
+					"name": "VelocityDown",
+					"type": "float",
+					"length": 1,
+					"default_value": 0.0,
+					"description": "Vertical velocity (positive downwards), [m/s]"
+				},
+				{
+					"name": "TimestampUs",
+					"type": "uint64_t",
+					"length": 1,
+					"default_value": 0,
+					"description": "Timestamp in microseconds"
+				},
+				{
+					"name": "Valid",
+					"type": "uint8_t",
+					"length": 1,
+					"default_value": 0,
+					"description": "Validity flag"
+				}
+			]
+		}
+	]
+}

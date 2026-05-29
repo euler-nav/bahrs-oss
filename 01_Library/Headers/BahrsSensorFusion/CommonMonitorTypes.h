@@ -49,7 +49,7 @@ namespace NMonitorTypes
   /**
    * @brief Array labeled by redundant sensor indices.
   */
-  DECLARE_LABELED_ARRAY_TEMPLATE(SRedundantSensorLabels, eSensor1, eSensor2, eSensor3)
+  DECLARE_LABELED_ARRAY_TEMPLATE(SRedundantSensorDataArrayTemplate, eSensor1, eSensor2, eSensor3)
 
   /**
    * @brief Template class for storing triple redundant sensor data.
@@ -62,7 +62,7 @@ namespace NMonitorTypes
   class TRedundantSensorData
   {
   public:
-    using ERedundantSensorLabels = SRedundantSensorLabels::EnumType;
+    using ERedundantSensorLabels = SRedundantSensorDataArrayTemplate::EnumType;
     using DataType = SensorDataType;
 
     static_assert(SensorId1 != SensorId2);
@@ -108,7 +108,7 @@ namespace NMonitorTypes
   protected:
 
   private:
-    SRedundantSensorLabels::TLabeledArray<SensorDataType> oData_; ///< Internal sensor data storage
+    SRedundantSensorDataArrayTemplate::TLabeledArray<SensorDataType> oData_; ///< Internal sensor data storage
 
 #ifdef GOOGLETEST_INCLUDE_GTEST_GTEST_H_
     FRIEND_TEST(TRedundantSensorDataTest, SetGet);
