@@ -1,8 +1,8 @@
 var namespace_n_monitor_types =
 [
+    [ "TRedundantSensorData", "class_n_monitor_types_1_1_t_redundant_sensor_data.html", "class_n_monitor_types_1_1_t_redundant_sensor_data" ],
     [ "SMultidimensionalSignalBase", "struct_n_monitor_types_1_1_s_multidimensional_signal_base.html", "struct_n_monitor_types_1_1_s_multidimensional_signal_base" ],
     [ "TMultidimensionalSignal", "class_n_monitor_types_1_1_t_multidimensional_signal.html", "class_n_monitor_types_1_1_t_multidimensional_signal" ],
-    [ "TRedundantSensorData", "class_n_monitor_types_1_1_t_redundant_sensor_data.html", "class_n_monitor_types_1_1_t_redundant_sensor_data" ],
     [ "EDetectionResult", "namespace_n_monitor_types.html#a3d9b06088218c6891953f1f10cf97e3c", [
       [ "eInvalid", "namespace_n_monitor_types.html#a3d9b06088218c6891953f1f10cf97e3cac755153be5e641cf4748e990da4eaf3b", null ],
       [ "eUnavailable", "namespace_n_monitor_types.html#a3d9b06088218c6891953f1f10cf97e3ca2fdd41f3c9d616a8388fa048e17fb1c5", null ],

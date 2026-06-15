@@ -20,5 +20,6 @@ var class_c_quaternion =
     [ "Y", "class_c_quaternion.html#a6d37a9b9c967b8a52d43ee0af0d87f23", null ],
     [ "Y", "class_c_quaternion.html#a06ab72e7e7c0161dbff2d6c56edf5974", null ],
     [ "Z", "class_c_quaternion.html#a5e244abd6ba6243c139b298c6c436d11", null ],
-    [ "Z", "class_c_quaternion.html#a5446b8323692a752049f5b2a372a5619", null ]
+    [ "Z", "class_c_quaternion.html#a5446b8323692a752049f5b2a372a5619", null ],
+    [ "oVector_", "class_c_quaternion.html#a19c2057d1d65b4d7e59a70a8708fe379", null ]
 ];

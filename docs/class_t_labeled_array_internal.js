@@ -9,5 +9,7 @@ var class_t_labeled_array_internal =
     [ "end", "class_t_labeled_array_internal.html#a7453434f79007b3c47795fa6e687e01b", null ],
     [ "end", "class_t_labeled_array_internal.html#a2ebba56982a91a70d54e0911743d3fc8", null ],
     [ "operator[]", "class_t_labeled_array_internal.html#a13cc24602e60d34772c42285bbf8f13d", null ],
-    [ "operator[]", "class_t_labeled_array_internal.html#ad7c04d464815f780f5a4af8773e92570", null ]
+    [ "operator[]", "class_t_labeled_array_internal.html#ad7c04d464815f780f5a4af8773e92570", null ],
+    [ "data_", "class_t_labeled_array_internal.html#a33f85447bdfce0062acf1be64970f8d8", null ],
+    [ "skuSize_", "class_t_labeled_array_internal.html#aab223e922c1ada79901ad87b1dcbb0f9", null ]
 ];

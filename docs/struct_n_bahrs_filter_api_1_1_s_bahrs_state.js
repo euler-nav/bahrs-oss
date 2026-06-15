@@ -5,7 +5,10 @@ var struct_n_bahrs_filter_api_1_1_s_bahrs_state =
     [ "operator+=", "struct_n_bahrs_filter_api_1_1_s_bahrs_state.html#aa97104e1889169530d24dee9d249f38e", null ],
     [ "fHeight_", "struct_n_bahrs_filter_api_1_1_s_bahrs_state.html#a29ad8e61fc6a35f3f58ec176ab3247a9", null ],
     [ "fVelocityDown_", "struct_n_bahrs_filter_api_1_1_s_bahrs_state.html#ab7fe9491f8a3a2a914f351bf2343b5b8", null ],
+    [ "oAccelerationNed_", "struct_n_bahrs_filter_api_1_1_s_bahrs_state.html#a7d78a462ed360f2c2a67489c73b5f842", null ],
     [ "oAccelerometerBias_", "struct_n_bahrs_filter_api_1_1_s_bahrs_state.html#afb8e873dec234a2561ce48c0954f5d58", null ],
+    [ "oAccelerometerScaleFactor_", "struct_n_bahrs_filter_api_1_1_s_bahrs_state.html#a5055c8f36067d8d039c5ba4122482cbf", null ],
     [ "oGyroscopeBias_", "struct_n_bahrs_filter_api_1_1_s_bahrs_state.html#aa13137d4cf5c52c4bcd779bcb799f5f5", null ],
+    [ "oGyroscopeScaleFactor_", "struct_n_bahrs_filter_api_1_1_s_bahrs_state.html#a3289bcc00be39f5c6e16a22163770e5f", null ],
     [ "oQuaternionBodyToNed_", "struct_n_bahrs_filter_api_1_1_s_bahrs_state.html#a479d7d2dcf205ca7e5845aca4f887d49", null ]
 ];

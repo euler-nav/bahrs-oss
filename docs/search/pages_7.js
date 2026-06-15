@@ -1,5 +1,26 @@
 var searchData=
 [
-  ['risks_20and_20technical_20debt_0',['Risks and technical debt',['../md_doc_pages_page_risks_and_tech_debt.html',1,'']]],
-  ['runtime_20view_1',['Runtime view',['../md_doc_pages_page_runtime_view.html',1,'']]]
+  ['case_0',['case',['../class_c_butterworth_low_pass_filter2.html#autotoc_md3',1,'Normal case'],['../class_c_butterworth_low_pass_filter2.html#autotoc_md11',1,'Normal case'],['../class_c_butterworth_low_pass_filter2.html#autotoc_md14',1,'Normal case']]],
+  ['case_201_3a_20filter_20is_20not_20initialized_1',['Case 1: Filter is not initialized',['../class_c_butterworth_low_pass_filter2.html#autotoc_md6',1,'']]],
+  ['case_202_3a_20filter_20is_20initialized_2',['Case 2: Filter is initialized',['../class_c_butterworth_low_pass_filter2.html#autotoc_md7',1,'']]],
+  ['chain_3a_20bahrs_20filter_201_3',['Signal chain: BAHRS Filter 1',['../page_runtime_view.html#subsubsec_runtime_view_filter_chain_1',1,'']]],
+  ['chain_3a_20bahrs_20filters_202_20and_203_4',['Signal chain: BAHRS Filters 2 and 3',['../page_runtime_view.html#subsubsec_runtime_view_filter_chain_2_and_3',1,'']]],
+  ['channel_20monitor_20swc_5',['Internal behavior of Vertical channel monitor SWC',['../page_runtime_view.html#subsec_runtime_view_vertical_channel_monitor_activity',1,'']]],
+  ['chapters_6',['Software architecture document chapters',['../index.html#autotoc_md1',1,'']]],
+  ['checks_7',['checks',['../class_c_butterworth_low_pass_filter2.html#autotoc_md4',1,'Argument checks'],['../class_c_butterworth_low_pass_filter2.html#autotoc_md12',1,'Argument checks'],['../class_c_butterworth_low_pass_filter2.html#autotoc_md15',1,'Argument checks']]],
+  ['classification_8',['Source code classification',['../page_solution_strategy.html#subsec_solution_strategy_source_file_types',1,'']]],
+  ['code_20classification_9',['Source code classification',['../page_solution_strategy.html#subsec_solution_strategy_source_file_types',1,'']]],
+  ['code_20version_20identifier_10',['Source code version identifier',['../index.html#autotoc_md0',1,'']]],
+  ['component_20diagram_11',['component diagram',['../page_building_block_view.html#subsubsec_asw_level_3_component_diagram',1,'UML component diagram'],['../page_building_block_view.html#subsubsec_bsw_level_3_component_diagram',1,'UML component diagram']]],
+  ['component_20port_20data_20types_12',['Software component port data types',['../page_design_decisions.html#subsec_design_decisions_port_data_types',1,'']]],
+  ['component_20ports_13',['Software component ports',['../page_solution_strategy.html#subsubsec_solution_strategy_swc_ports',1,'']]],
+  ['components_14',['components',['../page_building_block_view.html#subsubsec_asw_swc_list',1,'List of application software components'],['../page_building_block_view.html#subsubsec_bsw_swc_list',1,'List of basic software components'],['../page_runtime_view.html#sec_runtime_view_internal_behavior_swc',1,'Software components'],['../page_solution_strategy.html#subsubsec_solution_strategy_software_component',1,'Software components'],['../page_solution_strategy.html#subsec_solution_strategy_software_components',1,'Software components']]],
+  ['computation_20of_20the_20filtered_20output_15',['Computation of the filtered output',['../class_c_butterworth_low_pass_filter2.html#autotoc_md8',1,'']]],
+  ['concepts_16',['Cross-cutting concepts',['../page_cross_cutting_concerns.html',1,'index']]],
+  ['constraints_17',['Architecture constraints',['../page_architecture_constraints.html',1,'index']]],
+  ['context_18',['System scope and context',['../page_system_scope_and_context.html',1,'index']]],
+  ['cross_20cutting_20concepts_19',['Cross-cutting concepts',['../page_cross_cutting_concerns.html',1,'index']]],
+  ['cutting_20concepts_20',['Cross-cutting concepts',['../page_cross_cutting_concerns.html',1,'index']]],
+  ['cyclic_20task_2010ms_20interval_21',['Cyclic task (10ms interval)',['../page_runtime_view.html#subsubsec_runtime_view_task_10_ms',1,'']]],
+  ['cyclic_20task_205ms_20interval_22',['Cyclic task (5ms interval)',['../page_runtime_view.html#subsubsec_runtime_view_task_5_ms',1,'']]]
 ];

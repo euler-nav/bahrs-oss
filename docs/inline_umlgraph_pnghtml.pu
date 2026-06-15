@@ -1,12 +1,22 @@
+@startuml bahrs_sw_class_diagram_level_0.png
+class "BAHRS Software" as BahrsSw
+class "Bootloader" as Bootloader
+class "Target Application" as TargetApp
+
+BahrsSw "1" o-- "1" Bootloader
+BahrsSw "1" o-- "1" TargetApp
+@enduml
 @startuml bahrs_sw_class_diagram.png
-class "BAHRS Software" as bahrssw
+class "Target Application" as TargetApp
 class "Application Software" as asw
 class "Basic Software" as bsw
 class "Runtime Environment" as rte
+class "Library Collection" as LibraryCollection
 
-bahrssw "1" o-- "1" asw
-bahrssw "1" o-- "1" bsw
-bahrssw "1" o-- "1" rte
+TargetApp "1" o-- "1" asw
+TargetApp "1" o-- "1" bsw
+TargetApp "1" o-- "1" rte
+TargetApp "1" o-- "1" LibraryCollection
 @enduml
 @startuml bb_view_level_2_bsw.png
 "Basic Software" "1" o-- "1" RTOS
@@ -27,4 +37,441 @@ class "Software Component Port" {
 +Read()
 +Write()
 }
+@enduml
+@startuml asw_component_diagram.png
+left to right direction
+
+interface PressureDataSensor1
+interface PressureDataSensor2
+interface PressureDataSensor3
+interface ImuDataSensor1
+interface ImuDataSensor2
+interface ImuDataSensor3
+interface MagneticFieldSensor1
+
+[Barometer Monitor] as BaroMonitor
+
+PressureDataSensor1 )-- BaroMonitor
+PressureDataSensor2 )-- BaroMonitor
+PressureDataSensor3 )-- BaroMonitor
+
+interface SafePressureData1
+interface SafePressureData2
+interface SafePressureData3
+
+[Magnetometer Compensator] as MagnetometerCompensator
+MagneticFieldSensor1 )-- MagnetometerCompensator
+
+interface CompensatedMagneticFieldData
+MagnetometerCompensator -- CompensatedMagneticFieldData
+
+[BAHRS Filter 1] as BahrsFilter1
+[BAHRS Filter 2] as BahrsFilter2
+[BAHRS Filter 3] as BahrsFilter3
+
+ImuDataSensor1 )-- BahrsFilter1
+ImuDataSensor2 )-- BahrsFilter2
+ImuDataSensor3 )-- BahrsFilter3
+
+interface BahrsFilterOutput1
+interface BahrsFilterOutput2
+interface BahrsFilterOutput3
+
+SafePressureData1 )-- BahrsFilter1
+BahrsFilter1 -- BahrsFilterOutput1
+
+SafePressureData2 )-- BahrsFilter2
+BahrsFilter2 -- BahrsFilterOutput2
+
+SafePressureData3 )-- BahrsFilter3
+BahrsFilter3 -- BahrsFilterOutput3
+
+[IMU monitor] as ImuMonitor
+ImuDataSensor1 )-- ImuMonitor
+ImuDataSensor2 )-- ImuMonitor
+ImuDataSensor3 )-- ImuMonitor
+
+interface SafeImuData
+ImuMonitor -- SafeImuData
+
+BaroMonitor -- SafePressureData1
+BaroMonitor -- SafePressureData2
+BaroMonitor -- SafePressureData3
+
+[Output Transformer] as OutputTransformer
+
+interface VehicleAttitude1
+interface VehicleAttitude2
+interface VehicleAttitude3
+interface MagneticFieldDataInVehicleFrame
+interface SafeImuDataInVehicleFrame
+
+BahrsFilterOutput1 )-- OutputTransformer
+BahrsFilterOutput2 )-- OutputTransformer
+BahrsFilterOutput3 )-- OutputTransformer
+CompensatedMagneticFieldData )-- OutputTransformer
+SafeImuData )-- OutputTransformer
+OutputTransformer -- VehicleAttitude1
+OutputTransformer -- VehicleAttitude2
+OutputTransformer -- VehicleAttitude3
+OutputTransformer -- MagneticFieldDataInVehicleFrame
+OutputTransformer -- SafeImuDataInVehicleFrame
+
+[Attitude Monitor] as AttitudeMonitor
+VehicleAttitude1 )-- AttitudeMonitor
+VehicleAttitude2 )-- AttitudeMonitor
+VehicleAttitude3 )-- AttitudeMonitor
+
+[Vertical Channel Monior] as VerticalChannelMonior
+BahrsFilterOutput1 )-- VerticalChannelMonior
+BahrsFilterOutput2 )-- VerticalChannelMonior
+BahrsFilterOutput3 )-- VerticalChannelMonior
+
+interface SafeVehicleAttitude
+interface SafeVerticalChannelData
+
+AttitudeMonitor -- SafeVehicleAttitude
+VerticalChannelMonior -- SafeVerticalChannelData
+
+[Magnetic Heading Filter] as MagneticHeadingFilter
+
+SafeVehicleAttitude )-- MagneticHeadingFilter
+MagneticFieldDataInVehicleFrame )-- MagneticHeadingFilter
+
+interface MagneticHeading
+
+MagneticHeadingFilter -- MagneticHeading
+@enduml
+@startuml bsw_component_diagram.png
+left to right direction
+
+[BMP384 sensor driver] as Bmp384Driver
+Bmp384Driver -- PressureDataSensor1
+
+[BMM150 sensor 1 driver] as Bmm150Driver1
+Bmm150Driver1 -- MagneticFieldSensor2
+
+[BMM150 sensor 2 driver] as Bmm150Driver2
+Bmm150Driver2 -- MagneticFieldSensor3
+
+[SCHA63T sensor driver] as Scha63TDriver
+Scha63TDriver -- ImuDataSensor1
+
+[ICM20789 sensor 1 driver] as Icm20789Driver1
+Icm20789Driver1 -- ImuDataSensor2
+Icm20789Driver1 -- PressureDataSensor2
+
+[ICM20789 sensor 2 driver] as Icm20789Driver2
+Icm20789Driver2 -- ImuDataSensor3
+Icm20789Driver2 -- PressureDataSensor3
+
+[MMC5983 sensor driver] as Mmc5983Driver
+Mmc5983Driver -- MagneticFieldSensor1
+
+[Sync pulse handler] as SyncPulseHandler
+SyncPulseHandler -- TimeOfLatestSyncPulse
+
+[RS232 output handler] as Rs232OutputHanler
+SafeVehicleAttitude )-- Rs232OutputHanler
+SafeVerticalChannelData )-- Rs232OutputHanler
+SafeImuDataInVehicleFrame )-- Rs232OutputHanler
+MagneticHeading )-- Rs232OutputHanler
+TimeOfLatestSyncPulse )-- Rs232OutputHanler
+
+[CAN handler] as CanHandler
+
+[CAN output handler] as CanOutputHandler
+SafeVehicleAttitude )-- CanOutputHandler
+SafeVerticalChannelData )-- CanOutputHandler
+SafeImuDataInVehicleFrame )-- CanOutputHandler
+MagneticHeading )-- CanOutputHandler
+SafePressureData1 )-- CanOutputHandler
+SafePressureData2 )-- CanOutputHandler
+SafePressureData3 )-- CanOutputHandler
+@enduml
+@startuml inline_umlgraph_1.png
+start
+
+:Power On;
+
+partition "Bootloader" {
+    :Start Bootloader;
+    :Wait 2 seconds for STM32Cube Programmer request;
+
+    if (Connection request received?) then (yes)
+        repeat
+            :Process requests from STM32CubeProgrammer;
+        repeat while (Is power ON?) is (yes)
+
+        end
+    else (no)
+        :Launch Target Application;
+    endif
+}
+
+partition "Target Application" {
+    :Initialize Peripherals;
+    :Wait 2 seconds for a request from NVMManager GUI;
+
+    if (Diagnostics request received?) then (yes)
+        :Process requests from NVMManager GUI;
+    endif
+
+    :Initialize FreeRTOS;
+    :Launch FreeRTOS;
+    :Execute Initialization Task;
+
+    repeat
+        :Normal Operation;
+    repeat while (Is power ON?) is (yes)
+
+    end
+}
+@enduml
+@startuml inline_umlgraph_2.png
+participant "Timer Task" as TimerTask
+participant "Task Receive SCAH63T Data" as Scha63TTask
+participant "Task BAHRS Filter 1" as BahrsFilter1
+participant "Task 10ms" as Task10ms
+
+loop Every 5ms
+    TimerTask ->> Scha63TTask: Activate
+
+    activate Scha63TTask
+    Scha63TTask -> Scha63TTask: Downsample SCHA63T data
+    Scha63TTask -> Scha63TTask: Provide IMU data set to BAHRS Filter 1
+
+    alt Every 10ms
+        Scha63TTask ->> BahrsFilter1: Trigger BAHRS Filter 1 iteration
+        deactivate Scha63TTask
+        activate BahrsFilter1
+        BahrsFilter1 -> BahrsFilter1: Run BAHRS Filter 1
+        BahrsFilter1 ->> Task10ms: Report completion of iteration
+        deactivate BahrsFilter1
+    end
+end
+@enduml
+@startuml inline_umlgraph_3.png
+participant "Timer Task" as TimerTask
+participant "Task Poll ICM20789 Sensor X" as Icm20789Task
+participant "Task BAHRS Filter Y" as BahrsFilter
+participant "Task 10ms" as Task10ms
+participant "ICM20789 Sensor X" as IcmSensor
+
+activate IcmSensor
+
+loop Every 5ms
+    TimerTask ->> Icm20789Task: Activate
+
+    activate Icm20789Task
+    Icm20789Task ->> IcmSensor: Request IMU data
+    deactivate Icm20789Task
+
+    IcmSensor -->> Icm20789Task: IMU data
+
+    activate Icm20789Task
+    Icm20789Task -> Icm20789Task: Provide IMU data to SWC port
+
+    alt Every 10ms
+        Icm20789Task ->> BahrsFilter: Trigger BAHRS Filter Y iteration
+        activate BahrsFilter
+        BahrsFilter -> BahrsFilter: Run BAHRS Filter Y
+        BahrsFilter ->> Task10ms: Report completion of iteration
+        deactivate BahrsFilter
+    end
+
+    alt Every 40ms AND if NOT waiting for pressure measurement
+        Icm20789Task ->> IcmSensor:  Trigger pressure measurement
+        Icm20789Task -> Icm20789Task: Set "waiting for pressure" flag to true
+    end
+
+    alt "waiting for pressure" flag is true AND waiting period elapsed
+        Icm20789Task ->> IcmSensor: Request pressure data
+        deactivate Icm20789Task
+        IcmSensor -->> Icm20789Task: Pressure data
+        activate Icm20789Task
+        Icm20789Task -> Icm20789Task: Provide pressure data to SWC port
+        Icm20789Task -> Icm20789Task: Set "waiting for pressure" flag to false
+    end
+
+    deactivate Icm20789Task
+end
+@enduml
+@startuml inline_umlgraph_4.png
+start
+
+:Initialize Counter to 0;
+
+repeat
+    :Wait for Semaphore;
+
+    if (Counter == 0) then (yes)
+        :Send Software Version Message;
+    endif
+
+    :Run IMU Monitor;
+    :Transform IMU Signals to vehicle frame;
+    :Send Inertial Data Message on RS232;
+
+    if (Counter % 8 == 0) then (yes)
+        :Run Barometer Monitor;
+        :Provide Safe Pressure Data to BAHRS Filters;
+    endif
+
+    if (Counter % 20 == 0) then (yes)
+        :Send Time of Inertial Data Message on RS232;
+    endif
+
+    :Increment Counter;
+@enduml
+@startuml inline_umlgraph_5.png
+start
+
+:Initialize Counter to 0;
+
+repeat
+    :Wait for all BAHRS filters to complete iteration;
+    
+    :Compute vehicle attitude from outputs of BAHRS filters;
+    :Run attitude monitor;
+    :Run vertical channel monitor;
+
+    :Provide Safe Attitude Data to magnetic heading filter;
+    :Run magnetic heading filter;
+
+    :Send Navigation Data Message on RS232;
+
+    if (Counter % 10 == 0) then (yes)
+        :Send Accuracy Data Message on RS232;
+        :Send Time of Navigation Data Message on RS232;
+    endif
+
+    :Increment Counter;
+@enduml
+@startuml inline_umlgraph_6.png
+start
+
+:Read redundant IMU measurements from SWC ports;
+:Execute Fault detection and isolation for angular rates and accelerations;
+:Construct safe 6D IMU output;
+:Write data to SafeImuData port;
+
+stop
+@enduml
+@startuml inline_umlgraph_7.png
+start
+
+:Read redundant pressure measurements from SWC ports;
+:Execute fault detection and isolation;
+
+if (Is data from the Pressure Sensor 1 available?) then (yes)
+    if (Is data from the Pressure Sensor 1 safe?) then (yes)
+        :Provide new data to SafePressureData1 SWC port;
+    else
+        :Invalidate data stored in the SafePressureData1 SWC port;
+    endif
+else (no)
+    :Invalidate data stored in the SafePressureData1 SWC port;
+endif
+
+if (Is data from the Pressure Sensor 2 available?) then (yes)
+    if (Is data from the Pressure Sensor 2 safe?) then (yes)
+        :Provide new data to SafePressureData2 SWC port;
+    else
+        :Invalidate data stored in the SafePressureData2 SWC port;
+    endif
+else (no)
+    :Invalidate data stored in the SafePressureData2 SWC port;
+endif
+
+if (Is data from the Pressure Sensor 3 available?) then (yes)
+    if (Is data from the Pressure Sensor 3 safe?) then (yes)
+        :Provide new data to SafePressureData3 SWC port;
+    else
+        :Invalidate data stored in the SafePressureData3 SWC port;
+    endif
+else (no)
+    :Invalidate data stored in the SafePressureData3 SWC port;
+endif
+
+stop
+@enduml
+@startuml inline_umlgraph_8.png
+start
+
+:Read redundant vertical motion data (height and vertical speed) from SWC ports;
+:Execute fault detection and isolation;
+
+if (Are height AND vertical speed from the BAHRS Filter 1 safe?) then (no)
+    if (Are height AND vertical speed from the BAHRS Filter 2 safe?) then (no)
+        if (Are height AND vertical speed from the BAHRS Filter 3 safe?) then (yes)
+            :Provide vertical motion data from the BAHRS Filter 3 into the SafeVerticalChannelData SWC port;
+        else (no)
+            :Invalidate vertical motion data in the SafeVerticalChannelData SWC port;
+        endif
+    else (yes)
+        :Provide vertical motion data from the BAHRS Filter 2 into the SafeVerticalChannelData SWC port;
+    endif
+else (yes)
+    :Provide vertical motion data from the BAHRS Filter 1 into the SafeVerticalChannelData SWC port;
+endif
+
+stop
+@enduml
+@startuml inline_umlgraph_9.png
+start
+
+:Read redundant vehicle attitude data (roll and pitch) from SWC ports;
+:Execute fault detection and isolation;
+
+if (Are roll AND pitch from the BAHRS Filter 1 safe?) then (no)
+    if (Are roll AND pitch from the BAHRS Filter 2 safe?) then (no)
+        if (Are roll AND pitch from the BAHRS Filter 3 safe?) then (yes)
+            :Provide attitude data from the BAHRS Filter 3 into the SafeVehicleAttitude SWC port;
+        else (no)
+            :Invalidate attitude in the SafeVehicleAttitude SWC port;
+        endif
+    else (yes)
+        :Provide attitude from the BAHRS Filter 2 into the SafeVehicleAttitude SWC port;
+    endif
+else (yes)
+    :Provide attitude from the BAHRS Filter 1 into the SafeVehicleAttitude SWC port;
+endif
+
+stop
+@enduml
+@startuml inline_umlgraph_10.png
+start
+
+:Access fault detection status;
+
+if (Detection available?) then (yes)
+    if (Alarm raised?) then (no)
+        :Provide signal from primary sensor;
+        stop
+    else (yes)
+        :Check fault isolation availability;
+        if (Isolation available?) then (yes)
+            :Check fault isolation status;
+            if (Isolation succeeded?) then (yes)
+                if (Primary sensor excluded?) then (no)
+                    :Provide signal from primary sensor;
+                else (yes)
+                    :Provide signal from back-up sensor;
+                endif
+
+                stop
+            else (no)
+                :Provide mean value;
+                stop
+            endif
+        else (no)
+            :Provide mean value;
+            stop
+        endif
+    endif
+else (no)
+    :Provide the only available signal;
+    stop
+endif
 @enduml

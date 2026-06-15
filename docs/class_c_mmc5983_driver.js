@@ -1,5 +1,49 @@
 var class_c_mmc5983_driver =
 [
+    [ "EBandwidth", "class_c_mmc5983_driver.html#a76a5356d66cad462f820a7ab7c68c8db", [
+      [ "e100Hz", "class_c_mmc5983_driver.html#a76a5356d66cad462f820a7ab7c68c8dba781b391ac5ca00b7d72a019258a70076", null ],
+      [ "e200Hz", "class_c_mmc5983_driver.html#a76a5356d66cad462f820a7ab7c68c8dba5177d85c8aa312422d4ff8566c9f89bc", null ],
+      [ "e400Hz", "class_c_mmc5983_driver.html#a76a5356d66cad462f820a7ab7c68c8dbaecefc40d2b267778eac78eab927161fc", null ],
+      [ "e800Hz", "class_c_mmc5983_driver.html#a76a5356d66cad462f820a7ab7c68c8dba20c83ff5b61b3b5883ff3a8dfa0c2107", null ]
+    ] ],
+    [ "EMeasurementMode", "class_c_mmc5983_driver.html#ab72eeb9187498ca1afd6a2458e14f058", [
+      [ "eSkip", "class_c_mmc5983_driver.html#ab72eeb9187498ca1afd6a2458e14f058ae642238da9eee570225bc6affcb3a3ef", null ],
+      [ "e1Hz", "class_c_mmc5983_driver.html#ab72eeb9187498ca1afd6a2458e14f058a235b98528cf77c9d6729bdc71ff9d918", null ],
+      [ "e10Hz", "class_c_mmc5983_driver.html#ab72eeb9187498ca1afd6a2458e14f058aaa2c0f3ac3197a28331b170368893425", null ],
+      [ "e20Hz", "class_c_mmc5983_driver.html#ab72eeb9187498ca1afd6a2458e14f058a4497a50b5e8a51afdb9f6a280e8a9c8d", null ],
+      [ "e50Hz", "class_c_mmc5983_driver.html#ab72eeb9187498ca1afd6a2458e14f058ab5841e7d5ed300f681ee2a5d8f45f96f", null ],
+      [ "e100Hz", "class_c_mmc5983_driver.html#ab72eeb9187498ca1afd6a2458e14f058a781b391ac5ca00b7d72a019258a70076", null ],
+      [ "e200Hz", "class_c_mmc5983_driver.html#ab72eeb9187498ca1afd6a2458e14f058a5177d85c8aa312422d4ff8566c9f89bc", null ],
+      [ "e1000Hz", "class_c_mmc5983_driver.html#ab72eeb9187498ca1afd6a2458e14f058a46c4aa5cd8372d78bdfe9e4338368943", null ]
+    ] ],
+    [ "CMmc5983Driver", "class_c_mmc5983_driver.html#afa2541ef2ee1cd395d192a49f6341b92", null ],
+    [ "CMmc5983Driver", "class_c_mmc5983_driver.html#a8728169ae1d441b07936de95dfbed1c6", null ],
+    [ "CMmc5983Driver", "class_c_mmc5983_driver.html#ae45e4a6514eee1064eb2a49e603a3757", null ],
+    [ "~CMmc5983Driver", "class_c_mmc5983_driver.html#a7840968afdc0164c4964d8757e8835dd", null ],
+    [ "getInstanceImpl", "class_c_mmc5983_driver.html#adb9d81ac458edb43500d5dc16ddaf14d", null ],
+    [ "getMeasurementXYZ", "class_c_mmc5983_driver.html#ae1c4aed68b1f7a0c834da1169ea582fc", null ],
+    [ "getProductID", "class_c_mmc5983_driver.html#aae5b5be7c0f2114a008f685ac39517a0", null ],
+    [ "getStatusRegValue", "class_c_mmc5983_driver.html#abd9df6a7cdf6c754a868ac5529406468", null ],
+    [ "getTemperature", "class_c_mmc5983_driver.html#aef7a3c60c5b85da400269b010940864c", null ],
+    [ "Init", "class_c_mmc5983_driver.html#a581c65e94cbadca26d010e1140e3d33b", null ],
+    [ "IsInitialized", "class_c_mmc5983_driver.html#a996954c98f722f68e30e7df081853800", null ],
+    [ "operator=", "class_c_mmc5983_driver.html#a041c09818d986db9366319e374a2d80c", null ],
+    [ "operator=", "class_c_mmc5983_driver.html#aa448d828a09e9c725a479b80af31bfde", null ],
     [ "PollSensor", "class_c_mmc5983_driver.html#aa6a69566253144f12ad172f9cbbf5fbc", null ],
-    [ "CSoftwareComponent< CMmc5983Driver, 1U >", "class_c_mmc5983_driver.html#a3dc0da751ab15a6e37f98d0fc8a37225", null ]
+    [ "PollSensor", "class_c_mmc5983_driver.html#aea8ee0619972322cef57769210db2650", null ],
+    [ "readFromAddress", "class_c_mmc5983_driver.html#a81a2e9be28cb77dda4152f7cdb9e9c71", null ],
+    [ "setAutoSetReset", "class_c_mmc5983_driver.html#a1556c8544e37b99e40b9d7a2b2fa3f3c", null ],
+    [ "setBitReset", "class_c_mmc5983_driver.html#ad0f9a548862bfab186613347216e2b8c", null ],
+    [ "setBitSet", "class_c_mmc5983_driver.html#ad734685b0eaa403778621e9587882c46", null ],
+    [ "setContinuousModeFrequency", "class_c_mmc5983_driver.html#a5721c9e32e0eb9d32cbd826c4e695deb", null ],
+    [ "setCsOff", "class_c_mmc5983_driver.html#a3cd36e2ef8802c803dbfc335cb44ee5d", null ],
+    [ "setCsOn", "class_c_mmc5983_driver.html#aa381a4b062964fdad6fcecb47cbcf368", null ],
+    [ "setFilterBandwidth", "class_c_mmc5983_driver.html#ac422976cb61521af185104cc5b6253e3", null ],
+    [ "setSoftReset", "class_c_mmc5983_driver.html#a357fd5583b54b31f21fac4e927bf675b", null ],
+    [ "spiWriteRead", "class_c_mmc5983_driver.html#a655d17a07feb2eb0c90cd238f7c43b09", null ],
+    [ "writeToAddress", "class_c_mmc5983_driver.html#aa1a4d4669bffc7f77f5a2a81791c9b44", null ],
+    [ "CSoftwareComponent< CMmc5983Driver, 1U >", "class_c_mmc5983_driver.html#a3dc0da751ab15a6e37f98d0fc8a37225", null ],
+    [ "skuReadWriteTimeoutI2c_", "class_c_mmc5983_driver.html#a19abaa22b3c2e165a0a52f8576b1e922", null ],
+    [ "skuReadWriteTimeoutSpi_", "class_c_mmc5983_driver.html#a5d546e4a40ea56bab35aea7b20c38542", null ],
+    [ "uSensorStatus_", "class_c_mmc5983_driver.html#a0a9460681f795e691b04177fbd6cfd64", null ]
 ];

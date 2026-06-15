@@ -8,32 +8,50 @@ var namespaces_dup =
       ] ]
     ] ],
     [ "NAttitudeMonitorApi", "namespace_n_attitude_monitor_api.html", [
-      [ "COutputData", "namespace_n_attitude_monitor_api.html#a674bf27a79633398f0d90faf8b8f8498", null ],
-      [ "CRedundantInputData", "namespace_n_attitude_monitor_api.html#ab1ffe4cd4810d81d0ef85d0b70e24d9a", null ],
+      [ "COutputData", "namespace_n_attitude_monitor_api.html#a99e39291fd9e3c75135023991611266c", null ],
+      [ "CRedundantInputData", "namespace_n_attitude_monitor_api.html#a07204aa5c0c5ec04ad2223ae663372b1", null ],
       [ "AttitudeMonitorGetState", "namespace_n_attitude_monitor_api.html#afec4364b27b1bf5e66e172038b161679", null ],
       [ "AttitudeMonitorRun", "namespace_n_attitude_monitor_api.html#a93209232af4e4c81f870bfcaba04ff14", null ]
     ] ],
     [ "NBahrsFilterApi", "namespace_n_bahrs_filter_api.html", "namespace_n_bahrs_filter_api" ],
     [ "NBaroMonitorApi", "namespace_n_baro_monitor_api.html", [
-      [ "COutputData", "namespace_n_baro_monitor_api.html#a287c077d3e813c3d79b40de3488383f3", null ],
-      [ "CRedundantInputData", "namespace_n_baro_monitor_api.html#ac7f9da0c4e8778160ca16f1c45fc4ad5", null ],
-      [ "BarometerMonitorGetState", "namespace_n_baro_monitor_api.html#ac03e5205b7fc3080bf5c18fbd6e67181", null ],
-      [ "BarometerMonitorRun", "namespace_n_baro_monitor_api.html#a11f127aa2b78fc3b77dba4b6fb494f45", null ]
+      [ "COutputData", "namespace_n_baro_monitor_api.html#adf64f78f696a90132ab33e832c580fcd", null ],
+      [ "CRedundantInputDataBahrsV2", "namespace_n_baro_monitor_api.html#a45010b1a1aab7c2a323fe0063b289a0b", null ],
+      [ "CRedundantInputDataBahrsV3", "namespace_n_baro_monitor_api.html#a6e1e02ee76ee3e77d50e6042b453f3b3", null ],
+      [ "BarometerMonitorRun", "namespace_n_baro_monitor_api.html#ac49e912afc4cfa891d2b4a55f9e7ce68", null ],
+      [ "BarometerMonitorRun", "namespace_n_baro_monitor_api.html#ac508a68ad20fc88e0697cdeeb3f493ee", null ]
     ] ],
     [ "NFusionLibCommon", "namespace_n_fusion_lib_common.html", "namespace_n_fusion_lib_common" ],
+    [ "NIcm20789DriverConfig", "namespace_n_icm20789_driver_config.html", [
+      [ "EAccelDynamicRange", "namespace_n_icm20789_driver_config.html#ae443c971754d2a88e506d9cf6108a66a", [
+        [ "e2g", "namespace_n_icm20789_driver_config.html#ae443c971754d2a88e506d9cf6108a66aa6086eaea9eae6e4c9b43bacd71eb4770", null ],
+        [ "e4g", "namespace_n_icm20789_driver_config.html#ae443c971754d2a88e506d9cf6108a66aa78972faf7a21d5ac33ba1ae45cdb588a", null ],
+        [ "e8g", "namespace_n_icm20789_driver_config.html#ae443c971754d2a88e506d9cf6108a66aa520ece89631726a34d9e986e693bcbfe", null ],
+        [ "e16g", "namespace_n_icm20789_driver_config.html#ae443c971754d2a88e506d9cf6108a66aa34fb25274a32db30a8543e33d1a32900", null ]
+      ] ],
+      [ "EGyroDynamicRange", "namespace_n_icm20789_driver_config.html#ae2baa2ba2c9638d5aa5af249bd838cce", [
+        [ "e250dps", "namespace_n_icm20789_driver_config.html#ae2baa2ba2c9638d5aa5af249bd838ccea72be64c499c5a90787bb55efa6d47ad3", null ],
+        [ "e500dps", "namespace_n_icm20789_driver_config.html#ae2baa2ba2c9638d5aa5af249bd838ccea75dc92599ced13fda6316255311f5c98", null ],
+        [ "e1000dps", "namespace_n_icm20789_driver_config.html#ae2baa2ba2c9638d5aa5af249bd838ccea506fb69f184af7342509cac7fc066641", null ],
+        [ "e2000dps", "namespace_n_icm20789_driver_config.html#ae2baa2ba2c9638d5aa5af249bd838cceae6c7cfc579e8cf2e56034e9d11fa5e6b", null ]
+      ] ],
+      [ "getAccelerometerRangeInG", "namespace_n_icm20789_driver_config.html#a10fff71043bc0ed21b8df921a802a6ea", null ],
+      [ "getGyroscopeRangeInDegreesPerSecond", "namespace_n_icm20789_driver_config.html#ab5031dffdb79ec49b8d7f9d2d769ca6b", null ]
+    ] ],
     [ "NImuMonitorApi", "namespace_n_imu_monitor_api.html", [
-      [ "COutputData", "namespace_n_imu_monitor_api.html#a93b16b7079f28fde950fb929302a5bda", null ],
-      [ "CRedundantInputData", "namespace_n_imu_monitor_api.html#afe43aa2260fad96110eb2d14592b2085", null ],
-      [ "ImuMonitorGetState", "namespace_n_imu_monitor_api.html#a2cc2f0b802c59ea9b9b0c94d3bd42a59", null ],
-      [ "ImuMonitorRun", "namespace_n_imu_monitor_api.html#acb4fef079d35343608b8c76d6b7f95dc", null ]
+      [ "COutputData", "namespace_n_imu_monitor_api.html#a7a97b13c94f390fff8eb8aa9b1fd20ef", null ],
+      [ "CRedundantInputDataBahrsV2", "namespace_n_imu_monitor_api.html#a80a378ba234795154c907228510a755d", null ],
+      [ "CRedundantInputDataBahrsV3", "namespace_n_imu_monitor_api.html#ac386297a76f8ffb27cf71d2a77607189", null ],
+      [ "ImuMonitorRun", "namespace_n_imu_monitor_api.html#ae0f460459f2ba3e7899bdecce9192b12", null ],
+      [ "ImuMonitorRun", "namespace_n_imu_monitor_api.html#a7da93fbe1d5eab2414203a637a3aaadc", null ]
     ] ],
     [ "NLibCommon", "namespace_n_lib_common.html", "namespace_n_lib_common" ],
     [ "NMagneticHeadingFilterApi", "namespace_n_magnetic_heading_filter_api.html", "namespace_n_magnetic_heading_filter_api" ],
     [ "NMonitorTypes", "namespace_n_monitor_types.html", "namespace_n_monitor_types" ],
     [ "NNavigationUtilities", "namespace_n_navigation_utilities.html", "namespace_n_navigation_utilities" ],
     [ "NVerticalChannelMonitorApi", "namespace_n_vertical_channel_monitor_api.html", [
-      [ "COutputData", "namespace_n_vertical_channel_monitor_api.html#a5c7c0a82fc2cd2884a5d012d4fd82834", null ],
-      [ "CRedundantInputData", "namespace_n_vertical_channel_monitor_api.html#a5f5e56375f546e135d8a27e560aef3a2", null ],
+      [ "COutputData", "namespace_n_vertical_channel_monitor_api.html#a0661fed4c0670a2e102ee0a86e7ad5b4", null ],
+      [ "CRedundantInputData", "namespace_n_vertical_channel_monitor_api.html#a80e719210918d822b138ae33bfd1c6d3", null ],
       [ "VerticalChannelMonitorGetState", "namespace_n_vertical_channel_monitor_api.html#ac6fa680816ef3abc1fc648ba5c206768", null ],
       [ "VerticalChannelMonitorRun", "namespace_n_vertical_channel_monitor_api.html#a9c61709d8f0eb21d5aca45ecd2467c31", null ]
     ] ]

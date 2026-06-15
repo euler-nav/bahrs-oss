@@ -1,10 +1,9 @@
 var searchData=
 [
-  ['operator_2a_0',['operator*',['../struct_n_bahrs_filter_api_1_1_s_bahrs_state.html#a4cabfa154cbe873b31bfc47fa439dfc2',1,'NBahrsFilterApi::SBahrsState::operator*()'],['../class_c_quaternion.html#abd0d9539f300f4395d903a5a62b98631',1,'CQuaternion::operator*(const CQuaternion &amp;korRight) const'],['../class_c_quaternion.html#ac9da844fee194b416d5a10be09ebc705',1,'CQuaternion::operator*(float fScalar) const'],['../class_c_quaternion.html#aa6f3ca8a3ba321fee83adf0d57845662',1,'CQuaternion::operator*(double dScalar) const'],['../_c_quaternion_8h.html#a5ddbabf04d528a2a10b530c345972d2c',1,'operator*(float fScalar, const CQuaternion &amp;korRight):&#160;CQuaternion.h'],['../_c_quaternion_8h.html#ab072ee774290916fa0b02ee0cc53aeeb',1,'operator*(double fScalar, const CQuaternion &amp;korRight):&#160;CQuaternion.h']]],
-  ['operator_2a_3d_1',['operator*=',['../class_c_quaternion.html#a22efc6c5b14f7eb01728317590a982fd',1,'CQuaternion::operator*=(float fScalar)'],['../class_c_quaternion.html#a8aa623caad6e08782c8461431109c95d',1,'CQuaternion::operator*=(double dScalar)']]],
-  ['operator_2b_2',['operator+',['../struct_n_bahrs_filter_api_1_1_s_bahrs_state.html#a5aedcb05c663ceb0f3b49864dcbc4f85',1,'NBahrsFilterApi::SBahrsState::operator+()'],['../class_c_quaternion.html#a622dfd271e6d960c77ddc8ff0a48cf28',1,'CQuaternion::operator+()']]],
-  ['operator_2b_3d_3',['operator+=',['../struct_n_bahrs_filter_api_1_1_s_bahrs_state.html#aa97104e1889169530d24dee9d249f38e',1,'NBahrsFilterApi::SBahrsState::operator+=()'],['../class_c_quaternion.html#a5343d9fc38cf84d94b2c2277716ac68e',1,'CQuaternion::operator+=(const CQuaternion &amp;korRight)']]],
-  ['operator_2d_4',['operator-',['../class_c_quaternion.html#a5e4e30d5dcd89f092a4e5d7718f01070',1,'CQuaternion']]],
-  ['operator_2d_3d_5',['operator-=',['../class_c_quaternion.html#aeffe05b62f7a325a8abe330eee61a7a5',1,'CQuaternion']]],
-  ['operator_5b_5d_6',['operator[]',['../class_t_labeled_array_internal.html#a13cc24602e60d34772c42285bbf8f13d',1,'TLabeledArrayInternal::operator[](LabelEnum eLabel)'],['../class_t_labeled_array_internal.html#ad7c04d464815f780f5a4af8773e92570',1,'TLabeledArrayInternal::operator[](LabelEnum eLabel) const']]]
+  ['magneticheadingfiltergetoutput_0',['MagneticHeadingFilterGetOutput',['../namespace_n_magnetic_heading_filter_api.html#a0124ceafde5a2f38f03747db83e4fe20',1,'NMagneticHeadingFilterApi']]],
+  ['magneticheadingfilterprepareinputs_1',['MagneticHeadingFilterPrepareInputs',['../namespace_n_magnetic_heading_filter_api.html#a46a1c61d3c907cea0874175bdef223a4',1,'NMagneticHeadingFilterApi']]],
+  ['magneticheadingfilterreset_2',['MagneticHeadingFilterReset',['../namespace_n_magnetic_heading_filter_api.html#a156ef9cca7a149eb0f9d8ff240bda452',1,'NMagneticHeadingFilterApi']]],
+  ['magneticheadingfiltersetinput_3',['MagneticHeadingFilterSetInput',['../namespace_n_magnetic_heading_filter_api.html#ae2ee3c2606166e2a879717ca6bcd7e49',1,'NMagneticHeadingFilterApi']]],
+  ['magneticheadingfilterstep_4',['MagneticHeadingFilterStep',['../namespace_n_magnetic_heading_filter_api.html#ad95502f31b89848801f2033abe7fd5b6',1,'NMagneticHeadingFilterApi']]],
+  ['mypublicmethod_5',['MyPublicMethod',['../class_c_software_component_example.html#a1f8f5e5f68046581c3257a3e6229af43',1,'CSoftwareComponentExample']]]
 ];

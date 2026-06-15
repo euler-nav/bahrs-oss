@@ -24,56 +24,8 @@
 */
 var NAVTREE =
 [
-  [ "BAHRS", "index.html", [
-    [ "Baro-Inertial Attitude and Heading Reference System (BAHRS).", "index.html", null ],
-    [ "Architecture constraints", "md_doc_pages_page_architecture_constraints.html", null ],
-    [ "Building block view", "md_doc_pages_page_building_block_view.html", [
-      [ "Level 1", "md_doc_pages_page_building_block_view.html#sec_bb_view_level_1", [
-        [ "Application software", "md_doc_pages_page_building_block_view.html#subsec_asw", null ],
-        [ "Basic software", "md_doc_pages_page_building_block_view.html#subsec_bsw", null ],
-        [ "Runtime Environment", "md_doc_pages_page_building_block_view.html#subsec_rte", null ]
-      ] ],
-      [ "Level 2", "md_doc_pages_page_building_block_view.html#sec_bb_view_level_2", [
-        [ "Basic software", "md_doc_pages_page_building_block_view.html#subsec_bsw_level_2", null ],
-        [ "Runtime environment", "md_doc_pages_page_building_block_view.html#subsec_rte_level_2", null ],
-        [ "Application software", "md_doc_pages_page_building_block_view.html#subsec_asw_level_2", null ]
-      ] ]
-    ] ],
-    [ "Cross-cutting concepts", "md_doc_pages_page_cross_cutting_concerns.html", null ],
-    [ "Deployment view", "md_doc_pages_page_deployment_view.html", null ],
-    [ "Design decisions", "md_doc_pages_page_design_decisions.html", [
-      [ "Runtime environment", "md_doc_pages_page_design_decisions.html#sec_design_decisions_rte", [
-        [ "Port access protection", "md_doc_pages_page_design_decisions.html#subsec_design_decisions_port_protection", null ],
-        [ "Port data types", "md_doc_pages_page_design_decisions.html#subsec_design_decisions_port_data_types", null ]
-      ] ]
-    ] ],
-    [ "Glossary", "md_doc_pages_page_glossary.html", null ],
-    [ "Introduction and goals", "md_doc_pages_page_intro_and_goals.html", null ],
-    [ "Quality requirements", "md_doc_pages_page_quality_requirements.html", null ],
-    [ "Risks and technical debt", "md_doc_pages_page_risks_and_tech_debt.html", null ],
-    [ "Runtime view", "md_doc_pages_page_runtime_view.html", null ],
-    [ "Solution strategy", "md_doc_pages_page_solution_strategy.html", [
-      [ "General", "md_doc_pages_page_solution_strategy.html#sec_solution_strategy_general", [
-        [ "Operating system", "md_doc_pages_page_solution_strategy.html#subsec_solution_strategy_operating_system", null ],
-        [ "Programming language", "md_doc_pages_page_solution_strategy.html#subsec_solution_strategy_programming_language", null ],
-        [ "Source code classification", "md_doc_pages_page_solution_strategy.html#subsec_solution_strategy_source_file_types", [
-          [ "Software components", "md_doc_pages_page_solution_strategy.html#subsubsec_solution_strategy_software_component", null ],
-          [ "Operating system", "md_doc_pages_page_solution_strategy.html#subsubsec_solution_strategy_operating_system", null ],
-          [ "Libraries", "md_doc_pages_page_solution_strategy.html#subsubsec_solution_strategy_libraries", null ]
-        ] ],
-        [ "Dynamic memory", "md_doc_pages_page_solution_strategy.html#subsubsec_solution_strategy_dynamic_memory", null ]
-      ] ],
-      [ "Patterns and principles", "md_doc_pages_page_solution_strategy.html#sec_solution_strategy_patterns_and_principles", [
-        [ "Software components", "md_doc_pages_page_solution_strategy.html#subsec_solution_strategy_software_components", [
-          [ "Principles", "md_doc_pages_page_solution_strategy.html#subsubsec_solution_strategy_swc_principles", null ],
-          [ "Design patterns", "md_doc_pages_page_solution_strategy.html#subsubsec_solution_strategy_swc_patterns", null ]
-        ] ],
-        [ "Runtime environment (RTE)", "md_doc_pages_page_solution_strategy.html#subsec_solution_strategy_runtime_environment", [
-          [ "Principles and patterns", "md_doc_pages_page_solution_strategy.html#subsubsec_solution_strategy_rte_principles", null ]
-        ] ]
-      ] ]
-    ] ],
-    [ "System scope and context", "md_doc_pages_page_system_scope_and_context.html", null ],
+  [ "AMS Advanced Air Mobility Sensors UG", "index.html", [
+    [ "EULER-NAV Baro-Inertial Attitude and Heading Reference System (BAHRS)", "index.html", "index" ],
     [ "Namespaces", "namespaces.html", [
       [ "Namespace List", "namespaces.html", "namespaces_dup" ],
       [ "Namespace Members", "namespacemembers.html", [
@@ -88,12 +40,13 @@ var NAVTREE =
       [ "Class Index", "classes.html", null ],
       [ "Class Hierarchy", "hierarchy.html", "hierarchy" ],
       [ "Class Members", "functions.html", [
-        [ "All", "functions.html", null ],
-        [ "Functions", "functions_func.html", null ],
-        [ "Variables", "functions_vars.html", null ],
+        [ "All", "functions.html", "functions_dup" ],
+        [ "Functions", "functions_func.html", "functions_func" ],
+        [ "Variables", "functions_vars.html", "functions_vars" ],
         [ "Typedefs", "functions_type.html", null ],
         [ "Enumerations", "functions_enum.html", null ],
-        [ "Related Functions", "functions_rela.html", null ]
+        [ "Enumerator", "functions_eval.html", null ],
+        [ "Related Symbols", "functions_rela.html", null ]
       ] ]
     ] ],
     [ "Files", "files.html", [
@@ -112,10 +65,17 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "_ams_assert_8cpp.html",
-"_common_monitor_types_8h.html",
-"md_doc_pages_page_building_block_view.html#sec_bb_view_level_2",
-"struct_n_magnetic_heading_filter_api_1_1_s_magnetometer_measurement.html#a86b523eabac82a44278232716cec6429"
+"_c_scha63_t_driver_8h.html#a5a47f744e9474820af5ba1d3896b5ca6",
+"class_c_bmp384_driver.html#ade0780318453119cdc1cbf3fa448458aa3a8a5bc24de3351b6093f4c81a681613",
+"class_c_imu_pre_filter_swc.html#a0915bd54710cf470b2f5c11bd73f8d00",
+"class_c_rs232_output_handler.html#ad4396d96977d4f20e904d647bb7c60b2",
+"class_c_software_component_port.html#a0954d7e454e9a920807e21ed36a72f4d",
+"functions_e.html",
+"page_glossary.html#sec_glossary_abbreviations",
+"struct_c_serial_protocol_1_1_s_packet_receive_confirmation.html#ab4cd2bb5299e999cfe89601d037174a4",
+"struct_s_magnetic_measurement.html#ab5d4a19d7e6986364a965c56699ddc86"
 ];
 
-var SYNCONMSG = 'click to disable panel synchronisation';
-var SYNCOFFMSG = 'click to enable panel synchronisation';
+const SYNCONMSG = 'click to disable panel synchronization';
+const SYNCOFFMSG = 'click to enable panel synchronization';
+const LISTOFALLMEMBERS = 'List of all members';

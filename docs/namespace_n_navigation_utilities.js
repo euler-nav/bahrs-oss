@@ -1,9 +1,11 @@
 var namespace_n_navigation_utilities =
 [
-    [ "CGeoConstants", "class_n_navigation_utilities_1_1_c_geo_constants.html", null ],
-    [ "CMathConstants", "class_n_navigation_utilities_1_1_c_math_constants.html", null ],
+    [ "CGeoConstants", "class_n_navigation_utilities_1_1_c_geo_constants.html", "class_n_navigation_utilities_1_1_c_geo_constants" ],
+    [ "CMathConstants", "class_n_navigation_utilities_1_1_c_math_constants.html", "class_n_navigation_utilities_1_1_c_math_constants" ],
+    [ "SEulerAngles", "struct_n_navigation_utilities_1_1_s_euler_angles.html", "struct_n_navigation_utilities_1_1_s_euler_angles" ],
     [ "DcmFromQuaternion", "namespace_n_navigation_utilities.html#af30032bf88410bee9ed4db0e34751eb1", null ],
     [ "DiffOfUnsigned", "namespace_n_navigation_utilities.html#a3aee1284dcac50b5bb57ea95dcd5cb23", null ],
+    [ "EulerAnglesToEulerAngles312", "namespace_n_navigation_utilities.html#afba3a3bd2a80afe16a9849cbaa6a5e89", null ],
     [ "EulerFromQuaternion", "namespace_n_navigation_utilities.html#a89de5827809f5ce2a4823df323345e91", null ],
     [ "EulerFromSpecificForce", "namespace_n_navigation_utilities.html#aef0408dfc2b96cdd8ee7a89ffd4f6182", null ],
     [ "HeadingFromMagnetometer", "namespace_n_navigation_utilities.html#ad8805e612d4fda355e08615830e8c82e", null ],

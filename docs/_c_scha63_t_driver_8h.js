@@ -1,6 +1,7 @@
 var _c_scha63_t_driver_8h =
 [
     [ "CScha63TDriver", "class_c_scha63_t_driver.html", "class_c_scha63_t_driver" ],
+    [ "CScha63TDriver::SCompensationParameters", "struct_c_scha63_t_driver_1_1_s_compensation_parameters.html", "struct_c_scha63_t_driver_1_1_s_compensation_parameters" ],
     [ "SPI_FRAME_READ_ACC_STATUS_1", "_c_scha63_t_driver_8h.html#a0360e16b3f45c8046b4cd2e1127d101f", null ],
     [ "SPI_FRAME_READ_ACC_X", "_c_scha63_t_driver_8h.html#a9223c9fa5f273f52102ce1a20d92b64b", null ],
     [ "SPI_FRAME_READ_ACC_Y", "_c_scha63_t_driver_8h.html#af508d4433dd75cde88948eb33021fb55", null ],
