@@ -12,3 +12,4 @@
 | PF_1_6         | 26.08.2025 | $${\color{green}\mathbf{Stable}}$$  |
 | PF_1_7         | 05.01.2026 | $${\color{green}\mathbf{Stable}}$$  |
 | PF_1_8 hw v3   | 26.05.2026 | $${\color{green}\mathbf{Stable}}$$  |
+| PF_2_0 hw v2   | 03.08.2026 | $${\color{green}\mathbf{Stable}}$$  |
