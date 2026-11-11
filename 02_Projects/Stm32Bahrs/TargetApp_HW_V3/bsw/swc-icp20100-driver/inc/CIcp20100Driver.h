@@ -1,5 +1,5 @@
 /// @file CIcp20100Driver.h
-/// @brief Implementation of the ICP20100 driver software component class.
+/// @brief Declaration of the ICP20100 driver software component class.
 /// @copyright Copyright 2025. AMS Advanced Air Mobility Sensors UG. All rights reserved.
 
 #ifndef C_ICP20100_DRIVER_H
@@ -16,6 +16,8 @@ class CIcp20100Driver : public CSoftwareComponent<CIcp20100Driver, 1U>
 
 public:
   void PollSensor(uint64_t uTimestampUs);
+
+  void InvalidatePortData();
 
 private:
   CIcp20100Driver() = default;
@@ -88,4 +90,4 @@ private:
   uint8_t uIgnoredSamplesCount_{0U};
 };
 
-#endif /* C_ICP20100_DRIVER_H */
+#endif // C_ICP20100_DRIVER_H

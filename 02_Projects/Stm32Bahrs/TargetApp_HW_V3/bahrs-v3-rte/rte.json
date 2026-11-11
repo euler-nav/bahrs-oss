@@ -2,6 +2,7 @@
 	"class_name": "CRte",
 	"inclusion_guard": "C_RTE_H",
 	"supported_port_field_types": ["char", "int8_t", "uint8_t", "int16_t", "uint16_t", "int32_t", "uint32_t", "int64_t", "uint64_t", "float", "double"],
+	"default_port_invalidation_timeout_ms": 1000,
 	"ports": [
 		{
 			"name": "ImuInput1",
@@ -79,7 +80,8 @@
 			"name": "SyncPulseTime",
 			"type": "TimeOfSyncPulse",
 			"generated": true,
-			"record_by_default": true
+			"record_by_default": true,
+			"invalidation_timeout_ms": 0
 		},
 		{
 			"name": "ImuOutput",
@@ -88,19 +90,19 @@
 			"record_by_default": false
 		},
 		{
-			"name": "CompensatedMagnetometerData",
+			"name": "CompensatedMagnetometerData1",
 			"type": "MagneticMeasurement",
 			"generated": true,
 			"record_by_default": false
 		},
 		{
-			"name": "MagneticHeading",
+			"name": "MagneticHeading1",
 			"type": "MagneticHeading",
 			"generated": true,
 			"record_by_default": false
 		},
 		{
-			"name": "CompensatedMagnetometerDataInVehicleFrame",
+			"name": "CompensatedMagnetometerDataInVehicleFrame1",
 			"type": "MagneticMeasurement",
 			"generated": true,
 			"record_by_default": false
@@ -176,6 +178,66 @@
 			"type": "SSafeVerticalChannelData",
 			"generated": false,
 			"record_by_default": true
+		},
+		{
+			"name": "ImuInputFiltered1",
+			"type": "ImuMeasurement",
+			"generated": true,
+			"record_by_default": false
+		},
+		{
+			"name": "ImuInputFiltered2",
+			"type": "ImuMeasurement",
+			"generated": true,
+			"record_by_default": false
+		},
+		{
+			"name": "ImuInputFiltered3",
+			"type": "ImuMeasurement",
+			"generated": true,
+			"record_by_default": false
+		},
+		{
+			"name": "CompensatedMagnetometerData2",
+			"type": "MagneticMeasurement",
+			"generated": true,
+			"record_by_default": false
+		},
+		{
+			"name": "CompensatedMagnetometerData3",
+			"type": "MagneticMeasurement",
+			"generated": true,
+			"record_by_default": false
+		},
+		{
+			"name": "MagneticHeading2",
+			"type": "MagneticHeading",
+			"generated": true,
+			"record_by_default": false
+		},
+		{
+			"name": "MagneticHeading3",
+			"type": "MagneticHeading",
+			"generated": true,
+			"record_by_default": false
+		},
+		{
+			"name": "CompensatedMagnetometerDataInVehicleFrame2",
+			"type": "MagneticMeasurement",
+			"generated": true,
+			"record_by_default": false
+		},
+		{
+			"name": "CompensatedMagnetometerDataInVehicleFrame3",
+			"type": "MagneticMeasurement",
+			"generated": true,
+			"record_by_default": false
+		},
+		{
+			"name": "SafeMagneticHeading",
+			"type": "SSafeMagneticHeadingData",
+			"generated": false,
+			"record_by_default": true
 		}
 	],
 	"components": [
@@ -240,6 +302,21 @@
 			"include_in_resimulation": false
 		},
 		{
+			"class_name": "CNvmDriver",
+			"header_file": "CNvmDriver.h",
+			"include_in_resimulation": false
+		},
+		{
+			"class_name": "CCanHandler",
+			"header_file": "CCanStackAliases.h",
+			"include_in_resimulation": false
+		},
+		{
+			"class_name": "CCanOutputHandler",
+			"header_file": "CCanStackAliases.h",
+			"include_in_resimulation": false
+		},
+		{
 			"class_name": "COutputTransformer",
 			"header_file": "COutputTransformer.h",
 			"include_in_resimulation": true
@@ -247,6 +324,21 @@
 		{
 			"class_name": "CPressureCompensator",
 			"header_file": "CPressureCompensator.h",
+			"include_in_resimulation": true
+		},
+		{
+			"class_name": "CImuPreFilterSwc",
+			"header_file": "CImuPreFilterSwc.h",
+			"include_in_resimulation": true
+		},
+		{
+			"class_name": "CMagnetometerCompensator",
+			"header_file": "CMagnetometerCompensator.h",
+			"include_in_resimulation": true
+		},
+		{
+			"class_name": "CMagneticHeadingFilterSwc",
+			"header_file": "CMagneticHeadingFilterSwc.h",
 			"include_in_resimulation": true
 		},
 		{
@@ -278,6 +370,11 @@
 			"class_name": "CSyncPulseHandler",
 			"header_file": "CSyncPulseHandler.h",
 			"include_in_resimulation": false
+		},
+		{
+			"class_name": "CMagneticHeadingMonitorSwc",
+			"header_file": "CMagneticHeadingMonitorSwc.h",
+			"include_in_resimulation": true
 		}
 	],
 	"port_data_types": [

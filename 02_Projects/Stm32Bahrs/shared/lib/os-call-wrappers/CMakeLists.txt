@@ -1,7 +1,9 @@
 set(LIB_NAME os-call-wrappers)
 
-add_library(${LIB_NAME} STATIC "${CMAKE_CURRENT_SOURCE_DIR}/src/CMutex.cpp")
+add_library(${LIB_NAME} STATIC
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/CMutex.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/CStartupTaskBarrier.cpp")
 
 target_include_directories(${LIB_NAME} PUBLIC PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/inc")
     
-target_link_libraries(${LIB_NAME} PUBLIC free-rtos-cmsis-os)
+target_link_libraries(${LIB_NAME} PUBLIC free-rtos-cmsis-os PRIVATE ams-assertion-handler)

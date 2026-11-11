@@ -1,8 +1,6 @@
-/**
- * @file CAsm330lhhDriver.cpp
- * @brief Implementation of the Asm330lhh driver software component class.
- * @copyright Copyright 2025. AMS Advanced Air Mobility Sensors UG. All rights reserved.
- */
+/// @file CAsm330lhhDriver.cpp
+/// @brief Implementation of the Asm330lhh driver software component class.
+/// @copyright Copyright 2025. AMS Advanced Air Mobility Sensors UG. All rights reserved.
 
 #include "CRte.h"
 #include "CAsm330lhhDriver.h"
@@ -78,6 +76,12 @@ void CAsm330lhhDriver::PollSensor(uint64_t uTimestamp)
 
     CRte::GetInstance().oPortImuInput3_.Write(oOutput);
   }
+}
+
+void CAsm330lhhDriver::InvalidatePortData()
+{
+  SImuMeasurement oOutput{};
+  CRte::GetInstance().oPortImuInput3_.Write(oOutput);
 }
 
 bool CAsm330lhhDriver::getChipID(uint8_t& urChipId)

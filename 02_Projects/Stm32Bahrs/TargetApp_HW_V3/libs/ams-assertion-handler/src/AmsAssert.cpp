@@ -1,10 +1,6 @@
-/**
- * @file AmsAssert.cpp
- * @brief Implementattion of project-specific assert function.
- * @author Fedor Baklanov
- * @date 2 August 2024
- * @copyright Copyright 2024. AMS Advanced Air Mobility Sensors UG. All rights reserved.
- */
+/// @file AmsAssert.cpp
+/// @brief Implementation of project-specific assert function.
+/// @copyright Copyright 2024. AMS Advanced Air Mobility Sensors UG. All rights reserved.
 
 #include "stm32f4xx_hal.h"
 #include <string>

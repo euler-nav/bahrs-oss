@@ -1,14 +1,11 @@
-/**
- * @file CBaroMonitorSwc.cpp
- * @brief Implementation of the barometer monitor software component.
- * @author Fedor Baklanov
- * @date 15 July 2024
- * @copyright Copyright 2024. AMS Advanced Air Mobility Sensors UG. All rights reserved.
- */
+/// @file CBaroMonitorSwc.cpp
+/// @brief Implementation of the barometer monitor software component.
+/// @copyright Copyright 2024. AMS Advanced Air Mobility Sensors UG. All rights reserved.
 
 #include "CBaroMonitorSwc.h"
 #include "UintToBool.h"
 #include "AmsAssert.h"
+#include "CRte.h"
 
 
 void CBaroMonitorSwc::Init()

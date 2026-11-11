@@ -33,10 +33,23 @@ public:
   bool MemRead(EBus eBus, uint16_t uDevAddr, uint16_t uMemAddr, uint16_t uMemAddrSize,
                uint8_t* upData, uint16_t uSize, uint32_t uTimeout);
 
+  /// @brief Read from an I2C device memory register using DMA.
+  /// @return True on success, false otherwise.
+  bool MemReadDma(EBus eBus, uint16_t uDevAddr, uint16_t uMemAddr,
+               uint16_t uMemAddrSize, uint8_t* upData, uint16_t uSize);
+
   /// @brief Write to an I2C device memory register.
   /// @return True on success, false otherwise.
   bool MemWrite(EBus eBus, uint16_t uDevAddr, uint16_t uMemAddr, uint16_t uMemAddrSize,
                 const uint8_t* upData, uint16_t uSize, uint32_t uTimeout);
+
+  /// @brief Initialize the I2C bus.
+  /// @return True on success, false otherwise.
+  bool InitializeBus(EBus eBus);
+
+  /// @brief De-initialize the I2C bus.
+  /// @return True on success, false otherwise.
+  bool DeinitializeBus(EBus eBus);
 
 private:
   CI2CHandler() = default;
@@ -46,7 +59,7 @@ private:
   static constexpr uint8_t skuFailureThreshold_{ 10U };
   static constexpr uint32_t skuMutexAcquisitionTimeout_{ 2U };
   static constexpr uint32_t skuWaitOnFlagTimeout_{ 25U };
-  static constexpr osPriority_t skeDemotedPriority_{ osPriorityNormal }; // Must be below Task5ms (AboveNormal1) and TaskRs232Sender (AboveNormal).
+  static constexpr osPriority_t skeDemotedPriority_{ osPriorityNormal }; // Must be below Task5ms (AboveNormal1).
 
   struct SBusState
   {

@@ -1,8 +1,6 @@
-/**
- * @file CBmi270Driver.cpp
- * @brief Implementation of the BMI270 driver software component class.
- * @copyright Copyright 2025. AMS Advanced Air Mobility Sensors UG. All rights reserved.
- */
+/// @file CBmi270DriverConfigFile.cpp
+/// @brief Implementation of the BMI270 driver software component class.
+/// @copyright Copyright 2025. AMS Advanced Air Mobility Sensors UG. All rights reserved.
 
 #include "main.h"
 #include "CRte.h"

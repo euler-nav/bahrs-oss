@@ -1,5 +1,5 @@
-/// @file CAsm330lhhDriver.cpp
-/// @brief Implementation of the BMI270 driver software component class.
+/// @file CLps22hhDriver.h
+/// @brief Declaration of the BMI270 driver software component class.
 /// @copyright Copyright 2025. AMS Advanced Air Mobility Sensors UG. All rights reserved.
 
 #ifndef C_LPS22HH_DRIVER_H
@@ -19,6 +19,8 @@ public:
   /// The timestamp is expected to be generated in the data-ready interrupt handler.
   /// @param uTimestampUs Timestamp of the measurement in microseconds.
   void PollSensor(uint64_t uTimestampUs);
+
+  void InvalidatePortData();
 
 private:
   CLps22hhDriver() = default;
@@ -78,4 +80,4 @@ private:
 
 };
 
-#endif /* C_LPS22HH_DRIVER_H */
+#endif // C_LPS22HH_DRIVER_H

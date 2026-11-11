@@ -1,31 +1,19 @@
+%% Copyright 2026. AMS Advanced Air Mobility Sensors UG. All rights reserved.
 %% Clean-up
 
 clear
 close all
 warning('on', 'backtrace')
 
-addpath('lib')
-
 tic
 
 %% Configuration
 
-testConfig.binaryFile = 'data/eulernav_log_20260101_115823.bin';
+testConfig.binaryFile = 'H:\My Drive\BAHRS\06_VV\PF_2_0\candidate_7\v3\v3_pf_2_0_candidate_7_static_10x_10min\static_10x_10min_1.bin';
 testConfig.convertBinaryFile = true;
-testConfig.software_version = '<=1.7'; % Valid options: '<=1.7', '>=1.8'
-testConfig.matFile = ''; % Needs to be set if convertBinaryFile is false
-
-%% Derive parameters from configuration
-if strcmp(testConfig.software_version, '<=1.7')
-    testConfig.converterExecutable = '..\..\03_Firmware\BahrsTargetApp\pf_1_0\Utilities\SerialProtocolToMat.exe';
-    addpath('lib/up_to_pf_1_7');
-elseif strcmp(testConfig.software_version, '>=1.8')
-    testConfig.converterExecutable = '..\..\03_Firmware\BahrsTargetApp\pf_1_8\Tools\SerialProtocolToMat.exe';
-    addpath('lib/from_pf_1_8');
-else
-    error('Invalid software version provided');
-end
-
+testConfig.converterExecutable = '..\VisualStudioToolsBahrs\WorkDir\SerialProtocolToMat.exe';
+testConfig.matFile = '';
+testConfig.canTraceFile = 'Test_1.trc';
 
 %% Convert binary file
 
@@ -35,7 +23,7 @@ if testConfig.convertBinaryFile
             % Convert the binary file to MAT format
             [filepath, name, ext] = fileparts(testConfig.binaryFile);
             convertedMatFile = strcat(name, '.mat');
-            commandString = sprintf('%s %s %s', testConfig.converterExecutable, testConfig.binaryFile, convertedMatFile);
+            commandString = sprintf('%s "%s" %s', testConfig.converterExecutable, testConfig.binaryFile, convertedMatFile);
             [status, result] = system(commandString);
 
             % Octave has a bug, so we do this instead of using '-echo'
@@ -56,7 +44,33 @@ if testConfig.convertBinaryFile
     end
 end
 
-%% Evaluate RS232 data
+%% Load CAN trace
+
+if exist(testConfig.canTraceFile,'file')
+    parsedFile = parseTrcRxFrames(testConfig.canTraceFile);
+
+    uniqueRxCanIds = unique(parsedFile{3});
+
+    if ~isempty(uniqueRxCanIds)
+        canRxFrames = cell(1, length(uniqueRxCanIds));
+        for i=1:1:length(uniqueRxCanIds)
+            mask = (parsedFile{3} == uniqueRxCanIds(i));
+            frameTypeCount = sum(mask);
+            floatPayload = swapbytes(typecast(reshape(uint8([parsedFile{9}(mask), parsedFile{10}(mask), parsedFile{11}(mask), parsedFile{12}(mask)])', 1, 4 * frameTypeCount), 'single'));
+            canRxFrames{i} = struct('nodeId', parsedFile{5}(mask)',...
+                                    'timeUs', 1000 * parsedFile{2}(mask)',...,
+                                    'dataType', parsedFile{6}(mask)',...
+                                    'serviceCode', parsedFile{7}(mask)',...
+                                    'messageCode', parsedFile{8}(mask)',...
+                                    'payload', floatPayload);
+        end
+    end
+else
+    warning('script_evaluateBahrs:noCanTrace',...
+        'Failed to find the input file %s', testConfig.canTraceFile);
+end
+
+%% Evaluate RS232 date
 
 canEvaluateRs232 = false;
 
@@ -74,6 +88,12 @@ end
 
 if canEvaluateRs232
     plotBahrsData(objBahrsOutput);
+end
+
+%% Evaluate CAN trace
+
+if exist('uniqueRxCanIds', 'var') && exist('canRxFrames', 'var')
+    plotBahrsCanData(uniqueRxCanIds, canRxFrames);
 end
 
 %% Print execution time

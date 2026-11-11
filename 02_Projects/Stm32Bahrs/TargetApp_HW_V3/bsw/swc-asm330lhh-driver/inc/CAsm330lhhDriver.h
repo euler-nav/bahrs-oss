@@ -1,13 +1,11 @@
-/**
- * @file CAsm330lhhDriver.h
- * @brief Implementation of the Asm330lhh driver software component class.
- * @copyright Copyright 2025. AMS Advanced Air Mobility Sensors UG. All rights reserved.
- */
-
-// Used ASM330LHH datasheet revision: DocID031239 Rev 4 (May 2020)
+/// @file CAsm330lhhDriver.h
+/// @brief Declaration of the Asm330lhh driver software component class.
+/// @copyright Copyright 2025. AMS Advanced Air Mobility Sensors UG. All rights reserved.
 
 #ifndef C_ASM330LHH_DRIVER_H
 #define C_ASM330LHH_DRIVER_H
+
+// Used ASM330LHH datasheet revision: DocID031239 Rev 4 (May 2020)
 
 #include "General/CSoftwareComponentBase.h"
 
@@ -19,6 +17,8 @@ class CAsm330lhhDriver : public CSoftwareComponent<CAsm330lhhDriver, 1U>
 
 public:
   void PollSensor(uint64_t uTimestamp);
+
+  void InvalidatePortData();
 
 private:
   CAsm330lhhDriver() = default;
@@ -116,4 +116,4 @@ private:
 
 };
 
-#endif /* C_ASM330LHH_DRIVER_H */
+#endif // C_ASM330LHH_DRIVER_H

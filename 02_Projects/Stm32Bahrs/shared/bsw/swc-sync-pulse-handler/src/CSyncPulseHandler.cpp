@@ -1,9 +1,6 @@
-/**
- * @file CSyncPulseHandler.cpp
- * @brief Implementation of the CSyncPulseHandler software component.
- * @author Fedor Baklanov
- * @date 31 May 2023
- */
+/// @file CSyncPulseHandler.cpp
+/// @brief Implementation of the CSyncPulseHandler software component.
+/// @copyright Copyright 2023. AMS Advanced Air Mobility Sensors UG. All rights reserved.
 
 #include "cmsis_os2.h"
 #include "CRte.h"
@@ -68,6 +65,6 @@ void CSyncPulseHandler::ProcessSyncPulse(uint64_t uTimestampUs)
   STimeOfSyncPulse oTimeOfSyncPulse;
   oTimeOfSyncPulse.uPulseTimeUs_ = uTimestampUs;
   CRte::GetInstance().oPortSyncPulseTime_.Write(oTimeOfSyncPulse);
-  CRs232OutputHandler::GetInstance().QueueTransmissionRequest(CSerialProtocol::EMessageIds::eTimeOfSyncPulse);
+  CRs232OutputHandler::GetInstance().SendTimeOfLatestSyncPulseMessage();
 }
 

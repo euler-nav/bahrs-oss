@@ -1,0 +1,55 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.2.32516.85
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SerialProtocolToMat", "SerialProtocolToMat\SerialProtocolToMat.vcxproj", "{3CB994FC-DB64-49F9-BB77-1D7A7DC04582}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BahrsUT", "BahrsUT\BahrsUT.vcxproj", "{42218C6B-BA6C-4FA6-A988-077A183CDF6E}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DebugOutputToMatBahrsV2", "DebugOutputToMatBahrsV2\DebugOutputToMatBahrsV2.vcxproj", "{2DF0E8D1-B4E5-49E9-8F85-9AFFCEFAB7AF}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DebugOutputToMatBahrsV3", "DebugOutputToMatBahrsV3\DebugOutputToMatBahrsV3.vcxproj", "{43A35518-C636-4905-99E9-0E1C37E06DC3}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BahrsReplayToolBahrsV2", "BahrsReplayToolBahrsV2\BahrsReplayToolBahrsV2.vcxproj", "{A79B6C5D-A251-412E-82A6-8E2C9F03B0B3}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BahrsReplayToolBahrsV3", "BahrsReplayToolBahrsV3\BahrsReplayToolBahrsV3.vcxproj", "{60A4C45C-0653-4D7C-B565-59E50D639F56}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3CB994FC-DB64-49F9-BB77-1D7A7DC04582}.Debug|x64.ActiveCfg = Debug|x64
+		{3CB994FC-DB64-49F9-BB77-1D7A7DC04582}.Debug|x64.Build.0 = Debug|x64
+		{3CB994FC-DB64-49F9-BB77-1D7A7DC04582}.Release|x64.ActiveCfg = Release|x64
+		{3CB994FC-DB64-49F9-BB77-1D7A7DC04582}.Release|x64.Build.0 = Release|x64
+		{42218C6B-BA6C-4FA6-A988-077A183CDF6E}.Debug|x64.ActiveCfg = Debug|x64
+		{42218C6B-BA6C-4FA6-A988-077A183CDF6E}.Debug|x64.Build.0 = Debug|x64
+		{42218C6B-BA6C-4FA6-A988-077A183CDF6E}.Release|x64.ActiveCfg = Release|x64
+		{42218C6B-BA6C-4FA6-A988-077A183CDF6E}.Release|x64.Build.0 = Release|x64
+		{2DF0E8D1-B4E5-49E9-8F85-9AFFCEFAB7AF}.Debug|x64.ActiveCfg = Debug|x64
+		{2DF0E8D1-B4E5-49E9-8F85-9AFFCEFAB7AF}.Debug|x64.Build.0 = Debug|x64
+		{2DF0E8D1-B4E5-49E9-8F85-9AFFCEFAB7AF}.Release|x64.ActiveCfg = Release|x64
+		{2DF0E8D1-B4E5-49E9-8F85-9AFFCEFAB7AF}.Release|x64.Build.0 = Release|x64
+		{43A35518-C636-4905-99E9-0E1C37E06DC3}.Debug|x64.ActiveCfg = Debug|x64
+		{43A35518-C636-4905-99E9-0E1C37E06DC3}.Debug|x64.Build.0 = Debug|x64
+		{43A35518-C636-4905-99E9-0E1C37E06DC3}.Release|x64.ActiveCfg = Release|x64
+		{43A35518-C636-4905-99E9-0E1C37E06DC3}.Release|x64.Build.0 = Release|x64
+		{A79B6C5D-A251-412E-82A6-8E2C9F03B0B3}.Debug|x64.ActiveCfg = Debug|x64
+		{A79B6C5D-A251-412E-82A6-8E2C9F03B0B3}.Debug|x64.Build.0 = Debug|x64
+		{A79B6C5D-A251-412E-82A6-8E2C9F03B0B3}.Release|x64.ActiveCfg = Release|x64
+		{A79B6C5D-A251-412E-82A6-8E2C9F03B0B3}.Release|x64.Build.0 = Release|x64
+		{60A4C45C-0653-4D7C-B565-59E50D639F56}.Debug|x64.ActiveCfg = Debug|x64
+		{60A4C45C-0653-4D7C-B565-59E50D639F56}.Debug|x64.Build.0 = Debug|x64
+		{60A4C45C-0653-4D7C-B565-59E50D639F56}.Release|x64.ActiveCfg = Release|x64
+		{60A4C45C-0653-4D7C-B565-59E50D639F56}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {992F250A-722F-4A11-A328-794B7761401B}
+	EndGlobalSection
+EndGlobal

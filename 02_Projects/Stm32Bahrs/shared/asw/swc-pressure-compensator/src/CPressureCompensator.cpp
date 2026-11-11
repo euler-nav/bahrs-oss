@@ -1,12 +1,17 @@
 /// @file CPressureCompensator.cpp
 /// @brief Implementation of the pressure compensator SWC class.
-/// @copyright Copyright 2026 AMS Advanced Air Mobility Sensors UG. All rights reserved.
+/// @copyright Copyright 2026. AMS Advanced Air Mobility Sensors UG. All rights reserved.
 
 #include "CPressureCompensator.h"
 
 #include "CRte.h"
 #include "AmsAssert.h"
 #include "UintToBool.h"
+
+#ifndef _MSC_VER
+#include "crc32.h"
+#include "CNvmDriver.h"
+#endif // _MSC_VER
 
 CPressureCompensator& CPressureCompensator::getInstanceImpl(unsigned uInstanceIndex)
 {
@@ -29,11 +34,30 @@ CPressureCompensator::CPressureCompensator(ESensorId eSensorId)
 
 void CPressureCompensator::Init()
 {
-  // Placeholder for the open-source variant: no NVM driver is included, so compensation
-  // parameters are not loaded here. A user may hard-code inter-barometer offsets,
-  // implement their own NVM-based loading, or use the Basic EULER-NAV BAHRS software license.
-  fPressureOffsetPa_ = 0.0F;
+#ifndef _MSC_VER
+  if (false == bIsInitialized_)
+  {
+    CNvmDriver::SPressureCompensationParameters oParams;
+    bool bStatus = CNvmDriver::ReadBlock<CNvmDriver::CNvmBlockPressureCompensationParameters>(oParams);
+
+    if (bStatus)
+    {
+      const Crc32_t kuComputedCrc = crc32(reinterpret_cast<void*>(&oParams), sizeof(oParams) - sizeof(oParams.uCrc_));
+      bStatus = (kuComputedCrc == oParams.uCrc_);
+    }
+
+    if (bStatus)
+    {
+      fPressureOffsetPa_ = oParams.afPressureOffset_[toIndex(keSensorId_)];
+      bIsInitialized_ = true;
+    }
+  }
+#else
+  // For the logs eulernav_log_20260827_085843.bin and eulernav_log_20260827_084643.bin.
+  float afPressureOffsets_[3] = { 84.9922F, -85.6797F, 0.6875F };
+  fPressureOffsetPa_ = afPressureOffsets_[toIndex(keSensorId_)];
   bIsInitialized_ = true;
+#endif // _MSC_VER
 }
 
 bool CPressureCompensator::IsInitialized()

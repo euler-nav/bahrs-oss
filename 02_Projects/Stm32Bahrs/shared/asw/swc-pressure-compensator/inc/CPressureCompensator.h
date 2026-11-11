@@ -1,6 +1,6 @@
 /// @file CPressureCompensator.h
 /// @brief Declaration of the pressure compensator SWC class.
-/// @copyright Copyright 2026 AMS Advanced Air Mobility Sensors UG. All rights reserved.
+/// @copyright Copyright 2026. AMS Advanced Air Mobility Sensors UG. All rights reserved.
 
 #ifndef C_PRESSURE_COMPENSATOR_H
 #define C_PRESSURE_COMPENSATOR_H

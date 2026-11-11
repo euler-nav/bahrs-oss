@@ -1,9 +1,6 @@
-/**
- * @file CScha63TDriver.cpp
- * @brief Implementation of the SCHA63T driver software component.
- * @author Fedor Baklanov
- * @date 07 Mai 2022
- */
+/// @file CScha63TDriver.cpp
+/// @brief Implementation of the SCHA63T driver software component.
+/// @copyright Copyright 2025. AMS Advanced Air Mobility Sensors UG. All rights reserved.
 
 #include "CScha63TDriver.h"
 #include "GetMicroseconds.h"
@@ -414,6 +411,12 @@ void CScha63TDriver::ConvertRawDataset()
   }
 
   orRte.oPortImuInput1_.Write(oImuData);
+}
+
+void CScha63TDriver::InvalidatePortData()
+{
+  SImuMeasurement oImuData{};
+  CRte::GetInstance().oPortImuInput1_.Write(oImuData);
 }
 
 bool CScha63TDriver::pollUnoStatus()

@@ -1,7 +1,6 @@
 
 add_subdirectory(swc-bmi270-driver)
 add_subdirectory(swc-asm330lhh-driver)
-add_subdirectory(swc-rs232-output-handler)
 add_subdirectory(swc-spi-handler)
 add_subdirectory(swc-i2c-handler)
 add_subdirectory(swc-bmp384-driver)
@@ -11,4 +10,5 @@ add_subdirectory(swc-icp20100-driver)
 add_subdirectory(swc-mmc5983-driver)
 add_subdirectory(swc-lis3mdl-driver)
 add_subdirectory(swc-bmm350-driver)
+add_subdirectory(swc-diagnostic-mode)
 add_subdirectory("${CMAKE_SOURCE_DIR}/../shared/bsw" "${CMAKE_CURRENT_BINARY_DIR}/shared/bsw/")

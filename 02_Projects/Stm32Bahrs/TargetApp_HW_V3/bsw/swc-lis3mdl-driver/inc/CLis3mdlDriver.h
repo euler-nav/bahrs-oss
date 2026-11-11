@@ -1,8 +1,7 @@
 /// @file CLis3mdlDriver.h
-/// @brief Implementation of the LIS3MDL driver software component class.
+/// @brief Declaration of the LIS3MDL driver software component class.
+/// @note Datasheet: DS9463 - Rev 7 - December 2023
 /// @copyright Copyright 2025. AMS Advanced Air Mobility Sensors UG. All rights reserved.
-
-// Datasheet: DS9463 - Rev 7 - December 2023
 
 #ifndef C_LIS3MDL_DRIVER_H
 #define C_LIS3MDL_DRIVER_H
@@ -24,9 +23,22 @@ public:
   /// @brief A function overload that generates a timestamp without a data-ready interrupt.
   void PollSensor();
 
+  /// @brief Poll sensor data in DMA mode.
+  /// @return True if DMA reception was initiated successfully, false otherwise.
+  bool PollSensorDma();
+
+  /// @brief Process data bytes received asynchronously.
+  /// @param uTimestampUs Timestamp of the measurement in microseconds.
+  void ProcessReceivedBytesDma(uint64_t uTimestampUs);
+
+  /// @brief Invalidate the driver's output port
+  void InvalidatePortData();
+
 private:
   CLis3mdlDriver() = default;
   ~CLis3mdlDriver() = default;
+
+  std::array<uint8_t, 8U> auBuffer{}; // stores 8 bytes of sensor data during DMA I2C read
 
   static constexpr uint16_t skuLis3mdlI2CAddress_{ 0x001E << 1U }; // SAD+R/W
 
@@ -49,6 +61,9 @@ private:
 
   static constexpr uint8_t skuLis3mdlCtrlReg1Value_{ skuLis3mdlCtrlReg1TempEn_ | skuLis3mdlCtrlReg1OpModeXY_ | skuLis3mdlCtrlReg1Odr_ };
 
+  // CTRL_REG2 (21h)
+  static constexpr uint8_t skuLis3mdlCtrlReg2SoftReset_{ 0x01 << 2U };
+
   // CTRL_REG3 (22h)
   static constexpr uint8_t skuLis3mdlCtrlReg3Value_{ 0x00 }; // No Low-power mode, Continuous-conversion mode
   // CTRL_REG4 (23h)
@@ -66,6 +81,7 @@ private:
   static constexpr uint32_t skuLis3mdlI2cTimeout_{2U};
 
   bool getDeviceId(uint8_t& urChipId);
+  bool softReset();
 
   bool readMagnetometer(float& frValueX, float& frValueY, float& frValueZ);
   bool readTemperature(float& frTemperature);
@@ -79,4 +95,4 @@ private:
 
 };
 
-#endif /* C_LIS3MDL_DRIVER_H */
+#endif // C_LIS3MDL_DRIVER_H

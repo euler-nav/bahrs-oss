@@ -1,9 +1,6 @@
-﻿/**
- * @file CScha63TDriver.h
- * @brief Declaration of the SCHA63T driver software component.
- * @author Fedor Baklanov
- * @date 07 Mai 2022
- */
+﻿/// @file CScha63TDriver.h
+/// @brief Declaration of the SCHA63T driver software component.
+/// @copyright Copyright 2025. AMS Advanced Air Mobility Sensors UG. All rights reserved.
 
 #ifndef C_SCHA63T_DRIVER_H
 #define C_SCHA63T_DRIVER_H
@@ -64,9 +61,7 @@
 #define SPI_FRAME_WRITE_USER_DATA_17H     0xDCAAAA4E
 #define SPI_FRAME_READ_USER_DATA_17H      0x5CAAAA8E
 
-/**
- * @brief This is class implements a driver for the Murata SCHA63T inertial sensor.
-*/
+/// @brief This class implements a driver for the Murata SCHA63T inertial sensor.
 class CScha63TDriver : public CSoftwareComponent<CScha63TDriver, 1U>
 {
   friend class CSoftwareComponent<CScha63TDriver, 1U>;
@@ -74,17 +69,16 @@ class CScha63TDriver : public CSoftwareComponent<CScha63TDriver, 1U>
   DECLARE_MANDATORY_APIS(CScha63TDriver)
 
 public:
-  /**
-   * @brief Poll the sensor. Puts batches of 30 measurements periodically into the queue of the FreeRTOS task.
-   * The function is called from the 6kHz interrupt triggered by the TIM7.
-  */
+  /// @brief Poll the sensor. Puts batches of 30 measurements periodically into the queue of the FreeRTOS task.
+  /// The function is called from the 6kHz interrupt triggered by the TIM7.
   void PollSensor();
 
-  /**
-   * @brief Converts batches of 30 raw measurements to IMU measurement, applies factory calibration and writes the result to the RTE port.
-   * The routine shall be called from FreeRTOS tasks.
-  */
+  /// @brief Converts batches of 30 raw measurements to IMU measurement, applies factory calibration and writes the result to the RTE port.
+  /// The routine shall be called from FreeRTOS tasks.
   void ConvertRawDataset();
+
+  /// @brief Invalidate the driver's output port.
+  void InvalidatePortData();
 
 protected:
 
@@ -97,9 +91,7 @@ private:
   /// @return Reference to SPI handle.
   static SPI_HandleTypeDef& getSpiHandle();
 
-  /**
-   * @brief A struct to store compensation parameters stored in the sensor's NVM.
-  */
+  /// @brief A struct to store compensation parameters stored in the sensor's NVM.
   struct SCompensationParameters
   {
     float fCxx_ { 1.0F };
@@ -128,9 +120,7 @@ private:
   static constexpr float skfGyroscopeSensitivity_ { 80.0F }; ///< Gyroscope sensitivity, [LSB/deg/s]
   static constexpr int skiMaxAttemptsToConfigure_ { 2 }; ///< Number of attempts to configure the sensor
 
-  /**
-   * @brief Enumeration of measurement frames for SPI communication.
-  */
+  /// @brief Enumeration of measurement frames for SPI communication.
   enum EMeasurementFrames
   {
     eSpecificForceX = 0,
@@ -144,82 +134,60 @@ private:
     eFrameCount
   };
 
-  /**
-   * @brief Poll the status of the UNO ASIC.
-   * @return True if the UNO ASIC operates normally, false otherwise.
-  */
+  /// @brief Poll the status of the UNO ASIC.
+  /// @return True if the UNO ASIC operates normally, false otherwise.
   bool pollUnoStatus();
 
-  /**
-   * @brief Poll the status of the DUE ASIC.
-   * @return True if the DUE ASIC operates normally, false otherwise.
-  */
+  /// @brief Poll the status of the DUE ASIC.
+  /// @return True if the DUE ASIC operates normally, false otherwise.
   bool pollDueStatus();
 
-  /**
-   * @brief Check for RS error bits in the frame. 
-   * @param uFrame 32-bit frame received from the ASIC.
-   * @return True -- there are errors, false -- no errors.
-  */
+  /// @brief Check for RS error bits in the frame. 
+  /// @param uFrame 32-bit frame received from the ASIC.
+  /// @return True -- there are errors, false -- no errors.
   inline static bool checkRsError(uint32_t uFrame);
 
-  /**
-   * @brief Check for RS errors in an array of frames received from the ASIC:
-   * @param upFrames A pointer to the first array element.
-   * @param uFrameCount Number of frames ín the array.
-   * @return True if there are errors, false -- no errors.
-  */
+  /// @brief Check for RS errors in an array of frames received from the ASIC:
+  /// @param upFrames A pointer to the first array element.
+  /// @param uFrameCount Number of frames ín the array.
+  /// @return True if there are errors, false -- no errors.
   static bool checkRsErrorInFrames(uint32_t* upFrames, unsigned uFrameCount);
 
-  /**
-   * @brief Read/write a 32-bit frame to/from the UNO ASIC.
-   * @param uDataOut Data to be send on SPI (for example read address).
-   * @return Response of the sensor to the previous operation.
-  */
+  /// @brief Read/write a 32-bit frame to/from the UNO ASIC.
+  /// @param uDataOut Data to be send on SPI (for example read address).
+  /// @return Response of the sensor to the previous operation.
   uint32_t spiWriteReadUno(uint32_t uDataOut);
 
-  /**
-   * @brief Read/write a 32-bit frame to/from the DUE ASIC.
-   * @param uDataOut Data to be send on SPI (for example read address).
-   * @return Response of the sensor to the previous operation.
-  */
+  /// @brief Read/write a 32-bit frame to/from the DUE ASIC.
+  /// @param uDataOut Data to be send on SPI (for example read address).
+  /// @return Response of the sensor to the previous operation.
   uint32_t spiWriteReadDue(uint32_t uDataOut);
 
-  /**
-   * @brief SPI communication with the sensor.
-   * @param uDataOut Data to be sent.
-   * @param opGpioX CSB GPIO group.
-   * @param uGpioPin  CSB GPIO pin.
-   * @return Response of the sensor.
-  */
+  /// @brief SPI communication with the sensor.
+  /// @param uDataOut Data to be sent.
+  /// @param opGpioX CSB GPIO group.
+  /// @param uGpioPin  CSB GPIO pin.
+  /// @return Response of the sensor.
   uint32_t spiWriteRead(uint32_t uDataOut, GPIO_TypeDef* opGpioX, uint16_t uGpioPin);
 
-  /**
-   * @brief Get a 16-bit integer from the frame received from the ASIC.
-   * @param uFrame A 32-bit frame received from the ASIC:
-   * @return 16-bit integer.
-  */
+  /// @brief Get a 16-bit integer from the frame received from the ASIC.
+  /// @param uFrame A 32-bit frame received from the ASIC:
+  /// @return 16-bit integer.
   inline static int16_t frameToInt16(uint32_t uFrame);
 
-  /**
-   * @brief Get a 16-bit unsigned integer from the frame received from the ASIC.
-   * @param uFrame A 32-bit frame received from the ASIC:
-   * @return A 16-bit unsigned integer.
-  */
+  /// @brief Get a 16-bit unsigned integer from the frame received from the ASIC.
+  /// @param uFrame A 32-bit frame received from the ASIC:
+  /// @return A 16-bit unsigned integer.
   inline static uint16_t frameToUint16(uint32_t uFrame);
 
-  /**
-   * @brief Get a 8-bit integer from the frame received from the ASIC using the lower bits.
-   * @param uFrame A 32-bit frame received from the ASIC.
-   * @return Desired 8-bit integer.
-  */
+  /// @brief Get a 8-bit integer from the frame received from the ASIC using the lower bits.
+  /// @param uFrame A 32-bit frame received from the ASIC.
+  /// @return Desired 8-bit integer.
   inline static int8_t lowerInt8FromFrame(uint32_t uFrame);
 
-  /**
-   * @brief Get a 8-bit integer from the frame received from the ASIC using the upper bits.
-   * @param uFrame A 32-bit frame received from the ASIC.
-   * @return Desired 8-bit integer.
-  */
+  /// @brief Get a 8-bit integer from the frame received from the ASIC using the upper bits.
+  /// @param uFrame A 32-bit frame received from the ASIC.
+  /// @return Desired 8-bit integer.
   inline static int8_t upperInt8FromFrame(uint32_t uFrame);
 
   bool bIsInitialized_ { false }; ///< Sensor initialization status: true -- initialized, false otherwise.
@@ -235,4 +203,4 @@ private:
 
 };
 
-#endif /* C_SCHA63T_DRIVER_H */
+#endif // C_SCHA63T_DRIVER_H

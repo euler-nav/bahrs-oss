@@ -1,17 +1,14 @@
-/**
- * @file CImuMonitorSwc.h
- * @brief Implementation of the IMU monitor software component
- * @author Fedor Baklanov
- * @date 6 December 2023
- * @copyright Copyright 2023. AMS Advanced Air Mobility Sensors UG. All rights reserved.
- */
+/// @file CImuMonitorSwc.h
+/// @brief Declaration of the IMU monitor software component
+/// @copyright Copyright 2023. AMS Advanced Air Mobility Sensors UG. All rights reserved.
 
 #ifndef C_IMU_MONITOR_SWC_H
 #define C_IMU_MONITOR_SWC_H
 
 #include "General/CSoftwareComponentBase.h"
+#include "RteTypesGenerated.h"
+#include "RteTypesUserDefined.h"
 #include "ImuMonitorApi.h"
-#include "CRte.h"
 
 #ifdef BAHRS_HW_V3
 using CRedundantImuData = NImuMonitorApi::CRedundantInputDataBahrsV3;
@@ -28,9 +25,7 @@ class CImuMonitorSwc : public CSoftwareComponent<CImuMonitorSwc, 1U>
   DECLARE_MANDATORY_APIS(CImuMonitorSwc)
 
 public:
-  /**
-   * @brief Run IMU monitor.
-  */
+  /// @brief Run IMU monitor.
   void Run();
 
 protected:
@@ -39,12 +34,10 @@ private:
   CImuMonitorSwc() = default;
   ~CImuMonitorSwc() = default;
 
-  /**
-   * @brief A helper function to populate redundant input data object.
-   * @param korImuData Reference to an IMU measurement.
-   * @param eSensorId ID of the sensor that the measurement originates from.
-   * @param orRedundantImuData Reference to an object being populated.
-   */
+  /// @brief A helper function to populate redundant input data object.
+  /// @param korImuData Reference to an IMU measurement.
+  /// @param eSensorId ID of the sensor that the measurement originates from.
+  /// @param orRedundantImuData Reference to an object being populated.
   static void populateRedundantImuDataObject(const SImuMeasurement& korImuData,
                                              NFusionLibCommon::ESensorId eSensorId,
                                              CRedundantImuData& orRedundantImuData);
@@ -62,4 +55,4 @@ private:
 #endif
 };
 
-#endif /* C_IMU_MONITOR_SWC_H */
+#endif // C_IMU_MONITOR_SWC_H

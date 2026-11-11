@@ -1,15 +1,25 @@
-/**
- * @file CBahrsFilterSwc.cpp
- * @brief Implementation of the BAHRS filter software component
- * @author Fedor Baklanov
- * @date 08 June 2022
- */
+/// @file CBahrsFilterSwc.cpp
+/// @brief Implementation of the BAHRS filter software component
+/// @copyright Copyright 2022. AMS Advanced Air Mobility Sensors UG. All rights reserved.
 
 #include "CBahrsFilterSwc.h"
 #include "UintToBool.h"
 #include "AmsAssert.h"
 
 #include "CRte.h"
+
+#ifdef SEND_DEBUG_OUTPUT
+
+#include "GetMicroseconds.h"
+#ifndef _MSC_VER
+#include "CRs232OutputHandler.h"
+using CDebugOutputHandler = CRs232OutputHandler;
+#else
+#include "CFileDebugOutputHandler.h"
+using CDebugOutputHandler = CFileDebugOutputHandler;
+#endif // _MSC_VER
+
+#endif // SEND_DEBUG_OUTPUT
 
 namespace NBahrsFilterApi
 {
@@ -34,7 +44,7 @@ CBahrsFilterSwc::CBahrsFilterSwc(uint32_t uInstanceIndex) :
   {
     AMS_HARD_ASSERT(false);
   }
-#endif /* _MSC_VER */
+#endif // _MSC_VER
 }
 
 void CBahrsFilterSwc::Init()
@@ -107,7 +117,7 @@ void CBahrsFilterSwc::SetImuInput()
     }
 #else
     NBahrsFilterApi::BahrsFilterSetInput(oBahrsImuData, kuInstanceIndex_);
-#endif /* _MSC_VER */
+#endif // _MSC_VER
   }
 }
 
@@ -142,12 +152,13 @@ void CBahrsFilterSwc::SetPressureInput()
     }
 #else
     NBahrsFilterApi::BahrsFilterSetInput(oBahrsPressureData, kuInstanceIndex_);
-#endif /* _MSC_VER */
+#endif // _MSC_VER
   }
 }
 
 void CBahrsFilterSwc::Step(uint64_t uTimestampUs)
 {
+#ifndef _MSC_VER
   osStatus_t eStatus = osMutexAcquire(pMutexHandle_, 1);
 
   if (osOK == eStatus)
@@ -155,9 +166,28 @@ void CBahrsFilterSwc::Step(uint64_t uTimestampUs)
     NBahrsFilterApi::BahrsFilterPrepareInputs(kuInstanceIndex_);
     osMutexRelease(pMutexHandle_);
   }
+#else
+  NBahrsFilterApi::BahrsFilterPrepareInputs(kuInstanceIndex_);
+#endif // _MSC_VER
+
+#ifdef SEND_DEBUG_OUTPUT
+  {
+    CSerialProtocol::SDebugData oDebugData;
+    oDebugData.uMsgType_ = CSerialProtocol::EMessageIds::eDebugEventRunnableCall;
+    oDebugData.uId_ = getRunnableIdForDebug();
+    oDebugData.uTimestampUs_ = GetMicroseconds();
+#ifndef _MSC_VER
+    oDebugData.bAllPortsLocked_ = BoolToUint(osOK == eStatus);
+#else
+    oDebugData.bAllPortsLocked_ = BoolToUint(true);
+#endif // _MSC_VER
+    CDebugOutputHandler::GetInstance().SendDebugData(oDebugData);
+  }
+#endif // SEND_DEBUG_OUTPUT
 
   NBahrsFilterApi::BahrsFilterStep(uTimestampUs, kuInstanceIndex_);
 
+#ifndef _MSC_VER
   eStatus = osMutexAcquire(pMutexHandle_, 1);
 
   if (osOK == eStatus)
@@ -165,6 +195,9 @@ void CBahrsFilterSwc::Step(uint64_t uTimestampUs)
     NBahrsFilterApi::BahrsFilterCompleteEpoch(kuInstanceIndex_);
     osMutexRelease(pMutexHandle_);
   }
+#else
+  NBahrsFilterApi::BahrsFilterCompleteEpoch(kuInstanceIndex_);
+#endif // _MSC_VER
 
   CBahrsFilterOutput oOutput;
   static_cast<NBahrsFilterApi::SOutputData&>(oOutput) = NBahrsFilterApi::BahrsFilterGetOutput(kuInstanceIndex_);
@@ -219,15 +252,15 @@ bool CBahrsFilterSwc::readImuDataPort(SImuMeasurement& orImuData, NFusionLibComm
   switch (kuInstanceIndex_)
   {
     case 0U:
-      bStatus = readPort(ERunnableIds::eRunnableBahrsFilterSetImuInput1, CRte::GetInstance().oPortImuInput1_, orImuData);
+      bStatus = readPort(ERunnableIds::eRunnableBahrsFilterSetImuInput1, CRte::GetInstance().oPortImuInputFiltered1_, orImuData);
       erSensorId = skeImuId1_;
       break;
     case 1U:
-      bStatus = readPort(ERunnableIds::eRunnableBahrsFilterSetImuInput2, CRte::GetInstance().oPortImuInput2_, orImuData);
+      bStatus = readPort(ERunnableIds::eRunnableBahrsFilterSetImuInput2, CRte::GetInstance().oPortImuInputFiltered2_, orImuData);
       erSensorId = skeImuId2_;
       break;
     case 2U:
-      bStatus = readPort(ERunnableIds::eRunnableBahrsFilterSetImuInput3, CRte::GetInstance().oPortImuInput3_, orImuData);
+      bStatus = readPort(ERunnableIds::eRunnableBahrsFilterSetImuInput3, CRte::GetInstance().oPortImuInputFiltered3_, orImuData);
       erSensorId = skeImuId3_;
       break;
     default:
@@ -263,3 +296,30 @@ bool CBahrsFilterSwc::readPressureDataPort(SBarometerMeasurement& orPressureData
 
   return bStatus;
 }
+
+#ifdef SEND_DEBUG_OUTPUT
+
+uint8_t CBahrsFilterSwc::getRunnableIdForDebug() const
+{
+  uint8_t eRunnableId{ static_cast<uint8_t>(CRte::ERunnableIds::eInvalid) };
+
+  switch (kuInstanceIndex_)
+  {
+    case 0U:
+      eRunnableId = static_cast<uint8_t>(CRte::ERunnableIds::eRunnableBahrsFilterStep1);
+      break;
+    case 1U:
+      eRunnableId = static_cast<uint8_t>(CRte::ERunnableIds::eRunnableBahrsFilterStep2);
+      break;
+    case 2U:
+      eRunnableId = static_cast<uint8_t>(CRte::ERunnableIds::eRunnableBahrsFilterStep3);
+      break;
+    default:
+      AMS_HARD_ASSERT(false);
+      break;
+  };
+
+  return eRunnableId;
+}
+
+#endif // SEND_DEBUG_OUTPUT

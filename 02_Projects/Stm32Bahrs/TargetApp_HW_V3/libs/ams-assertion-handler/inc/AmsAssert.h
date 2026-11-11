@@ -1,10 +1,6 @@
-/**
- * @file AmsAssert.h
- * @brief Declaration of project-specific assert macro.
- * @author Fedor Baklanov
- * @date 2 August 2024
- * @copyright Copyright 2024. AMS Advanced Air Mobility Sensors UG. All rights reserved.
- */
+/// @file AmsAssert.h
+/// @brief Declaration of project-specific assert macro.
+/// @copyright Copyright 2024. AMS Advanced Air Mobility Sensors UG. All rights reserved.
 
 #ifndef AMS_ASSERT_H
 #define AMS_ASSERT_H

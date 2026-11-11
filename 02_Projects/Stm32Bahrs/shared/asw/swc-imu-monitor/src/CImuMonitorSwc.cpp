@@ -1,13 +1,17 @@
-/**
- * @file CImuMonitorSwc.cpp
- * @brief Implementation of the BAHRS filter software component
- * @author Fedor Baklanov
- * @date 08 June 2022
- */
+/// @file CImuMonitorSwc.cpp
+/// @brief Implementation of the BAHRS filter software component
+/// @copyright Copyright 2024. AMS Advanced Air Mobility Sensors UG. All rights reserved.
 
 #include "CImuMonitorSwc.h"
 #include "UintToBool.h"
 #include "AmsAssert.h"
+#include "CRte.h"
+
+#ifdef SEND_DEBUG_OUTPUT
+
+#include "GetMicroseconds.h"
+
+#endif // SEND_DEBUG_OUTPUT
 
 void CImuMonitorSwc::Init()
 {
@@ -33,9 +37,9 @@ void CImuMonitorSwc::Run()
 
   const auto korInputs = CPortReader::ReadPorts(
     CRte::ERunnableIds::eRunnableImuMonitorRun,
-    CRte::GetInstance().oPortImuInput1_,
-    CRte::GetInstance().oPortImuInput2_,
-    CRte::GetInstance().oPortImuInput3_);
+    CRte::GetInstance().oPortImuInputFiltered1_,
+    CRte::GetInstance().oPortImuInputFiltered2_,
+    CRte::GetInstance().oPortImuInputFiltered3_);
 
   if (korInputs.has_value())
   {

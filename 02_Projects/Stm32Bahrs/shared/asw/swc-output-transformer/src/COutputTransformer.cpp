@@ -1,7 +1,16 @@
+/// @file COutputTransformer.cpp
+/// @brief Implementation of the Output Transformer SWC class.
+/// @copyright Copyright 2023. AMS Advanced Air Mobility Sensors UG. All rights reserved.
+
 #include "CRte.h"
 #include "crc32.h"
 #include "UintToBool.h"
 #include "NavigationUtilities.h"
+#include "AmsAssert.h"
+
+#ifndef _MSC_VER
+#include "CNvmDriver.h"
+#endif // _MSC_VER
 
 COutputTransformer& COutputTransformer::getInstanceImpl(unsigned uInstanceIndex)
 {
@@ -11,11 +20,37 @@ COutputTransformer& COutputTransformer::getInstanceImpl(unsigned uInstanceIndex)
 
 void COutputTransformer::Init()
 {
-  // Placeholder for the open-source variant: no NVM driver is included, so vehicle-to-IMU installation parameters are not loaded here.
-  // A user may hard-code alignment angles, implement their own loading, or use the Basic EULER-NAV BAHRS software license.
+#ifndef _MSC_VER
+  if (false == bIsInitialized_)
+  {
+    CNvmDriver::SEulerAnglesDeviceToVehicle oEulerDeviceToVehicle;
+
+    if(true == CNvmDriver::ReadBlock<CNvmDriver::CNvmBlockEulerAnglesDeviceToVehicle>(oEulerDeviceToVehicle))
+    {
+      Crc32_t uComputedCrc = crc32(reinterpret_cast<void*>(&oEulerDeviceToVehicle), sizeof(oEulerDeviceToVehicle) - sizeof(Crc32_t));
+
+      if (uComputedCrc == oEulerDeviceToVehicle.uCrc_)
+      {
+        oQuatVehicleToDevice_ = NNavigationUtilities::QuaternionFromEuler(oEulerDeviceToVehicle.fRoll_,
+                                                                          oEulerDeviceToVehicle.fPitch_,
+                                                                          oEulerDeviceToVehicle.fYaw_);
+
+        CQuaternion oQuatDeviceToVehicle = CQuaternion(oQuatVehicleToDevice_.W(),
+                                                       -oQuatVehicleToDevice_.X(),
+                                                       -oQuatVehicleToDevice_.Y(),
+                                                       -oQuatVehicleToDevice_.Z());
+
+        oDcmDeviceToVehicle_ = NNavigationUtilities::DcmFromQuaternion(oQuatDeviceToVehicle);
+        bIsInitialized_ = true;
+      }
+    }
+  }
+#else
+  // For the time being we assume no rotation between the device and vehicle frame.
   oDcmDeviceToVehicle_ = Eigen::Matrix3f::Identity();
   oQuatVehicleToDevice_ = CQuaternion(1.0F, 0.0F, 0.0F, 0.0F);
   bIsInitialized_ = true;
+#endif // _MSC_VER
 }
 
 bool COutputTransformer::IsInitialized()
@@ -177,14 +212,56 @@ void COutputTransformer::TransformOrientation()
   }
 }
 
-void COutputTransformer::TransformMagnetometerInput()
+bool COutputTransformer::readCompensatedMagnetometerPort(uint32_t uSensorIndex, SMagneticMeasurement& orData)
+{
+  bool bStatus = false;
+
+  switch (uSensorIndex)
+  {
+    case 0U:
+      bStatus = CRte::GetInstance().oPortCompensatedMagnetometerData1_.Read(orData);
+      break;
+    case 1U:
+      bStatus = CRte::GetInstance().oPortCompensatedMagnetometerData2_.Read(orData);
+      break;
+    case 2U:
+      bStatus = CRte::GetInstance().oPortCompensatedMagnetometerData3_.Read(orData);
+      break;
+    default:
+      AMS_HARD_ASSERT(false);
+      break;
+  }
+
+  return bStatus;
+}
+
+void COutputTransformer::writeMagnetometerInVehicleFramePort(uint32_t uSensorIndex, const SMagneticMeasurement& korData)
+{
+  switch (uSensorIndex)
+  {
+    case 0U:
+      CRte::GetInstance().oPortCompensatedMagnetometerDataInVehicleFrame1_.Write(korData);
+      break;
+    case 1U:
+      CRte::GetInstance().oPortCompensatedMagnetometerDataInVehicleFrame2_.Write(korData);
+      break;
+    case 2U:
+      CRte::GetInstance().oPortCompensatedMagnetometerDataInVehicleFrame3_.Write(korData);
+      break;
+    default:
+      AMS_HARD_ASSERT(false);
+      break;
+  }
+}
+
+void COutputTransformer::TransformMagnetometerInput(uint32_t uSensorIndex)
 {
   SMagneticMeasurement oTransformedMagData;
 
   if (true == bIsInitialized_)
   {
     SMagneticMeasurement oCompensatedMagData;
-    bool bReadStatus = CRte::GetInstance().oPortCompensatedMagnetometerData_.Read(oCompensatedMagData);
+    bool bReadStatus = readCompensatedMagnetometerPort(uSensorIndex, oCompensatedMagData);
 
     if ((true == bReadStatus) && (true == UintToBool(oCompensatedMagData.uValid_)))
     {
@@ -200,7 +277,7 @@ void COutputTransformer::TransformMagnetometerInput()
     }
   }
 
-  CRte::GetInstance().oPortCompensatedMagnetometerDataInVehicleFrame_.Write(oTransformedMagData);
+  writeMagnetometerInVehicleFramePort(uSensorIndex, oTransformedMagData);
 }
 
 

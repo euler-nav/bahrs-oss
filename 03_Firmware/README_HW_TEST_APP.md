@@ -1,11 +1,11 @@
 # Introduction
 
-The hardware test app firmware (*HwTestApp_V_2_0.hex*) performs two tasks:
+The hardware test app firmware (*HwTestApp_V_2_0.hex*) is for BAHRS rev. 2 and performs two tasks:
 
 - executes a simple hardware test
 - streams raw magnetometer measurements for calibration purpose
 
-**IMPORTANT**: the app is programmed to the application memory of BAHRS device (address 0x8008000). The app will not start automatically after power-on, if a bootloader is not programmed to the address zero.
+**IMPORTANT**: the app is programmed to the application memory of BAHRS device (address 0x8008000). The app will not start automatically after power-on, if a bootloader is not programmed to the address 0x8000000.
 
 ## Communication protocol
 

@@ -1,15 +1,13 @@
-/**
- * @file RteTypesUserDefined.h
- * @brief Declaration of software component user-defined port types.
- * @date 15 April 2024
- */
+/// @file RteTypesUserDefined.h
+/// @brief Declaration of software component user-defined port types.
+/// @copyright Copyright 2025. AMS Advanced Air Mobility Sensors UG. All rights reserved.
 
 #ifndef RTE_TYPES_USER_DEFINED_H
 #define RTE_TYPES_USER_DEFINED_H
 
 #ifndef __cplusplus
   #error This header must not be included in .c files.
-#endif /* __cplusplus */
+#endif // __cplusplus
 
 #include "ImuMonitorApi.h"
 #include "BahrsFilterApi.h"
@@ -172,7 +170,7 @@ public:
 
     return bStatus;
   }
-#endif /* SEND_DEBUG_OUTPUT || _MSC_VER */
+#endif // SEND_DEBUG_OUTPUT || _MSC_VER
 };
 
 class CBahrsFilterOutput final : public NBahrsFilterApi::SOutputData, public NLibCommon::CSerializable
@@ -300,7 +298,7 @@ public:
 
     return bStatus;
   }
-#endif /* SEND_DEBUG_OUTPUT || _MSC_VER */
+#endif // SEND_DEBUG_OUTPUT || _MSC_VER
 };
 
 struct SOutputImuData final : public NLibCommon::CSerializable
@@ -359,7 +357,7 @@ struct SOutputImuData final : public NLibCommon::CSerializable
 
     return bStatus;
   }
-#endif /* SEND_DEBUG_OUTPUT || _MSC_VER */
+#endif // SEND_DEBUG_OUTPUT || _MSC_VER
 };
 
 struct SSafeAttitudeData final : public NLibCommon::CSerializable
@@ -409,7 +407,7 @@ struct SSafeAttitudeData final : public NLibCommon::CSerializable
 
     return bStatus;
   }
-#endif /* SEND_DEBUG_OUTPUT || _MSC_VER */
+#endif // SEND_DEBUG_OUTPUT || _MSC_VER
 };
 
 struct SSafeVerticalChannelData final : public NLibCommon::CSerializable
@@ -453,7 +451,48 @@ struct SSafeVerticalChannelData final : public NLibCommon::CSerializable
 
     return bStatus;
   }
-#endif /* SEND_DEBUG_OUTPUT || _MSC_VER */
+#endif // SEND_DEBUG_OUTPUT || _MSC_VER
 };
 
-#endif /* RTE_TYPES_USER_DEFINED_H */
+struct SSafeMagneticHeadingData final : public NLibCommon::CSerializable
+{
+  float fMagneticHeading_{ 0.0F }; ///< Magnetic heading, [rad], from 0 to 2 pi
+  uint64_t uTimestampUs_{ 0U }; ///< Timestamp in microseconds
+  CSerialProtocol::ESignalHealthInfo eHealth_{ CSerialProtocol::ESignalHealthInfo::eUnavailable }; ///< Health information
+
+#if defined(SEND_DEBUG_OUTPUT) || defined(_MSC_VER)
+
+  std::vector<uint8_t> ToByteVector() final
+  {
+    std::vector<uint8_t> oBytes;
+    bool bStatus =  NLibCommon::Serialize(oBytes,
+      fMagneticHeading_,
+      uTimestampUs_,
+      eHealth_);
+
+    if (false == bStatus)
+    {
+      oBytes.clear();
+    }
+
+    return oBytes;
+  }
+
+  bool FromByteVector(const std::vector<uint8_t>& korBytes) final
+  {
+    bool bStatus = NLibCommon::Deserialize(korBytes,
+      fMagneticHeading_,
+      uTimestampUs_,
+      eHealth_);
+
+    if (false == bStatus)
+    {
+      *this = SSafeMagneticHeadingData();
+    }
+
+    return bStatus;
+  }
+#endif // SEND_DEBUG_OUTPUT || _MSC_VER
+};
+
+#endif // RTE_TYPES_USER_DEFINED_H

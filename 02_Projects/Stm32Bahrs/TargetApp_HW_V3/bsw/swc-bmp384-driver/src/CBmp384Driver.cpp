@@ -1,9 +1,6 @@
-/**
- * @file CBmp384Driver.cpp
- * @brief Implementation of the BMP384 Driver software component
- * @author Evgeniy Zamyatin
- * @date 26 April 2022
- */
+/// @file CBmp384Driver.cpp
+/// @brief Implementation of the BMP384 Driver software component
+/// @copyright Copyright 2025. AMS Advanced Air Mobility Sensors UG. All rights reserved.
 
 #include "CBmp384Driver.h"
 #include "CRte.h"
@@ -120,6 +117,17 @@ void CBmp384Driver::PollSensor()
   PollSensor(GetMicroseconds());
 }
 
+void CBmp384Driver::InvalidatePortData()
+{
+  SBarometerMeasurement oOutput{};
+
+#ifdef BAHRS_HW_V3
+  CRte::GetInstance().oPortPressureInput2_.Write(oOutput);
+#else
+  CRte::GetInstance().oPortPressureInput1_.Write(oOutput);
+#endif // BAHRS_HW_V3
+}
+
 bool CBmp384Driver::getChipID(uint8_t& urChipId)
 {
   return readFromAddress(&urChipId, BMP384_REG_CHIP_ID, 1);
@@ -171,10 +179,10 @@ bool CBmp384Driver::getTemperatureAndPressure(float& frTemperature, float& frPre
 
   if (readFromAddress(auData, BMP384_REG_PREES0, 6))
   {
-    int32_t iAdcTemp = (int32_t)auData[5] << 16 | (int32_t)auData[4] << 8 | (int32_t)auData[3];
-    int32_t iAdcPres = (int32_t)auData[2] << 16 | (int32_t)auData[1] << 8 | (int32_t)auData[0];
-    frTemperature = compensateTemperature(static_cast<float>(iAdcTemp));
-    frPressure = compensatePressure(static_cast<float>(iAdcPres), frTemperature);
+    uint32_t uAdcTemp = (static_cast<uint32_t>(auData[5]) << 16) | (static_cast<uint32_t>(auData[4]) << 8) | (static_cast<uint32_t>(auData[3]));
+    uint32_t uAdcPres = (static_cast<uint32_t>(auData[2]) << 16) | (static_cast<uint32_t>(auData[1]) << 8) | (static_cast<uint32_t>(auData[0]));
+    frTemperature = compensateTemperature(static_cast<float>(uAdcTemp));
+    frPressure = compensatePressure(static_cast<float>(uAdcPres), frTemperature);
     bStatus = true;
   }
 

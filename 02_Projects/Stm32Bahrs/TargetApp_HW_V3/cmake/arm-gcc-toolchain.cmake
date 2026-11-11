@@ -15,10 +15,10 @@ set(CMAKE_OBJCOPY      "${TOOLCHAIN_DIR}/${TOOLCHAIN_PREFIX}-objcopy.exe")
 # Set compiler flags common for all variants
 set(COMMON_ASSEMBLER_FLAGS "-mcpu=cortex-m4 -x assembler-with-cpp --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb")
 set(COMMON_C_FLAGS "-mcpu=cortex-m4 -std=c99 -ffunction-sections -fdata-sections -pedantic -pedantic-errors -Wmissing-include-dirs -fstack-usage --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb")
-set(COMMON_CXX_FLAGS "-mcpu=cortex-m4 -std=c++17 -ffunction-sections -fdata-sections -fno-exceptions -fno-rtti -fno-use-cxa-atexit -Wall -pedantic -pedantic-errors -Wmissing-include-dirs -fstack-usage --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb")
+set(COMMON_CXX_FLAGS "-mcpu=cortex-m4 -std=c++17 -ffunction-sections -fdata-sections -fno-exceptions -fno-rtti -fno-use-cxa-atexit -Wall -pedantic -pedantic-errors -Wmissing-include-dirs -Wconversion -Wsign-conversion -fstack-usage --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb")
 
 # Set common preprocessor definitions
-set(COMMON_COMPILE_DEFINITIONS "-DSTM32F446xx -DUSE_HAL_DRIVER -DUSE_FULL_ASSERT -DBAHRS_HW_V3")
+set(COMMON_COMPILE_DEFINITIONS "-DSTM32F446xx -DUSE_HAL_DRIVER -DUSE_FULL_ASSERT -DCAN_TIMER_NUMBER=3 -DCAN_INTERFACE_NUMBER=1 -DBAHRS_HW_V3")
 
 # Set variant-specific compiler options
 set(CMAKE_ASM_FLAGS_DEBUG "${COMMON_ASSEMBLER_FLAGS}")
@@ -28,6 +28,10 @@ set(CMAKE_CXX_FLAGS_DEBUG "${COMMON_CXX_FLAGS} -O3 -g3 ${COMMON_COMPILE_DEFINITI
 set(CMAKE_ASM_FLAGS_RELEASE "${COMMON_ASSEMBLER_FLAGS}")
 set(CMAKE_C_FLAGS_RELEASE   "${COMMON_C_FLAGS} -O3 -Werror ${COMMON_COMPILE_DEFINITIONS}")
 set(CMAKE_CXX_FLAGS_RELEASE "${COMMON_CXX_FLAGS} -O3 -Werror ${COMMON_COMPILE_DEFINITIONS}")
+
+set(CMAKE_ASM_FLAGS_DEBUG_WITH_DEBUG_OUTPUT "${COMMON_ASSEMBLER_FLAGS}")
+set(CMAKE_C_FLAGS_DEBUG_WITH_DEBUG_OUTPUT   "${COMMON_C_FLAGS} -O3 -g3 ${COMMON_COMPILE_DEFINITIONS} -DSEND_DEBUG_OUTPUT")
+set(CMAKE_CXX_FLAGS_DEBUG_WITH_DEBUG_OUTPUT "${COMMON_CXX_FLAGS} -O3 -g3 ${COMMON_COMPILE_DEFINITIONS} -DSEND_DEBUG_OUTPUT")
 
 # Avoid CMake test program builds (useful for embedded)
 set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)

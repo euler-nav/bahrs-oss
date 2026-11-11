@@ -45,6 +45,12 @@ void CLps22hhDriver::PollSensor(uint64_t uTimestampUs)
   CRte::GetInstance().oPortPressureInput3_.Write(oOutput);
 }
 
+void CLps22hhDriver::InvalidatePortData()
+{
+  SBarometerMeasurement oOutput{};
+  CRte::GetInstance().oPortPressureInput3_.Write(oOutput);
+}
+
 bool CLps22hhDriver::IsInitialized()
 {
   return bIsInitialized_;

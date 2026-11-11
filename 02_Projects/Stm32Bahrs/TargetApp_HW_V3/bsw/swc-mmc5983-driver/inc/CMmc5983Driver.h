@@ -1,13 +1,11 @@
-/**
- * @file CMmc5983Driver.h
- * @brief Declaration of the MMC5983 Driver software component
- * @author Evgeniy Zamyatin
- * @date 31 May 2022
- */
+/// @file CMmc5983Driver.h
+/// @brief Declaration of the MMC5983 Driver software component
+/// @copyright Copyright 2025. AMS Advanced Air Mobility Sensors UG. All rights reserved.
 
 #ifndef C_MMC_5983_DRIVER_H
 #define C_MMC_5983_DRIVER_H
 
+#include <array>
 #include "stdint.h"
 #include "General/CSoftwareComponentBase.h"
 
@@ -79,13 +77,21 @@ public:
   /// @brief A function overload that generates a timestamp without a data-ready interrupt.
   void PollSensor();
 
+  /// @brief Poll sensor data in DMA mode.
+  /// @return True if DMA reception was initiated successfully, false otherwise.
+  bool PollSensorDma();
+
+  /// @brief Process data bytes received asynchronously.
+  void ProcessReceivedBytesDma(uint64_t uTimestampUs);
+
+  /// @brief Invalidate the driver's output port.
+  void InvalidatePortData();
+
 private:
   CMmc5983Driver() = default;
   ~CMmc5983Driver() = default;
 
-  /**
-   * @brief An enum of measurement mode
-   */
+  /// @brief An enum of measurement mode
   enum class EMeasurementMode
   {
     eSkip   = 0x00, ///< No continuous measurement mode
@@ -98,9 +104,7 @@ private:
     e1000Hz = 0x07, ///< Frequency 1000 Hz
   };
 
-  /**
-   * @brief An enum of bandwidth filter
-   */
+  /// @brief An enum of bandwidth filter
   enum class EBandwidth
   {
     e100Hz  = 0x00, ///< Filter bandwidth 100 Hz
@@ -111,100 +115,81 @@ private:
 
   static constexpr uint32_t skuReadWriteTimeoutSpi_{2U};
   static constexpr uint32_t skuReadWriteTimeoutI2c_{3U};
+  static constexpr uint16_t skuDmaBufferSize_{9U};
 
-  /**
-   * @brief Full sensor reset
-   */
+  using CI2CReadPayload = std::array<uint8_t, skuDmaBufferSize_>;
+
+  /// @brief Full sensor reset
   void setSoftReset();
 
-  /**
-   * @brief Request SET function inductor coil integrated into chip
-   * See sensor datasheet for more information
-   */
+  /// @brief Request SET function inductor coil integrated into chip
+  /// See sensor datasheet for more information
   void setBitSet();
 
-  /**
-   * @brief Request RESET function inductor coil integrated into chip
-   * See sensor datasheet for more information
-   */
+  /// @brief Request RESET function inductor coil integrated into chip
+  /// See sensor datasheet for more information
   void setBitReset();
 
-  /**
-   * @brief Set the Measurement Mode value and enable continuous mode
-   * @param eMeasurementMode Mode value
-   */
+  /// @brief Set the Measurement Mode value and enable continuous mode
+  /// @param eMeasurementMode Mode value
   void setContinuousModeFrequency(EMeasurementMode eMeasurementMode);
 
-  /**
-   * @brief Set the Filter Bandwidth value
-   * @param eBandwidth filter value
-   */
+  /// @brief Set the Filter Bandwidth value
+  /// @param eBandwidth filter value
   void setFilterBandwidth(EBandwidth eBandwidth);
 
-  /**
-   * @brief Enable auto Set/Reset mode
-   */
+  /// @brief Enable auto Set/Reset mode
   void setAutoSetReset();
 
-  /**
-   * @brief Get measured magnetic field vector
-   * @param frValueX reference to the value X variable
-   * @param frValueY reference to the value Y variable
-   * @param frValueZ reference to the value Z variable
-   */
+  /// @brief Convert seven MMC5983 measurement bytes into Gauss values in body frame.
+  static void decodeMeasurementPayload(const CI2CReadPayload& korPayload,
+                                       float& frValueX,
+                                       float& frValueY,
+                                       float& frValueZ);
+
+  /// @brief Get measured magnetic field vector
+  /// @param frValueX reference to the value X variable
+  /// @param frValueY reference to the value Y variable
+  /// @param frValueZ reference to the value Z variable
   void getMeasurementXYZ(float& frValueX, float& frValueY, float& frValueZ);
 
-  /**
-   * @brief Get the Temperature value
-   * @return temperature value
-   * @note: Temperature and magnetic cannot be measured simultaneously
-   */
+  /// @brief Get the Temperature value
+  /// @return temperature value
+  /// @note Temperature and magnetic cannot be measured simultaneously
   float getTemperature();
 
-  /**
-   * @brief Get the Product ID value
-   * @return ProductID value
-   */
+  /// @brief Get the Product ID value
+  /// @return ProductID value
   uint8_t getProductID();
 
-  /**
-   * @brief Is the data ready to be read
-   * @return uint8_t Bit mask
-   */
+  /// @brief Is the data ready to be read
+  /// @return uint8_t Bit mask
   uint8_t getStatusRegValue();
 
-  /**
-   * @brief Read from address via SPI
-   * @param upBuffer Buffer for record
-   * @param uReadAddr Register address
-   * @param uNumByteToRead Number of bytes to read
-   */
+  /// @brief Read from address via SPI
+  /// @param upBuffer Buffer for record
+  /// @param uReadAddr Register address
+  /// @param uNumByteToRead Number of bytes to read
   void readFromAddress(uint8_t *upBuffer, uint8_t uReadAddr, uint16_t uNumByteToRead);
 
-  /**
-   * @brief Write to address via SPI
-   * @param uWriteAddr Register address
-   * @param uVal The resulting value
-   */
+  /// @brief Write to address via SPI
+  /// @param uWriteAddr Register address
+  /// @param uVal The resulting value
   void writeToAddress(uint8_t uWriteAddr, uint8_t uVal);
 
-  /**
-   * @brief Set the chip select pin is On
-   */
+  /// @brief Set the chip select pin is On
   void setCsOn();
 
-  /**
-   * @brief Set the chip select pin is Off
-   */
+  /// @brief Set the chip select pin is Off
   void setCsOff();
-  /**
-   * @brief Read/Write via SPI
-   * @param uByte Register add or dummy byte
-   * @return The read value via SPI
-   */
+  /// @brief Read/Write via SPI
+  /// @param uByte Register add or dummy byte
+  /// @return The read value via SPI
   uint8_t spiWriteRead(uint8_t uByte);
+
+  CI2CReadPayload auDmaBuffer_{};
 
   uint8_t uSensorStatus_ = 0;  ///< Sensor status after initialization
 };
 
-#endif /* C_MMC_5983_DRIVER_H */
+#endif // C_MMC_5983_DRIVER_H

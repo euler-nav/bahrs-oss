@@ -1,106 +1,67 @@
-/**
- * @file TaskRoutines.cpp
- * @brief Implementation of FreeRTOS task routines that wrap C++ code into C-functions.
- * @author Fedor Baklanov
- * @date 05 February 2022
- */
+/// @file TaskRoutines.cpp
+/// @brief Implementation of FreeRTOS task routines that wrap C++ code into C-functions.
+/// @copyright Copyright 2022. AMS Advanced Air Mobility Sensors UG. All rights reserved.
 
 #include "CRte.h"
-#include <assert.h>
-#include "GetMicroseconds.h"
+#include "AmsAssert.h"
 #include "cmsis_os.h"
+#include "CStartupTaskBarrier.h"
 
-extern osSemaphoreId_t SemaphoreTask10msHandle;
-
-extern "C" void TaskRoutine5ms()
+namespace
 {
-  static uint32_t suCounter = 0U;
-
-  // Send the software version message one time.
-  if (0U == suCounter)
+  void transmitFrames()
   {
-    CRs232OutputHandler::GetInstance().QueueTransmissionRequest(CSerialProtocol::EMessageIds::eSoftwareVersion);
-    CRs232OutputHandler::GetInstance().QueueTransmissionRequest(CSerialProtocol::EMessageIds::eHardwareVersion);
+#ifdef USE_DRONECAN
+    CCanHandler::GetInstance().TransmitFrames();
+#endif // USE_DRONECAN
   }
+} // namespace
 
-  CImuMonitorSwc::GetInstance().Run();
-  COutputTransformer::GetInstance().TransformImuSignals();
+extern osSemaphoreId_t SemTaskBahrsFilter1Handle;
+extern osSemaphoreId_t SemTaskBahrsFilter2Handle;
+extern osSemaphoreId_t SemTaskBahrsFilter3Handle;
+extern osTimerId_t TimerCyclicTaskTriggerHandle;
 
-  // Request to send inertial data message
-  CRs232OutputHandler::GetInstance().QueueTransmissionRequest(CSerialProtocol::EMessageIds::eInertialData);
-
-  // Request to send time of inertial data at 10Hz
-  if (0U == (suCounter % 20U))
-  {
-    CRs232OutputHandler::GetInstance().QueueTransmissionRequest(CSerialProtocol::EMessageIds::eTimeOfInertialData);
-  }
-
-  ++suCounter;
+extern "C" void TaskRoutine1ms()
+{
+  // Nothing to do
 }
 
-extern "C" void TaskRoutine10ms()
+extern "C" void TaskRoutineCanSender()
 {
-  static uint32_t suCounter = 0U;
+  static uint32_t uMillisecondCounter = 0U;
+  const auto& korHandles = CCanOutputHandler::GetFrameHandles();
 
-  CBahrsFilterSwc::GetInstance().Step(GetMicroseconds());
-
-  // Request to send navigation data message
-  CRs232OutputHandler::GetInstance().QueueTransmissionRequest(CSerialProtocol::EMessageIds::eNavigationData);
-
-  // Request to send some information at 10Hz
-  if (0U == (suCounter % 10U))
+  for (const auto& handle : korHandles)
   {
-    CRs232OutputHandler::GetInstance().QueueTransmissionRequest(CSerialProtocol::EMessageIds::eAccuracy);
-    CRs232OutputHandler::GetInstance().QueueTransmissionRequest(CSerialProtocol::EMessageIds::eTimeOfNavigationData);
+    if ((0U < handle.uFrameFrequency_) &&
+        (0U == (uMillisecondCounter % CCanOutputHandler::HerzToMs(handle.uFrameFrequency_))))
+    {
+      handle.pSend_();
+    }
   }
 
-  ++suCounter;
+  transmitFrames();
+
+  ++uMillisecondCounter;
 }
 
-extern "C" void TaskRoutineRs232Sender(uint8_t uMessageId)
+extern "C" void TaskRoutineCanReceiver()
 {
-  CSerialProtocol::EMessageIds eMessageId = static_cast<CSerialProtocol::EMessageIds>(uMessageId);
-
-  switch (eMessageId)
-  {
-    case CSerialProtocol::EMessageIds::eInertialData:
-      CRs232OutputHandler::GetInstance().SendInertialDataMessage();
-      break;
-    case CSerialProtocol::EMessageIds::eTimeOfInertialData:
-      CRs232OutputHandler::GetInstance().SendTimeOfInertialDataMessage();
-      break;
-    case CSerialProtocol::EMessageIds::eNavigationData:
-      CRs232OutputHandler::GetInstance().SendNavigationDataMessage();
-      break;
-    case CSerialProtocol::EMessageIds::eTimeOfNavigationData:
-      CRs232OutputHandler::GetInstance().SendTimeOfNavigationDataMessage();
-      break;
-    case CSerialProtocol::EMessageIds::eAccuracy:
-      CRs232OutputHandler::GetInstance().SendAccuracyDataMessage();
-      break;
-    case CSerialProtocol::EMessageIds::eTimeOfSyncPulse:
-      CRs232OutputHandler::GetInstance().SendTimeOfLatestSyncPulseMessage();
-      break;
-    case CSerialProtocol::EMessageIds::eSoftwareVersion:
-      CRs232OutputHandler::GetInstance().SendSoftwareVersionMessage();
-      break;
-    case CSerialProtocol::EMessageIds::eHardwareVersion:
-      CRs232OutputHandler::GetInstance().SendHardwareVersionMessage();
-      break;
-    default:
-      break;
-  }
+  CCanHandler::ReceiveCanFrames();
 }
 
 extern "C" void TaskRoutineReceiveScha63TData()
 {
-  static uint32_t suCounter{0U};
-  CScha63TDriver::GetInstance().ConvertRawDataset();
-  CBahrsFilterSwc::GetInstance().SetImuInput();
+  static uint32_t suCounter{ 0U };
 
-  if (suCounter % 2 == 0U)
+  CScha63TDriver::GetInstance().ConvertRawDataset();
+  CImuPreFilterSwc::GetInstance(0U).Run();
+  CBahrsFilterSwc::GetInstance(0U).SetImuInput();
+
+  if ((suCounter % 2) == 0)
   {
-    osSemaphoreRelease(SemaphoreTask10msHandle);
+    osSemaphoreRelease(SemTaskBahrsFilter1Handle);
   }
 
   ++suCounter;
@@ -109,27 +70,37 @@ extern "C" void TaskRoutineReceiveScha63TData()
 extern "C" void TaskRoutinePollBmm(uint32_t uBmmSensorIndex)
 {
   CBmm150Driver::GetInstance(uBmmSensorIndex).Bmm150ReadMagData();
+
+  // Compensate BMM150 sensor: index 0 → instance 1, index 1 → instance 2
+  CMagnetometerCompensator::GetInstance(uBmmSensorIndex + 1U).CompensateMeasurements();
+  COutputTransformer::GetInstance().TransformMagnetometerInput(uBmmSensorIndex + 1U);
 }
 
 extern "C" void TaskRoutinePollBmp()
 {
   CBmp384Driver::GetInstance().PollSensor();
-  CBahrsFilterSwc::GetInstance().SetPressureInput();
+  CPressureCompensator::GetInstance(0U).CompensateMeasurements();
 }
 
 extern "C" void TaskRoutinePollMmc()
 {
   CMmc5983Driver::GetInstance().PollSensor();
+  CMagnetometerCompensator::GetInstance(0U).CompensateMeasurements();
+  COutputTransformer::GetInstance().TransformMagnetometerInput(0U);
 }
 
 extern "C" void TaskRoutineInit()
 {
-  bool bStatus;
+  bool bStatus{CStartupTaskBarrier::suspend()};
 
-  CRte::GetInstance().Init();
+  AMS_HARD_ASSERT(bStatus);
 
-  CBmp384Driver::GetInstance().Init();
-  bStatus = CBmp384Driver::GetInstance().IsInitialized();
+  if (true == bStatus)
+  {
+    CRte::GetInstance().Init();
+    CBmp384Driver::GetInstance().Init();
+    bStatus = CBmp384Driver::GetInstance().IsInitialized();
+  }
 
   if (true == bStatus)
   {
@@ -173,16 +144,80 @@ extern "C" void TaskRoutineInit()
     bStatus = COutputTransformer::GetInstance().IsInitialized();
   }
 
-  if (false == bStatus)
+  if (true == bStatus)
   {
-    // If some driver failed to initialize, the SW shall not continue.
-    // TODO: implement failure handling
-    assert(false);
+    for (uint32_t uIndex = 0U; uIndex < CPressureCompensator::skuInstanceCount_; ++uIndex)
+    {
+      CPressureCompensator::GetInstance(uIndex).Init();
+      bStatus = CPressureCompensator::GetInstance(uIndex).IsInitialized();
+
+      if (false == bStatus)
+      {
+        break;
+      }
+    }
   }
+
+  if (true == bStatus)
+  {
+    for (uint32_t uIndex = 0U; uIndex < CImuPreFilterSwc::skuInstanceCount_; ++uIndex)
+    {
+      CImuPreFilterSwc::GetInstance(uIndex).Init();
+      bStatus = CImuPreFilterSwc::GetInstance(uIndex).IsInitialized();
+
+      if (false == bStatus)
+      {
+        break;
+      }
+    }
+  }
+
+  if (true == bStatus)
+  {
+    for (uint32_t uIndex = 0U; uIndex < CMagnetometerCompensator::skuInstanceCount_; ++uIndex)
+    {
+      CMagnetometerCompensator::GetInstance(uIndex).Init();
+      bStatus = CMagnetometerCompensator::GetInstance(uIndex).IsInitialized();
+
+      if (false == bStatus)
+      {
+        break;
+      }
+    }
+  }
+
+  if (true == bStatus)
+  {
+    CCanHandler::GetInstance().Init();
+    bStatus = CCanHandler::GetInstance().IsInitialized();
+  }
+
+  if (true == bStatus)
+  {
+    CCanOutputHandler::GetInstance().Init();
+    bStatus = CCanOutputHandler::GetInstance().IsInitialized();
+  }
+
+  if (true == bStatus)
+  {
+    CRs232OutputHandler::GetInstance().Init();
+    bStatus = CRs232OutputHandler::GetInstance().IsInitialized();
+  }
+
+  if (bStatus)
+  {
+    // Warm up singleton filters before releasing their consumer threads.
+    CBahrsFilterSwc::GetInstance(0).Step(0);
+    CBahrsFilterSwc::GetInstance(1).Step(0);
+    CBahrsFilterSwc::GetInstance(2).Step(0);
+
+    bStatus = (osOK == osTimerStart(TimerCyclicTaskTriggerHandle, 1U)) && CStartupTaskBarrier::resume();
+  }
+
+  AMS_HARD_ASSERT(bStatus);
 }
 
 extern "C" void TaskRoutineProcessSyncPulse(uint64_t uTimestampUs)
 {
   CSyncPulseHandler::ProcessSyncPulse(uTimestampUs);
 }
-

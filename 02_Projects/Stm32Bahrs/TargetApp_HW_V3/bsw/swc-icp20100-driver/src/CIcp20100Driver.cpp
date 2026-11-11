@@ -75,6 +75,12 @@ void CIcp20100Driver::PollSensor(uint64_t uTimestampUs)
   CRte::GetInstance().oPortPressureInput1_.Write(oOutput);
 }
 
+void CIcp20100Driver::InvalidatePortData()
+{
+  SBarometerMeasurement oOutput{};
+  CRte::GetInstance().oPortPressureInput1_.Write(oOutput);
+}
+
 bool CIcp20100Driver::getDeviceId(uint8_t& urChipId)
 {
   return readReg(skuIcp20100RegDeviceId_, &urChipId, 1);

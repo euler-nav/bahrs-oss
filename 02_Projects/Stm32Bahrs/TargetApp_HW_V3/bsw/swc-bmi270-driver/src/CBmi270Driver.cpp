@@ -1,8 +1,6 @@
-/**
- * @file CBmi270Driver.cpp
- * @brief Implementation of the BMI270 driver software component class.
- * @copyright Copyright 2025. AMS Advanced Air Mobility Sensors UG. All rights reserved.
- */
+/// @file CBmi270Driver.cpp
+/// @brief Implementation of the BMI270 driver software component class.
+/// @copyright Copyright 2025. AMS Advanced Air Mobility Sensors UG. All rights reserved.
 
 #include "CRte.h"
 #include "CBmi270Driver.h"
@@ -76,6 +74,12 @@ void CBmi270Driver::PollSensor(uint64_t uTimestamp)
   CRte::GetInstance().oPortImuInput2_.Write(oOutput);
 }
 
+void CBmi270Driver::InvalidatePortData()
+{
+  SImuMeasurement oOutput{};
+  CRte::GetInstance().oPortImuInput2_.Write(oOutput);
+}
+
 bool CBmi270Driver::getChipID(uint8_t& urChipId)
 {
   return readReg(skuBmi270RegChipId_, &urChipId, 1);
@@ -111,7 +115,7 @@ void CBmi270Driver::Init()
     bStatus = readReg(skuBmi270RegPwrConf_, &uRegValue, 1);
     if (true == bStatus)
     {
-      uRegValue &= ~skuBmi270AdvPwrSaveMsk_; // clear bit 0
+      uRegValue &= static_cast<uint8_t>(~skuBmi270AdvPwrSaveMsk_); // clear bit 0
       bStatus = writeReg(skuBmi270RegPwrConf_, &uRegValue, 1);
     }
   }
@@ -150,7 +154,7 @@ void CBmi270Driver::Init()
       }
 
       uAddress += skuBmi270ChunkSize_ / 2; // Address needs to be incremented by the length of the chunk in bytes/2
-      uRegInitAddr1Value = (uAddress >> skuBmi270InitAddr1Pos_);
+      uRegInitAddr1Value = static_cast<uint8_t>(uAddress >> skuBmi270InitAddr1Pos_);
       bStatus = writeReg(skuBmi270RegInitAddr1_, &uRegInitAddr1Value, 1);
       if (false == bStatus)
       {

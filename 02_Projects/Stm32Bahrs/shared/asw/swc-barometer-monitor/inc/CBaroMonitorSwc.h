@@ -6,8 +6,9 @@
 #define C_BARO_MONITOR_SWC_H
 
 #include "General/CSoftwareComponentBase.h"
+#include "RteTypesGenerated.h"
+#include "RteTypesUserDefined.h"
 #include "BarometerMonitorApi.h"
-#include "CRte.h"
 
 #ifdef BAHRS_HW_V3
 using CRedundantPressureData = NBaroMonitorApi::CRedundantInputDataBahrsV3;
@@ -39,12 +40,12 @@ private:
   /// A signal is safe if one of the following is fulfilled
   /// -# Fault detection is available AND the monitor did not raise an alarm
   /// -# An alarm was raised, fault isolation is available AND succeeded, the query sensor is NOT faulty.
-  /// 
+  ///
   /// The function asserts if the query sensor is not supported by the monitor (configuration issue).
-  /// 
+  ///
   /// @param eSensorId Query sensor ID.
   /// @param korMonitorOutput Result of fault detection and isolation.
-  /// @return True if the measurement is safe, false otherwise.   
+  /// @return True if the measurement is safe, false otherwise.
   static bool isPressureMeasurementSafe(NFusionLibCommon::ESensorId eSensorId, const NBaroMonitorApi::COutputData& korMonitorOutput);
 
   /// @brief A helper function to populate redundant input data object.
@@ -68,4 +69,4 @@ private:
 #endif
 };
 
-#endif /* C_BARO_MONITOR_SWC_H */
+#endif // C_BARO_MONITOR_SWC_H

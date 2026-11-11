@@ -2,6 +2,8 @@
 /// @brief Implementation of the Bmm350 driver software component class.
 /// @copyright Copyright 2025. AMS Advanced Air Mobility Sensors UG. All rights reserved.
 
+#include <limits>
+
 #ifdef ENABLE_PRINTF
 #include <stdio.h>
 #endif // ENABLE_PRINTF
@@ -67,10 +69,17 @@ void CBmm350Driver::PollSensor(uint64_t uTimestampUs)
 
 void CBmm350Driver::Init()
 {
-  bool bStatus = false;
-  uint8_t uChipId{};
+  bIsInitialized_ = false;
 
-  bStatus = getDeviceId(uChipId);
+  uint8_t uChipId{};
+  bool bStatus = softReset();
+
+  if (true == bStatus)
+  {
+    HAL_Delay(50U);
+    bStatus = getDeviceId(uChipId);
+  }
+
   if (true == bStatus)
   {
     if (skuBmm350ChipId_ != uChipId)
@@ -365,6 +374,66 @@ CBmm350Driver::CVector3dAndTemperature CBmm350Driver::compensateMeasurement(cons
   return orSensorData;
 }
 
+bool CBmm350Driver::PollSensorDma()
+{
+  static_assert(decltype(auBuffer){}.max_size() <= std::numeric_limits<uint16_t>::max(), "I2C DMA buffer size must fit uint16_t");
+
+  return CI2CHandler::GetInstance().MemReadDma(CI2CHandler::EBus::eI2c2,
+                                               skuBmm350I2CAddress_,
+                                               skuBmm350RegIntStatus_,
+                                               1U,
+                                               auBuffer.data(),
+                                               static_cast<uint16_t>(auBuffer.size()));
+}
+
+void CBmm350Driver::ProcessReceivedBytesDma(uint64_t uTimestampUs)
+{
+  uint8_t uIndex{};
+  std::array<uint8_t, 12U> auSensorData{};
+  SMagneticMeasurement oOutput{};
+  CVector3dAndTemperature oRawSensorData{};
+  CVector3dAndTemperature oCompensatedSensorData{};
+  const uint8_t kuIntStatus = auBuffer[skuBmm350DummyBytes_];
+
+  if (skuBmm350DrDyDataReg_ == (kuIntStatus & skuBmm350DrDyDataReg_))
+  {
+    // Skip dummy bytes and the INT_STATUS register byte.
+    while (uIndex < auSensorData.size())
+    {
+      auSensorData[uIndex] = auBuffer[uIndex + skuBmm350DummyBytes_ + 1U];
+      uIndex++;
+    }
+
+    const int32_t kiMagXAxisRaw = static_cast<int32_t>((static_cast<uint32_t>(auSensorData[0]) << 8) | (static_cast<uint32_t>(auSensorData[1]) << 16) | (static_cast<uint32_t>(auSensorData[2]) << 24)) >> 8;
+    const int32_t kiMagYAxisRaw = static_cast<int32_t>((static_cast<uint32_t>(auSensorData[3]) << 8) | (static_cast<uint32_t>(auSensorData[4]) << 16) | (static_cast<uint32_t>(auSensorData[5]) << 24)) >> 8;
+    const int32_t kiMagZAxisRaw = static_cast<int32_t>((static_cast<uint32_t>(auSensorData[6]) << 8) | (static_cast<uint32_t>(auSensorData[7]) << 16) | (static_cast<uint32_t>(auSensorData[8]) << 24)) >> 8;
+
+    const int32_t kiTempRaw = static_cast<int32_t>((static_cast<uint32_t>(auSensorData[9]) << 8) | (static_cast<uint32_t>(auSensorData[10]) << 16) | (static_cast<uint32_t>(auSensorData[11]) << 24)) >> 8;
+
+    oRawSensorData.fMagneticVectorX_ = static_cast<float>(kiMagXAxisRaw) * skfBmm350LsbToMicroTeslaXy_;
+    oRawSensorData.fMagneticVectorY_ = static_cast<float>(kiMagYAxisRaw) * skfBmm350LsbToMicroTeslaXy_;
+    oRawSensorData.fMagneticVectorZ_ = static_cast<float>(kiMagZAxisRaw) * skfBmm350LsbToMicroTeslaZ_;
+    oRawSensorData.fTemperatureInDegreesCelsius_ = static_cast<float>(kiTempRaw) * skfBmm350LsbToDegC_ - skfBmm350TemperatureShiftDegC_;
+
+    oCompensatedSensorData = compensateMeasurement(oRawSensorData, oCompensationParameters_);
+
+    oOutput.fVectorX_ = oCompensatedSensorData.fMagneticVectorX_;
+    oOutput.fVectorY_ = -oCompensatedSensorData.fMagneticVectorY_;
+    oOutput.fVectorZ_ = -oCompensatedSensorData.fMagneticVectorZ_;
+    oOutput.fTemperature_ = oCompensatedSensorData.fTemperatureInDegreesCelsius_;
+    oOutput.uTimestampUs_ = uTimestampUs;
+    oOutput.uValid_ = BoolToUint(true);
+  }
+
+  CRte::GetInstance().oPortMagnetometerInput2_.Write(oOutput);
+}
+
+void CBmm350Driver::InvalidatePortData()
+{
+  SMagneticMeasurement oOutput{};
+  CRte::GetInstance().oPortMagnetometerInput2_.Write(oOutput);
+}
+
 bool CBmm350Driver::configureInterrupt()
 {
   bool bStatus = false;
@@ -436,6 +505,11 @@ bool CBmm350Driver::enableNormalMode()
   }
 
   return bStatus;
+}
+
+bool CBmm350Driver::softReset()
+{
+  return writeReg(skuBmm350RegCmd_, &skuBmm350CmdSoftReset_, 1U);
 }
 
 bool CBmm350Driver::readReg(uint8_t uRegAddr, uint8_t* upBuffer, uint16_t uLen)

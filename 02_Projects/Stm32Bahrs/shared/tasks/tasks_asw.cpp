@@ -18,15 +18,12 @@ extern osEventFlagsId_t EventBahrsFiltersCompletedHandle;
 
 struct SEventFlagsBahrsFilters
 {
-  static constexpr uint32_t skuCompletedFilter1_{0x01}; /// <Event flag indicating that BAHRS filter 1 finished an iteration
+  static constexpr uint32_t skuCompletedFilter1_{0x01}; ///< Event flag indicating that BAHRS filter 1 finished an iteration
   static constexpr uint32_t skuCompletedFilter2_{0x02}; ///< Event flag indicating that BAHRS filter 2 finished an iteration
   static constexpr uint32_t skuCompletedFilter3_{0x04}; ///< Event flag indicating that BAHRS filter 3 finished an iteration
 
   /// Event flags indicating all BAHRS filters finished an iteration
   static constexpr uint32_t skuAllCompleted_{skuCompletedFilter1_ | skuCompletedFilter2_ | skuCompletedFilter3_};
-
-  /// Event flags indicating all active BAHRS filters finished an iteration
-  static constexpr uint32_t skuActiveFiltersCompleted_{skuCompletedFilter1_};
 };
 
 extern "C" void RunTask5ms(void* arguments)
@@ -42,8 +39,8 @@ extern "C" void RunTask5ms(void* arguments)
       // Send the software version message one time.
       if (0U == suCounter)
       {
-        CRs232OutputHandler::GetInstance().QueueTransmissionRequest(CSerialProtocol::EMessageIds::eSoftwareVersion);
-        CRs232OutputHandler::GetInstance().QueueTransmissionRequest(CSerialProtocol::EMessageIds::eHardwareVersion);
+        CRs232OutputHandler::GetInstance().SendSoftwareVersionMessage();
+        CRs232OutputHandler::GetInstance().SendHardwareVersionMessage();
       }
 
       CImuMonitorSwc::GetInstance().Run();
@@ -54,17 +51,20 @@ extern "C" void RunTask5ms(void* arguments)
         // Run barometer monitor at 25Hz
         CBaroMonitorSwc::GetInstance().Run();
 
-        // Provide pressure data to BAHRS filter 1
-        CBahrsFilterSwc::GetInstance(0U).SetPressureInput();
+        // Provide pressure data to BAHRS filters
+        for (uint32_t uFilterIndex = 0U; uFilterIndex < CBahrsFilterSwc::skuInstanceCount_; ++uFilterIndex)
+        {
+          CBahrsFilterSwc::GetInstance(uFilterIndex).SetPressureInput();
+        }
       }
 
-      // Request to send inertial data message
-      CRs232OutputHandler::GetInstance().QueueTransmissionRequest(CSerialProtocol::EMessageIds::eInertialData);
+      // Send inertial data message
+      CRs232OutputHandler::GetInstance().SendInertialDataMessage();
 
-      // Request to send time of inertial data at 10Hz
+      // Send time of inertial data at 10Hz
       if (0U == (suCounter % 20U))
       {
-        CRs232OutputHandler::GetInstance().QueueTransmissionRequest(CSerialProtocol::EMessageIds::eTimeOfInertialData);
+        CRs232OutputHandler::GetInstance().SendTimeOfInertialDataMessage();
       }
     }
 
@@ -78,22 +78,32 @@ extern "C" void RunTask10ms(void* arguments)
 
   for(;;)
   {
-    uint32_t uFlags = osEventFlagsWait(EventBahrsFiltersCompletedHandle, SEventFlagsBahrsFilters::skuActiveFiltersCompleted_, osFlagsWaitAll, 20U);
+    uint32_t uFlags = osEventFlagsWait(EventBahrsFiltersCompletedHandle, SEventFlagsBahrsFilters::skuAllCompleted_, osFlagsWaitAll, 20U);
 
-    if ((osFlagsErrorTimeout == uFlags) || (SEventFlagsBahrsFilters::skuActiveFiltersCompleted_ == uFlags))
+    if ((osFlagsErrorTimeout == uFlags) || (SEventFlagsBahrsFilters::skuAllCompleted_ == uFlags))
     {
       COutputTransformer::GetInstance().TransformOrientation();
       CAttitudeMonitorSwc::GetInstance().Run();
       CVerticalChannelMonitorSwc::GetInstance().Run();
 
-      // Request to send navigation data message
-      CRs232OutputHandler::GetInstance().QueueTransmissionRequest(CSerialProtocol::EMessageIds::eNavigationData);
+      CMagneticHeadingFilterSwc::GetInstance(0U).SetAttitudeInput();
+      CMagneticHeadingFilterSwc::GetInstance(1U).SetAttitudeInput();
+      CMagneticHeadingFilterSwc::GetInstance(2U).SetAttitudeInput();
 
-      // Request to send some information at 10Hz
+      CMagneticHeadingFilterSwc::GetInstance(0U).Step(GetMicroseconds());
+      CMagneticHeadingFilterSwc::GetInstance(1U).Step(GetMicroseconds());
+      CMagneticHeadingFilterSwc::GetInstance(2U).Step(GetMicroseconds());
+
+      CMagneticHeadingMonitorSwc::GetInstance().Run();
+
+      // Send navigation data message
+      CRs232OutputHandler::GetInstance().SendNavigationDataMessage();
+
+      // Send accuracy and time of navigation data at 10Hz
       if (0U == (suCounter % 10U))
       {
-        CRs232OutputHandler::GetInstance().QueueTransmissionRequest(CSerialProtocol::EMessageIds::eAccuracy);
-        CRs232OutputHandler::GetInstance().QueueTransmissionRequest(CSerialProtocol::EMessageIds::eTimeOfNavigationData);
+        CRs232OutputHandler::GetInstance().SendAccuracyDataMessage();
+        CRs232OutputHandler::GetInstance().SendTimeOfNavigationDataMessage();
       }
     }
 

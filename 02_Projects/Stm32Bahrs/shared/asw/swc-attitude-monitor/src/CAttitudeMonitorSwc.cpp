@@ -1,13 +1,10 @@
-/**
- * @file CAttitudeMonitorSwc.cpp
- * @brief Implementation of the attitude monitor software component.
- * @author Fedor Baklanov
- * @date 26 July 2024
- * @copyright Copyright 2024. AMS Advanced Air Mobility Sensors UG. All rights reserved.
- */
+/// @file CAttitudeMonitorSwc.cpp
+/// @brief Implementation of the attitude monitor software component.
+/// @copyright Copyright 2024. AMS Advanced Air Mobility Sensors UG. All rights reserved.
 
 #include "CAttitudeMonitorSwc.h"
 #include "UintToBool.h"
+#include "CRte.h"
 
 void CAttitudeMonitorSwc::Init()
 {

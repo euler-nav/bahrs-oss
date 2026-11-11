@@ -33,6 +33,7 @@
 #include "CRs232OutputHandlerWrapper.h"
 #include "AmsAssert.h"
 #include "GetMicroseconds.h"
+#include "CDiagnosticModeWrapper.h"
 #include "SyncPulseHandlerCApi.h"
 
 /* USER CODE END Includes */
@@ -56,6 +57,9 @@
 
 /* USER CODE BEGIN PV */
 extern osSemaphoreId_t asm330lhhInt1SemHandle;
+extern osSemaphoreId_t SemI2c1RxCompleteHandle;
+extern osSemaphoreId_t SemI2c2RxCompleteHandle;
+extern osSemaphoreId_t SemI2c3RxCompleteHandle;
 
 extern osMessageQueueId_t QueueTaskAsm330TimeStampHandle;
 extern osMessageQueueId_t QueueTaskBmi270TimeStampHandle;
@@ -172,6 +176,9 @@ int main(void)
   MX_I2C2_Init();
   MX_I2C3_Init();
 
+  DiagnosticModeSetUARTHandle(&huart2, &hdma_usart2_rx);
+  DiagnosticModeProcess();
+
   /* USER CODE END 2 */
 
   /* Init scheduler */
@@ -255,7 +262,10 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 {
   if (huart->Instance == USART2)
   {
-    Rs232TxInterruptHandler(huart->TxXferSize);
+    if (!DiagnosticModeIsEnabled())
+    {
+      Rs232TxInterruptHandler(huart->TxXferSize);
+    }
   }
 }
 
@@ -263,6 +273,7 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
 {
   if (huart->Instance == USART2)
   {
+    DiagnosticModeUARTRxInterruptHandler(Size);
   }
 }
 
@@ -318,6 +329,25 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
   }
 }
 
+void HAL_I2C_MemRxCpltCallback(I2C_HandleTypeDef* hi2c)
+{
+  if (&hi2c1 == hi2c)
+  {
+    osSemaphoreRelease(SemI2c1RxCompleteHandle);
+  }
+  else if (&hi2c2 == hi2c)
+  {
+    osSemaphoreRelease(SemI2c2RxCompleteHandle);
+  }
+  else if (&hi2c3 == hi2c)
+  {
+    osSemaphoreRelease(SemI2c3RxCompleteHandle);
+  }
+  else
+  {
+    // do nothing
+  }
+}
 
 /**
  * The function shall redirect assertions from std to custom assertion handler.

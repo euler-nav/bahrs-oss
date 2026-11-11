@@ -76,6 +76,46 @@ bool CI2CHandler::MemRead(EBus eBus, uint16_t uDevAddr, uint16_t uMemAddr, uint1
   return bStatus;
 }
 
+bool CI2CHandler::MemReadDma(EBus eBus, uint16_t uDevAddr, uint16_t uMemAddr, uint16_t uMemAddrSize,
+                             uint8_t* upData, uint16_t uSize)
+{
+  AMS_HARD_ASSERT(0 == xPortIsInsideInterrupt());
+  bool bStatus{false};
+
+  if ((nullptr != upData) && bIsInitialized_)
+  {
+    bStatus = true;
+  }
+
+  if (bStatus)
+  {
+    HAL_StatusTypeDef eStatus{HAL_BUSY};
+
+    bStatus = false; // Assume failure until the read operation succeeds.
+
+    if (mutexAcquire(eBus))
+    {
+      I2C_HandleTypeDef* opHandle{getI2CHandle(eBus)};
+
+      if (nullptr != opHandle)
+      {
+        if (i2cWaitOnFlag(opHandle, I2C_FLAG_BUSY, SET))
+        {
+          // HAL performs its own BUSY check; we already yielded while waiting.
+          eStatus = HAL_I2C_Mem_Read_DMA(opHandle, uDevAddr, uMemAddr, uMemAddrSize, upData, uSize);
+        }
+
+        bStatus = (HAL_OK == eStatus);
+      }
+
+      updateFailureState(eBus, eStatus);
+      mutexRelease(eBus);
+    }
+  }
+
+  return bStatus;
+}
+
 bool CI2CHandler::MemWrite(EBus eBus, uint16_t uDevAddr, uint16_t uMemAddr, uint16_t uMemAddrSize,
                            const uint8_t* upData, uint16_t uSize, uint32_t uTimeout)
 {
@@ -109,6 +149,50 @@ bool CI2CHandler::MemWrite(EBus eBus, uint16_t uDevAddr, uint16_t uMemAddr, uint
       }
 
       updateFailureState(eBus, eStatus);
+      mutexRelease(eBus);
+    }
+  }
+
+  return bStatus;
+}
+
+bool CI2CHandler::InitializeBus(EBus eBus)
+{
+  bool bStatus{false};
+  I2C_HandleTypeDef* opHandle{getI2CHandle(eBus)};
+
+  if (nullptr != opHandle)
+  {
+    if (mutexAcquire(eBus))
+    {
+      if (HAL_OK == HAL_I2C_Init(opHandle))
+      {
+        updateFailureState(eBus, HAL_OK); // Reset failure state on successful initialization.
+        bStatus = true;
+      }
+
+      mutexRelease(eBus);
+    }
+  }
+
+  return bStatus;
+}
+
+bool CI2CHandler::DeinitializeBus(EBus eBus)
+{
+  bool bStatus{false};
+  I2C_HandleTypeDef* opHandle{getI2CHandle(eBus)};
+
+  if (nullptr != opHandle)
+  {
+    if (mutexAcquire(eBus))
+    {
+      if (HAL_OK == HAL_I2C_DeInit(opHandle))
+      {
+        updateFailureState(eBus, HAL_OK); // Reset failure state on successful deinitialization.
+        bStatus = true;
+      }
+
       mutexRelease(eBus);
     }
   }

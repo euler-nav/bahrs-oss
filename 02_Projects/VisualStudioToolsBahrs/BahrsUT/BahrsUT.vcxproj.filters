@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="DataSerializerUT.cpp" />
+    <ClCompile Include="..\..\Stm32Bahrs\shared\lib\swc-ports\CSoftwareComponentPort.cpp">
+      <Filter>Modules under test</Filter>
+    </ClCompile>
+    <ClCompile Include="CSoftwareComponentTest.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Modules under test">
+      <UniqueIdentifier>{98a633aa-e584-4752-a50b-ec64408f2707}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Embedded code replacements">
+      <UniqueIdentifier>{5715e3d6-1916-4fce-9c13-f9eb885f9b53}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\shared\AmsAssert.h">
+      <Filter>Embedded code replacements</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

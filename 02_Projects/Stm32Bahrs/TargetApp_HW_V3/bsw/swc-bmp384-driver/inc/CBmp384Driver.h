@@ -1,9 +1,6 @@
-/**
- * @file CBmp384Driver.h
- * @brief Declaration of the BMP384 Driver software component
- * @author Evgeniy Zamyatin
- * @date 26 April 2022
- */
+/// @file CBmp384Driver.h
+/// @brief Declaration of the BMP384 Driver software component
+/// @copyright Copyright 2025. AMS Advanced Air Mobility Sensors UG. All rights reserved.
 
 #ifndef C_BMP_384_DRIVER_H
 #define C_BMP_384_DRIVER_H
@@ -66,10 +63,8 @@
 #define BMP384_DRDY_PRESS                 ((uint8_t)0x20)
 #define BMP384_DRDY_CMD                   ((uint8_t)0x10)
 
-/**
- * @brief The class implements the BMP384 Driver.
- * The driver adjusts the sensor BMP384
- */
+/// @brief The class implements the BMP384 Driver.
+/// The driver adjusts the sensor BMP384
 class CBmp384Driver : public CSoftwareComponent<CBmp384Driver, 1U>
 {
   friend class CSoftwareComponent<CBmp384Driver, 1U>;
@@ -84,28 +79,27 @@ public:
   /// @brief A function overload that generates a timestamp without a data-ready interrupt.
   void PollSensor();
 
+  /// @brief Invalidate the data in the output port.
+  void InvalidatePortData();
+
 private:
   CBmp384Driver() = default;
   ~CBmp384Driver() = default;
 
-  /**
-  * @brief An enum of bit fields with redundant
-  * sampling in the control and measurement register
-  */
+  /// @brief An enum of bit fields with redundant
+  /// sampling in the control and measurement register
   enum class EOversampling
   {
     eSkip      = 0x00,  ///< Oversampling x1
     eX2        = 0x01,  ///< Oversampling x2
-    eX4        = 0x02,  ///< Oversampling x3
+    eX4        = 0x02,  ///< Oversampling x4
     eX8        = 0x03,  ///< Oversampling x8
     eX16       = 0x04,  ///< Oversampling x16
     eX32       = 0x05   ///< Oversampling x32
   };
 
-  /**
-  * @brief An enum of the bit fields
-  * of the infinite Impulse response (IIR) filter in the configuration register
-  */
+  /// @brief An enum of the bit fields
+  /// of the infinite Impulse response (IIR) filter in the configuration register
   enum class EIirFilter
   {
     eOff       = 0x00,  ///< Coefficient 0
@@ -118,9 +112,7 @@ private:
     e127       = 0x07   ///< Coefficient 127
   };
 
-  /**
-   * @brief An enum of the waiting time bit fields in the output data rate register (ODR)
-   */
+  /// @brief An enum of the waiting time bit fields in the output data rate register (ODR)
   enum class ETimeStandby
   {
     e5MS       = 0x00,  ///< 5 millisecond - 200 Hz
@@ -143,10 +135,8 @@ private:
     e655360MS  = 0x11   ///< 655360 millisecond - 0.0015 Hz
   };
 
-  /**
-   * @brief An enum of operated power modes
-   *
-   */
+  /// @brief An enum of operated power modes
+  ///
   enum class EMode
   {
     eSleep,  ///< Sleep mode
@@ -154,9 +144,7 @@ private:
     eNormal  ///< Normal mode
   };
 
-  /**
-   * @brief Integer pressure compensation parameters read from the NVM of BMP384
-   */
+  /// @brief Integer pressure compensation parameters read from the NVM of BMP384
 #pragma pack(push,1)
   struct SParams
   {
@@ -177,9 +165,7 @@ private:
   };
 #pragma pack(pop)
 
-  /**
-   * @brief Structure of BMP384 compensation trim parameters
-   */
+  /// @brief Structure of BMP384 compensation trim parameters
   struct SFloatParams
   {
     float  fT1_;  ///< Calibration coefficient T1
@@ -198,123 +184,87 @@ private:
     float  fP11_;  ///< Calibration coefficient P11
   };
 
-  /**
-   * @brief Get the Chip ID value
-   * @param urChipId Reference to the chip ID to be filled
-   * @return True -- success, false -- failure.
-   */
+  /// @brief Get the Chip ID value
+  /// @param urChipId Reference to the chip ID to be filled
+  /// @return True -- success, false -- failure.
   bool getChipID(uint8_t& urChipId);
 
-  /**
-   * @brief Get the Trim Parameters structure
-   * @return True -- success, false -- failure.
-   */
+  /// @brief Get the Trim Parameters structure
+  /// @return True -- success, false -- failure.
   bool getTrimParam();
 
-  /**
-   * @brief Get the Temperature And Pressure values
-   * @param frTemperature reference to the temperature variable
-   * @param frPressure reference to the pressure variable
-   * @return True -- success, false -- failure.
-   */
+  /// @brief Get the Temperature And Pressure values
+  /// @param frTemperature reference to the temperature variable
+  /// @param frPressure reference to the pressure variable
+  /// @return True -- success, false -- failure.
   bool getTemperatureAndPressure(float& frTemperature, float& frPressure);
 
-  /**
-   * @brief Request soft reset
-   * @return True -- success, false -- failure.
-   */
+  /// @brief Request soft reset
+  /// @return True -- success, false -- failure.
   bool setSoftReset();
 
-  /**
-   * @brief Configure interrupts
-   * @return True -- success, false -- failure.
-   */
+  /// @brief Configure interrupts
+  /// @return True -- success, false -- failure.
   bool enableInterrupt();
 
-  /**
-   * @brief Set the Power Mode
-   * @param eMode power mode
-   * @return True -- success, false -- failure.
-   */
+  /// @brief Set the Power Mode
+  /// @param eMode power mode
+  /// @return True -- success, false -- failure.
   bool setPowerMode(EMode eMode);
 
-  /**
-   * @brief Set the Filter value
-   * @param eFilterType Filter value
-   */
+  /// @brief Set the Filter value
+  /// @param eFilterType Filter value
   bool setFilter(EIirFilter eFilterType);
 
-  /**
-   * @brief Set the Time Standby
-   * @param eTimeStandby  Time Standby
-   */
+  /// @brief Set the Time Standby
+  /// @param eTimeStandby  Time Standby
   bool setTimeStandby(ETimeStandby eTimeStandby);
 
-  /**
-   * @brief Set the Pressure Oversampling value
-   * @param ePresOversampling  Pressure Oversampling value
-   */
+  /// @brief Set the Pressure Oversampling value
+  /// @param ePresOversampling  Pressure Oversampling value
   bool setPresOversampling(EOversampling ePresOversampling);
 
-  /**
-   * @brief Set the Temperature oversampling value
-   * @param eTempOversampling Temperature oversampling value
-   */
+  /// @brief Set the Temperature oversampling value
+  /// @param eTempOversampling Temperature oversampling value
   bool setTempOversampling(EOversampling eTempOversampling);
 
-  /**
-   * @brief Set the Oversampling Register value
-   * @param ePresOversampling Pressure over sampling value
-   * @param eTempOversamping Temperature over sampling value
-   */
+  /// @brief Set the Oversampling Register value
+  /// @param ePresOversampling Pressure over sampling value
+  /// @param eTempOversamping Temperature over sampling value
   bool setOversamplingRegister(EOversampling ePresOversampling, EOversampling eTempOversamping);
 
-  /**
-   * @brief Is the data ready to be read
-   * @return True -- ready, false -- not ready.
-   */
+  /// @brief Is the data ready to be read
+  /// @return True -- ready, false -- not ready.
   bool isReadyRead();
 
-  /**
-   * @brief Read from address via SPI
-   * @param upBuffer Buffer for record
-   * @param uReadAddr Register address
-   * @param uNumByteToRead Number of bytes to read
-   * @return True -- success, false -- failure.
-   */
+  /// @brief Read from address via SPI
+  /// @param upBuffer Buffer for record
+  /// @param uReadAddr Register address
+  /// @param uNumByteToRead Number of bytes to read
+  /// @return True -- success, false -- failure.
   bool readFromAddress(uint8_t *upBuffer, uint8_t uReadAddr, uint16_t uNumByteToRead);
 
-  /**
-   * @brief Write to address via SPI
-   * @param uWriteAddr Register address
-   * @param uVal The resulting value
-   * @return True -- success, false -- failure.
-   */
+  /// @brief Write to address via SPI
+  /// @param uWriteAddr Register address
+  /// @param uVal The resulting value
+  /// @return True -- success, false -- failure.
   bool writeToAddress(uint8_t uWriteAddr, uint8_t uVal);
 
-  /**
-   * @brief Compensate temperature value
-   * @param fUncompensatedTemperature Temperature value
-   * @return Compensated temperature
-   */
+  /// @brief Compensate temperature value
+  /// @param fUncompensatedTemperature Temperature value
+  /// @return Compensated temperature
   float compensateTemperature(float fUncompensatedTemperature);
 
-  /**
-   * @brief Compensate pressure value
-   * @param fUncompensatedPressure Pressure value
-   * @param fCompensatedTemperature Temperature value (after compensation)
-   * @return Compensated pressure
-   */
+  /// @brief Compensate pressure value
+  /// @param fUncompensatedPressure Pressure value
+  /// @param fCompensatedTemperature Temperature value (after compensation)
+  /// @return Compensated pressure
   float compensatePressure(float fUncompensatedPressure, float fCompensatedTemperature);
 
-  /**
-   * @brief Set the chip select pin is On
-   */
+  /// @brief Set the chip select pin is On
   void setCsOn();
 
-  /**
-   * @brief Set the chip select pin is Off
-   */
+  /// @brief Set the chip select pin is Off
   void setCsOff();
 
   SFloatParams oFloatParams_;  ///< Float point compensation trim parameters
@@ -322,4 +272,4 @@ private:
   bool bIsInitialized_{ false };  ///< Sensor status after initialization
 };
 
-#endif /* C_BMP_384_DRIVER_H */
+#endif // C_BMP_384_DRIVER_H

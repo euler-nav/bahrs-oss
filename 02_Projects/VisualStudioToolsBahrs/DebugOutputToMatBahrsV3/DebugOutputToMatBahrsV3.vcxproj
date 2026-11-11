@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{43A35518-C636-4905-99E9-0E1C37E06DC3}</ProjectGuid>
+    <RootNamespace>SerialProtocolToMat</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>DebugOutputToMatBahrsV3</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ExternalIncludePath>..\..\Stm32Bahrs\shared\lib\bahrs-sensor-fusion\Headers\BahrsSensorFusion\;..\..\Stm32Bahrs\shared\lib\common;..\..\..\99_3rd_party\TinyMAT\inc;..\..\Stm32Bahrs\TargetApp_HW_V3\bahrs-v3-rte\Inc;..\..\Stm32Bahrs\TargetApp_HW_V3\libs\serial-protocol\inc;..\..\..\99_3rd_party\eigen-3.4.0;..\..\Stm32Bahrs\shared\lib\stm32-lib-common;$(ExternalIncludePath)</ExternalIncludePath>
+    <OutDir>$(SolutionDir)\WorkDir\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ExternalIncludePath>..\..\Stm32Bahrs\shared\lib\bahrs-sensor-fusion\Headers\BahrsSensorFusion\;..\..\Stm32Bahrs\shared\lib\common;..\..\..\99_3rd_party\TinyMAT\inc;..\..\Stm32Bahrs\TargetApp_HW_V3\bahrs-v3-rte\Inc;..\..\Stm32Bahrs\TargetApp_HW_V3\libs\serial-protocol\inc;..\..\..\99_3rd_party\eigen-3.4.0;..\..\Stm32Bahrs\shared\lib\stm32-lib-common;$(ExternalIncludePath)</ExternalIncludePath>
+    <OutDir>$(SolutionDir)\WorkDir\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);BAHRS_HW_V3</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <AdditionalIncludeDirectories>..\..\Stm32Bahrs\shared\asw\swc-magnetic-heading-monitor\inc;..\..\Stm32Bahrs\shared\asw\swc-vertical-channel-monitor\inc;..\..\Stm32Bahrs\shared\asw\swc-bahrs-filter\inc;..\..\Stm32Bahrs\shared\asw\swc-attitude-monitor\inc;..\..\Stm32Bahrs\shared\asw\swc-imu-monitor\inc;..\..\Stm32Bahrs\shared\asw\swc-barometer-monitor\inc;..\..\Stm32Bahrs\shared\asw\swc-output-transformer\inc;..\..\Stm32Bahrs\shared\asw\swc-imu-pre-filter\inc;..\..\Stm32Bahrs\shared\asw\swc-pressure-compensator\inc;..\..\Stm32Bahrs\shared\asw\swc-magnetometer-compensator\inc;..\..\Stm32Bahrs\shared\asw\swc-magnetic-heading-filter\inc;..\..\Stm32Bahrs\TargetApp_HW_V3\bahrs-v3-rte\rte_generated\Inc;..\..\Stm32Bahrs\shared\lib\serial-protocol\inc;..\..\Stm32Bahrs\shared\lib\swc-ports;$(SolutionDir)\shared</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>BahrsSensorFusionLibrary.lib;TinyMATShared_Debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\..\99_3rd_party\TinyMAT\bin\Debug;..\..\Stm32Bahrs\shared\lib\bahrs-sensor-fusion\Binaries\VS\Debug</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_CONSOLE;%(PreprocessorDefinitions);BAHRS_HW_V3</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <AdditionalIncludeDirectories>..\..\Stm32Bahrs\shared\asw\swc-magnetic-heading-monitor\inc;..\..\Stm32Bahrs\shared\asw\swc-vertical-channel-monitor\inc;..\..\Stm32Bahrs\shared\asw\swc-bahrs-filter\inc;..\..\Stm32Bahrs\shared\asw\swc-attitude-monitor\inc;..\..\Stm32Bahrs\shared\asw\swc-imu-monitor\inc;..\..\Stm32Bahrs\shared\asw\swc-barometer-monitor\inc;..\..\Stm32Bahrs\shared\asw\swc-output-transformer\inc;..\..\Stm32Bahrs\shared\asw\swc-imu-pre-filter\inc;..\..\Stm32Bahrs\shared\asw\swc-pressure-compensator\inc;..\..\Stm32Bahrs\shared\asw\swc-magnetometer-compensator\inc;..\..\Stm32Bahrs\shared\asw\swc-magnetic-heading-filter\inc;..\..\Stm32Bahrs\TargetApp_HW_V3\bahrs-v3-rte\rte_generated\Inc;..\..\Stm32Bahrs\shared\lib\serial-protocol\inc;..\..\Stm32Bahrs\shared\lib\swc-ports;$(SolutionDir)\shared</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>BahrsSensorFusionLibrary.lib;TinyMATShared_Release.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\..\99_3rd_party\TinyMAT\bin\Release;..\..\Stm32Bahrs\shared\lib\bahrs-sensor-fusion\Binaries\VS\Release</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\shared\Crc32.cpp" />
+    <ClCompile Include="DebugOutputToMat.cpp" />
+    <ClCompile Include="WriteUserDefinedDataPorts.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\shared\Crc32.h" />
+    <ClInclude Include="WriteUserDefinedDataPorts.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

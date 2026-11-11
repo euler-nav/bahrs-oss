@@ -1,16 +1,13 @@
-/**
- * @file Scha63TDriverTypes.h
- * @brief Type declarations for the SCHA63T driver.
- * @author Fedor Baklanov
- * @date 01 June 2022
- */
+/// @file Scha63TDriverTypes.h
+/// @brief Type declarations for the SCHA63T driver.
+/// @copyright Copyright 2025. AMS Advanced Air Mobility Sensors UG. All rights reserved.
 
 #ifndef SCHA63T_DRIVER_TYPES_H
 #define SCHA63T_DRIVER_TYPES_H
 
 #ifndef __cplusplus
 #error This file must not be included in C code.
-#endif /* __cplusplus */
+#endif // __cplusplus
 
 #include <stdint.h>
 #include <array>
@@ -57,4 +54,4 @@ struct SScha63TStatusDue
 };
 
 
-#endif /* SCHA63T_DRIVER_TYPES_H */
+#endif // SCHA63T_DRIVER_TYPES_H

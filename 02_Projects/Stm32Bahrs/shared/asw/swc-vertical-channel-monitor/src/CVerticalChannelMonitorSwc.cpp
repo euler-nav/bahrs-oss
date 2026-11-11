@@ -1,13 +1,10 @@
-/**
- * @file CVerticalChannelMonitorSwc.cpp
- * @brief Implementation of the vertical channel data (height and velocity downwards) monitor software component
- * @author Fedor Baklanov
- * @date 26 July 2024
- * @copyright Copyright 2024. AMS Advanced Air Mobility Sensors UG. All rights reserved.
- */
+/// @file CVerticalChannelMonitorSwc.cpp
+/// @brief Implementation of the vertical channel data (height and velocity downwards) monitor software component
+/// @copyright Copyright 2024. AMS Advanced Air Mobility Sensors UG. All rights reserved.
 
 #include "CVerticalChannelMonitorSwc.h"
 #include "UintToBool.h"
+#include "CRte.h"
 
 void CVerticalChannelMonitorSwc::Init()
 {

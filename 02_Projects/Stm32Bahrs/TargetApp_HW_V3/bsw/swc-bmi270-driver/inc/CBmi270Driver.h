@@ -1,8 +1,6 @@
-/**
- * @file CBmi270Driver.h
- * @brief Declaration of the BMI270 driver software component class.
- * @copyright Copyright 2025. AMS Advanced Air Mobility Sensors UG. All rights reserved.
- */
+/// @file CBmi270Driver.h
+/// @brief Declaration of the BMI270 driver software component class.
+/// @copyright Copyright 2025. AMS Advanced Air Mobility Sensors UG. All rights reserved.
 
 #ifndef C_BMI270_DRIVER_H
 #define C_BMI270_DRIVER_H
@@ -18,6 +16,8 @@ class CBmi270Driver : public CSoftwareComponent<CBmi270Driver, 1U>
 
 public:
   void PollSensor(uint64_t uTimestamp);
+
+  void InvalidatePortData();
 
 private:
   CBmi270Driver() = default;
@@ -121,4 +121,4 @@ private:
   bool bIsInitialized_{ false };  ///< Sensor status after initialization
 };
 
-#endif /* C_BMI270_DRIVER_H */
+#endif // C_BMI270_DRIVER_H

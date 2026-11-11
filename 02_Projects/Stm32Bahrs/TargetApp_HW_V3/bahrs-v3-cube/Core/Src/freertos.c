@@ -79,18 +79,6 @@ const osThreadAttr_t TaskBmi270_attributes = {
   .stack_size = sizeof(TaskBmi270Buffer),
   .priority = (osPriority_t) osPriorityHigh,
 };
-/* Definitions for TaskRs232Sender */
-osThreadId_t TaskRs232SenderHandle;
-uint32_t TaskRs232SenderBuffer[ 256 ];
-osStaticThreadDef_t TaskRs232SenderControlBlock;
-const osThreadAttr_t TaskRs232Sender_attributes = {
-  .name = "TaskRs232Sender",
-  .cb_mem = &TaskRs232SenderControlBlock,
-  .cb_size = sizeof(TaskRs232SenderControlBlock),
-  .stack_mem = &TaskRs232SenderBuffer[0],
-  .stack_size = sizeof(TaskRs232SenderBuffer),
-  .priority = (osPriority_t) osPriorityAboveNormal,
-};
 /* Definitions for TaskAsm330 */
 osThreadId_t TaskAsm330Handle;
 uint32_t TaskAsm330Buffer[ 256 ];
@@ -283,17 +271,6 @@ const osThreadAttr_t TaskProcessSyncPulse_attributes = {
   .stack_size = sizeof(TaskProcessSyncPulseBuffer),
   .priority = (osPriority_t) osPriorityHigh1,
 };
-/* Definitions for QueueTaskRs232Sender */
-osMessageQueueId_t QueueTaskRs232SenderHandle;
-uint8_t QueueTaskRs232SenderBuffer[ 8 * sizeof( uint8_t ) ];
-osStaticMessageQDef_t QueueTaskRs232SenderControlBlock;
-const osMessageQueueAttr_t QueueTaskRs232Sender_attributes = {
-  .name = "QueueTaskRs232Sender",
-  .cb_mem = &QueueTaskRs232SenderControlBlock,
-  .cb_size = sizeof(QueueTaskRs232SenderControlBlock),
-  .mq_mem = &QueueTaskRs232SenderBuffer,
-  .mq_size = sizeof(QueueTaskRs232SenderBuffer)
-};
 /* Definitions for QueueTaskAsm330TimeStamp */
 osMessageQueueId_t QueueTaskAsm330TimeStampHandle;
 uint8_t QueueTaskAsm330TimeStampBuffer[ 1 * sizeof( uint64_t ) ];
@@ -457,6 +434,30 @@ const osSemaphoreAttr_t SemTaskBahrsFilter3_attributes = {
   .cb_mem = &SemTaskBahrsFilter3ControlBlock,
   .cb_size = sizeof(SemTaskBahrsFilter3ControlBlock),
 };
+/* Definitions for SemI2c2RxComplete */
+osSemaphoreId_t SemI2c2RxCompleteHandle;
+osStaticSemaphoreDef_t SemI2c2RxCompleteControlBlock;
+const osSemaphoreAttr_t SemI2c2RxComplete_attributes = {
+  .name = "SemI2c2RxComplete",
+  .cb_mem = &SemI2c2RxCompleteControlBlock,
+  .cb_size = sizeof(SemI2c2RxCompleteControlBlock),
+};
+/* Definitions for SemI2c3RxComplete */
+osSemaphoreId_t SemI2c3RxCompleteHandle;
+osStaticSemaphoreDef_t SemI2c3RxCompleteControlBlock;
+const osSemaphoreAttr_t SemI2c3RxComplete_attributes = {
+  .name = "SemI2c3RxComplete",
+  .cb_mem = &SemI2c3RxCompleteControlBlock,
+  .cb_size = sizeof(SemI2c3RxCompleteControlBlock),
+};
+/* Definitions for SemI2c1RxComplete */
+osSemaphoreId_t SemI2c1RxCompleteHandle;
+osStaticSemaphoreDef_t SemI2c1RxCompleteControlBlock;
+const osSemaphoreAttr_t SemI2c1RxComplete_attributes = {
+  .name = "SemI2c1RxComplete",
+  .cb_mem = &SemI2c1RxCompleteControlBlock,
+  .cb_size = sizeof(SemI2c1RxCompleteControlBlock),
+};
 /* Definitions for EventBahrsFiltersCompleted */
 osEventFlagsId_t EventBahrsFiltersCompletedHandle;
 osStaticEventGroupDef_t EventBahrsFiltersCompletedControlBlock;
@@ -473,7 +474,6 @@ const osEventFlagsAttr_t EventBahrsFiltersCompleted_attributes = {
 
 void RunTaskInit(void *argument);
 extern void RunTaskBmi270(void *argument);
-extern void RunTaskRs232Sender(void *argument);
 extern void RunTaskAsm330(void *argument);
 extern void RunTaskBmp384(void *argument);
 extern void RunTaskLps22(void *argument);
@@ -586,6 +586,15 @@ void MX_FREERTOS_Init(void) {
   /* creation of SemTaskBahrsFilter3 */
   SemTaskBahrsFilter3Handle = osSemaphoreNew(1, 0, &SemTaskBahrsFilter3_attributes);
 
+  /* creation of SemI2c2RxComplete */
+  SemI2c2RxCompleteHandle = osSemaphoreNew(1, 0, &SemI2c2RxComplete_attributes);
+
+  /* creation of SemI2c3RxComplete */
+  SemI2c3RxCompleteHandle = osSemaphoreNew(1, 0, &SemI2c3RxComplete_attributes);
+
+  /* creation of SemI2c1RxComplete */
+  SemI2c1RxCompleteHandle = osSemaphoreNew(1, 0, &SemI2c1RxComplete_attributes);
+
   /* USER CODE BEGIN RTOS_SEMAPHORES */
   /* add semaphores, ... */
   /* USER CODE END RTOS_SEMAPHORES */
@@ -595,14 +604,9 @@ void MX_FREERTOS_Init(void) {
   TimerCyclicTaskTriggerHandle = osTimerNew(TimerCyclicTaskTriggerCallback, osTimerPeriodic, NULL, &TimerCyclicTaskTrigger_attributes);
 
   /* USER CODE BEGIN RTOS_TIMERS */
-  osTimerStart(TimerCyclicTaskTriggerHandle, 1U);
-
   /* USER CODE END RTOS_TIMERS */
 
   /* Create the queue(s) */
-  /* creation of QueueTaskRs232Sender */
-  QueueTaskRs232SenderHandle = osMessageQueueNew (8, sizeof(uint8_t), &QueueTaskRs232Sender_attributes);
-
   /* creation of QueueTaskAsm330TimeStamp */
   QueueTaskAsm330TimeStampHandle = osMessageQueueNew (1, sizeof(uint64_t), &QueueTaskAsm330TimeStamp_attributes);
 
@@ -640,9 +644,6 @@ void MX_FREERTOS_Init(void) {
 
   /* creation of TaskBmi270 */
   TaskBmi270Handle = osThreadNew(RunTaskBmi270, NULL, &TaskBmi270_attributes);
-
-  /* creation of TaskRs232Sender */
-  TaskRs232SenderHandle = osThreadNew(RunTaskRs232Sender, NULL, &TaskRs232Sender_attributes);
 
   /* creation of TaskAsm330 */
   TaskAsm330Handle = osThreadNew(RunTaskAsm330, NULL, &TaskAsm330_attributes);
@@ -729,4 +730,3 @@ __weak void RunTaskInit(void *argument)
 /* USER CODE BEGIN Application */
 
 /* USER CODE END Application */
-

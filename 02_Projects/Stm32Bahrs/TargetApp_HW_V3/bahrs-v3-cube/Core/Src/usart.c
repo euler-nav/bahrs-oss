@@ -53,7 +53,15 @@ void MX_USART2_UART_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN USART2_Init 2 */
+#ifdef SEND_DEBUG_OUTPUT
+  // We use higher baud rate if debug output is enabled.
+  huart2.Init.BaudRate = 921600;
 
+  if (HAL_UART_Init(&huart2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+#endif /* SEND_DEBUG_OUTPUT */
   /* USER CODE END USART2_Init 2 */
 
 }

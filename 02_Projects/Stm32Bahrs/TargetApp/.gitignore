@@ -4,3 +4,7 @@
 /Debug
 /Release_WithDebugOutput
 /Debug_WithDebugOutput
+/Debug_DroneCAN
+/Release_DroneCAN
+*.launch
+/build

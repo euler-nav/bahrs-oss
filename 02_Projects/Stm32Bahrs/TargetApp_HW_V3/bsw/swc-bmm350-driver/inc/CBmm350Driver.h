@@ -1,5 +1,5 @@
 /// @file CBmm350Driver.h
-/// @brief Implementation of the BMM350 driver software component class.
+/// @brief Declaration of the BMM350 driver software component class.
 /// @copyright Copyright 2025. AMS Advanced Air Mobility Sensors UG. All rights reserved.
 
 #ifndef C_BMM350_DRIVER_H
@@ -16,6 +16,17 @@ class CBmm350Driver : public CSoftwareComponent<CBmm350Driver, 1U>
 
 public:
   void PollSensor(uint64_t uTimestampUs);
+
+  /// @brief Poll sensor data in DMA mode.
+  /// @return True if DMA reception was initiated successfully, false otherwise.
+  bool PollSensorDma();
+
+  /// @brief Process data bytes received asynchronously.
+  /// @param uTimestampUs Timestamp of the measurement in microseconds.
+  void ProcessReceivedBytesDma(uint64_t uTimestampUs);
+
+  /// @brief Invalidate the driver's output port
+  void InvalidatePortData();
 
 private:
   CBmm350Driver() = default;
@@ -56,6 +67,8 @@ private:
   };
 
   SCompensationParameters oCompensationParameters_{};
+
+  std::array<uint8_t, 15U> auBuffer{}; // stores 2 dummy bytes, INT_STATUS, and 12 MAG/TEMP bytes during DMA I2C read
 
   /// @brief Compensate raw magnetic measurement using temperature and compensation parameters.
   ///
@@ -209,13 +222,11 @@ private:
   static constexpr uint8_t skuBmm350RegIntCtrl_{ 0x2E };
   static constexpr uint8_t skuBmm350RegIntStatus_{ 0x30 };
   static constexpr uint8_t skuBmm350RegMagXXlsb_{ 0x31 };
-
   static constexpr uint8_t skuBmm350ChipId_{ 0x33 };
-
-  // OTP registers
   static constexpr uint8_t skuBmm350RegOtpCmd_{ 0x50 };
   static constexpr uint8_t skuBmm350RegOtpMsb_{ 0x52 };
   static constexpr uint8_t skuBmm350RegOtpStatus_{ 0x55 };
+  static constexpr uint8_t skuBmm350RegCmd_{ 0x7E };
 
   // Register OTP_CMD_REG (0x50)
   static constexpr uint8_t skuBmm350OtpCmdDirRead_{ 0x20 };
@@ -248,6 +259,9 @@ private:
   // Register INT_STATUS (0x30)
   static constexpr uint8_t skuBmm350DrDyDataReg_{ 0x01 << 2U };
 
+  // Register CMD (0x7E)
+  static constexpr uint8_t skuBmm350CmdSoftReset_{ 0xB6 }; ///< Soft reset command
+
   // I2C timeout
   static constexpr uint32_t skuBmm350I2cTimeout_{ 2U };
   static constexpr uint32_t skuBmm350DummyBytes_{ 2U };
@@ -262,6 +276,7 @@ private:
   bool configureOdrAndAveraging();
   bool enableXYZAxis();
   bool enableNormalMode();
+  bool softReset();
 
   bool readReg(uint8_t uRegAddr, uint8_t* upBuffer, uint16_t uLen);
   bool writeReg(uint8_t uRegAddr, const uint8_t* upBuffer, uint16_t uLen);
@@ -269,4 +284,4 @@ private:
   bool bIsInitialized_{ false };  ///< Sensor status after initialization
 };
 
-#endif /* C_BMM350_DRIVER_H */
+#endif // C_BMM350_DRIVER_H

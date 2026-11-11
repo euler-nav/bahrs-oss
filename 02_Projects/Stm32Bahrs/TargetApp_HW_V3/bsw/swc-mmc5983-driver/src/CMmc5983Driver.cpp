@@ -1,9 +1,6 @@
-/**
- * @file CMmc5983Driver.cpp
- * @brief Implementation of the MMC5983 Driver software component
- * @author Evgeniy Zamyatin
- * @date 31 May 2022
- */
+/// @file CMmc5983Driver.cpp
+/// @brief Implementation of the MMC5983 Driver software component
+/// @copyright Copyright 2025. AMS Advanced Air Mobility Sensors UG. All rights reserved.
 
 #include "CMmc5983Driver.h"
 #include "CRte.h"
@@ -82,6 +79,40 @@ void CMmc5983Driver::PollSensor()
   PollSensor(GetMicroseconds());
 }
 
+bool CMmc5983Driver::PollSensorDma()
+{
+  return CI2CHandler::GetInstance().MemReadDma(CI2CHandler::EBus::eI2c1,
+                                               MMC5983_I2C_ADDR,
+                                               static_cast<uint16_t>(MMC5983_REG_X_OUT0),
+                                               1U,
+                                               auDmaBuffer_.data(),
+                                               static_cast<uint16_t>(auDmaBuffer_.size()));
+}
+
+void CMmc5983Driver::ProcessReceivedBytesDma(uint64_t uTimestampUs)
+{
+  SMagneticMeasurement oOutput{};
+
+  if (true == IsInitialized())
+  {
+    // Clear the interrupt status. This is required.
+    const uint8_t kuClearStatus = auDmaBuffer_[8] | (MMC5983_MEAS_M_DONE | MMC5983_MEAS_T_DONE);
+    writeToAddress(MMC5983_REG_STATUS, kuClearStatus);
+
+    oOutput.uTimestampUs_ = uTimestampUs;
+    decodeMeasurementPayload(auDmaBuffer_, oOutput.fVectorX_, oOutput.fVectorY_, oOutput.fVectorZ_);
+    oOutput.uValid_ = BoolToUint(true);
+  }
+
+  CRte::GetInstance().oPortMagnetometerInput1_.Write(oOutput);
+}
+
+void CMmc5983Driver::InvalidatePortData()
+{
+  SMagneticMeasurement oOutput{};
+  CRte::GetInstance().oPortMagnetometerInput1_.Write(oOutput);
+}
+
 uint8_t CMmc5983Driver::getProductID()
 {
   uint8_t uCtrl = 0;
@@ -91,80 +122,81 @@ uint8_t CMmc5983Driver::getProductID()
 
 void CMmc5983Driver::getMeasurementXYZ(float& frValueX, float& frValueY, float& frValueZ)
 {
-  uint8_t uDataReg[7] = {0};
-  float fData18bit[3] = {0};
-  uint32_t uTemp = 0;
-  uint32_t uResult = 0;
-  readFromAddress(uDataReg, MMC5983_REG_X_OUT0, 7);
+  CI2CReadPayload oReadPayload{};
+  readFromAddress(oReadPayload.begin(), MMC5983_REG_X_OUT0, oReadPayload.size());
+  decodeMeasurementPayload(oReadPayload, frValueX, frValueY, frValueZ);
+}
 
-  /* Get 18bits data, raw data unit is "count or LSB" */
-  uTemp = static_cast<uint32_t>(uDataReg[MMC5983_REG_X_OUT0]);
-  uTemp = uTemp << MMC5983_XYZ_0_SHIFT;
-  uResult |= uTemp;
+void CMmc5983Driver::decodeMeasurementPayload(const CI2CReadPayload& korPayload,
+                                              float& frValueX,
+                                              float& frValueY,
+                                              float& frValueZ)
+{
+  float fData18bit[3]{};
+  uint32_t uTmp{0};
+  uint32_t uResult{0};
 
-  uTemp = static_cast<uint32_t>(uDataReg[MMC5983_REG_X_OUT1]);
-  uTemp = uTemp << MMC5983_XYZ_1_SHIFT;
-  uResult |= uTemp;
+  // Get 18bits data, raw data unit is "count or LSB"
+  uTmp = static_cast<uint32_t>(korPayload[0]);
+  uTmp = uTmp << MMC5983_XYZ_0_SHIFT;
+  uResult |= uTmp;
 
-  uTemp = static_cast<uint32_t>(uDataReg[MMC5983_REG_XYZ_OUT2]);
-  uTemp &= MMC5983_X2_MASK;
-  uTemp = uTemp >> 6;
-  uResult |= uTemp;
+  uTmp = static_cast<uint32_t>(korPayload[1]);
+  uTmp = uTmp << MMC5983_XYZ_1_SHIFT;
+  uResult |= uTmp;
+
+  uTmp = static_cast<uint32_t>(korPayload[6]);
+  uTmp &= MMC5983_X2_MASK;
+  uTmp = uTmp >> 6;
+  uResult |= uTmp;
 
   fData18bit[0] = static_cast<float>(uResult);
 
   uResult = 0;
-  uTemp = static_cast<uint32_t>(uDataReg[MMC5983_REG_Y_OUT0]);
-  uTemp = uTemp << MMC5983_XYZ_0_SHIFT;
-  uResult |= uTemp;
+  uTmp = static_cast<uint32_t>(korPayload[2]);
+  uTmp = uTmp << MMC5983_XYZ_0_SHIFT;
+  uResult |= uTmp;
 
-  uTemp = static_cast<uint32_t>(uDataReg[MMC5983_REG_Y_OUT1]);
-  uTemp = uTemp << MMC5983_XYZ_1_SHIFT;
-  uResult |= uTemp;
+  uTmp = static_cast<uint32_t>(korPayload[3]);
+  uTmp = uTmp << MMC5983_XYZ_1_SHIFT;
+  uResult |= uTmp;
 
-  uTemp = static_cast<uint32_t>(uDataReg[MMC5983_REG_XYZ_OUT2]);
-  uTemp &= MMC5983_Y2_MASK;
-  uTemp = uTemp >> 4;
-  uResult |= uTemp;
+  uTmp = static_cast<uint32_t>(korPayload[6]);
+  uTmp &= MMC5983_Y2_MASK;
+  uTmp = uTmp >> 4;
+  uResult |= uTmp;
 
   fData18bit[1] = static_cast<float>(uResult);
 
   uResult = 0;
-  uTemp = static_cast<uint32_t>(uDataReg[MMC5983_REG_Z_OUT0]);
-  uTemp = uTemp << MMC5983_XYZ_0_SHIFT;
-  uResult |= uTemp;
+  uTmp = static_cast<uint32_t>(korPayload[4]);
+  uTmp = uTmp << MMC5983_XYZ_0_SHIFT;
+  uResult |= uTmp;
 
-  uTemp = static_cast<uint32_t>(uDataReg[MMC5983_REG_Z_OUT1]);
-  uTemp = uTemp << MMC5983_XYZ_1_SHIFT;
-  uResult |= uTemp;
+  uTmp = static_cast<uint32_t>(korPayload[5]);
+  uTmp = uTmp << MMC5983_XYZ_1_SHIFT;
+  uResult |= uTmp;
 
-  uTemp = static_cast<uint32_t>(uDataReg[MMC5983_REG_XYZ_OUT2]);
-  uTemp &= MMC5983_Z2_MASK;
-  uTemp = uTemp >> 2;
-  uResult |= uTemp;
+  uTmp = static_cast<uint32_t>(korPayload[6]);
+  uTmp &= MMC5983_Z2_MASK;
+  uTmp = uTmp >> 2;
+  uResult |= uTmp;
 
   fData18bit[2] = static_cast<float>(uResult);
 
-  /* Magnetic field output, unit is Gauss */
-  float fTmpValueX = (fData18bit[0] - MMC5983_18BIT_OFFSET) / MMC5983_18BIT_SENSITIVITY;
-  float fTmpValueY = (fData18bit[1] - MMC5983_18BIT_OFFSET) / MMC5983_18BIT_SENSITIVITY;
-  float fTmpValueZ = (fData18bit[2] - MMC5983_18BIT_OFFSET) / MMC5983_18BIT_SENSITIVITY;
-
-  /* Sensor-frame to body-frame output conversion:
-   *
-   *        /  0 -1  0 \
-   * C_bs = |  1  0  0 |
-   *        \  0  0 -1 /
-  */
+  // Magnetic field output, unit is Gauss
+  const float kfTmpValueX = (fData18bit[0] - MMC5983_18BIT_OFFSET) / MMC5983_18BIT_SENSITIVITY;
+  const float kfTmpValueY = (fData18bit[1] - MMC5983_18BIT_OFFSET) / MMC5983_18BIT_SENSITIVITY;
+  const float kfTmpValueZ = (fData18bit[2] - MMC5983_18BIT_OFFSET) / MMC5983_18BIT_SENSITIVITY;
 
 #ifdef BAHRS_HW_V3
-  frValueX = fTmpValueX;
-  frValueY = fTmpValueY;
-  frValueZ = -fTmpValueZ;
+  frValueX = kfTmpValueX;
+  frValueY = kfTmpValueY;
+  frValueZ = -kfTmpValueZ;
 #else
-  frValueX = -fTmpValueY;
-  frValueY = fTmpValueX;
-  frValueZ = -fTmpValueZ;
+  frValueX = -kfTmpValueY;
+  frValueY = kfTmpValueX;
+  frValueZ = -kfTmpValueZ;
 #endif // BAHRS_HW_V3
 }
 
@@ -174,22 +206,22 @@ float CMmc5983Driver::getTemperature()
   uint8_t uRegT = 0U;
   float fTemperature = 0.0;
 
-  /* Write reg 0x1B, set TM_T bit '1', Take temperature measurement */
+  // Write reg 0x1B, set TM_T bit '1', Take temperature measurement
   writeToAddress(MMC5983_REG_CONTROL0, MMC5983_CMD_TMT);
   HAL_Delay(1);
 
-  /* Read Meas_T_done bit */
+  // Read Meas_T_done bit
   readFromAddress(&uRegStatus, MMC5983_REG_STATUS, 1);
   while((uRegStatus & MMC5983_MEAS_T_DONE) != MMC5983_MEAS_T_DONE)
   {
     readFromAddress(&uRegStatus, MMC5983_REG_STATUS, 1);
   }
 
-  /* Read reg 0x07 */
+  // Read reg 0x07
   readFromAddress(&uRegT, MMC5983_REG_T_OUT0, 1);
 
-  /* Temperature output, unit is degree Celsius */
-  /* The temperature output has not been calibrated, can not present the ambient temperature*/
+  // Temperature output, unit is degree Celsius
+  // The temperature output has not been calibrated, can not present the ambient temperature
   fTemperature = static_cast<float>(uRegT) * MMC5983_T_SENSITIVITY + MMC5983_T_ZERO;
   return fTemperature;
 }
